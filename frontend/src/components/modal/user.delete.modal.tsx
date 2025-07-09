@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEY } from "../../config/key";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import { deleteUserAPI } from "@/services/api";
 
 interface IUser {
   id: number;
@@ -12,15 +13,7 @@ const UserDeleteModal = (props: any) => {
   const { dataUser, isOpenDeleteModal, setIsOpenDeleteModal } = props;
 
   const mutation = useMutation({
-    mutationFn: async (payload: IUser) => {
-      const res = await fetch(`http://localhost:8000/users/${payload.id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      return res.json();
-    },
+    mutationFn: (payload: IUser) => deleteUserAPI(payload.id),
     onSuccess: () => {
       toast.success("Delete thành công");
       setIsOpenDeleteModal(false);
@@ -68,11 +61,10 @@ const UserDeleteModal = (props: any) => {
           <button
             onClick={handleSubmit}
             disabled={mutation.isPending}
-            className={`px-4 py-2 text-white rounded-md flex items-center gap-2 ${
-              mutation.isPending
+            className={`px-4 py-2 text-white rounded-md flex items-center gap-2 ${mutation.isPending
                 ? "bg-red-400 cursor-not-allowed"
                 : "bg-red-600 hover:bg-red-700"
-            }`}
+              }`}
           >
             {mutation.isPending && (
               <svg

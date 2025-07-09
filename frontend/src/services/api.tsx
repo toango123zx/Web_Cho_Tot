@@ -1,4 +1,5 @@
 import axios from "@/services/axios.customize";
+import type { AxiosResponse } from "axios";
 
 export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -34,4 +35,26 @@ export const getOnlineUsersAPI = () => {
 export const getMessagesAPI = (receiverId: string) => {
   const urlBackend = `/api/messages/${receiverId}`;
   return axios.get<IBackendRes<IMessage[]>>(urlBackend);
+};
+
+export const getUsersPaginateAPI = (page: number, limit: number) => {
+  return axios.get("/users", {
+    params: {
+      _page: page,
+      _limit: limit,
+    },
+  });
+};
+
+export const createUserAPI = (payload: IUser) => {
+  return axios.post("/api/users", payload);
+};
+
+export const deleteUserAPI = (id: number) => {
+  return axios.delete(`/api/users/${id}`);
+};
+
+
+export const updateUserAPI = ({ id, ...rest }: IUserUpdatePayload) => {
+  return axios.put(`/api/users/${id}`, rest);
 };

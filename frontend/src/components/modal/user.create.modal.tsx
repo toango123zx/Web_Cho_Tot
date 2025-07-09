@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEY } from "../../config/key";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import { createUserAPI } from "@/services/api";
 
 interface IUser {
   name: string;
@@ -15,25 +16,17 @@ const UserCreateModal = ({ isOpenCreateModal, setIsOpenCreateModal }: any) => {
   const [email, setEmail] = useState<string>("");
   const [name, setName] = useState<string>("");
 
-  const mutation = useMutation({
-    mutationFn: async (payload: IUser) => {
-      const res = await fetch("http://localhost:8000/users", {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      return res.json();
-    },
-    onSuccess: () => {
-      toast.success("Thành công");
-      setIsOpenCreateModal(false);
-      setEmail("");
-      setName("");
-      queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAllUser() });
-    },
-  });
+ const mutation = useMutation({
+  mutationFn: (payload: IUser) => createUserAPI(payload),
+  onSuccess: () => {
+    toast.success("Thành công");
+    setIsOpenCreateModal(false);
+    setEmail("");
+    setName("");
+    queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAllUser() });
+  },
+});
+
 
   const handleSubmit = () => {
     if (!email) return alert("Email is empty");
@@ -98,11 +91,10 @@ const UserCreateModal = ({ isOpenCreateModal, setIsOpenCreateModal }: any) => {
           <button
             onClick={handleSubmit}
             disabled={mutation.isPending}
-            className={`px-4 py-2 text-white rounded-md flex items-center gap-2 ${
-              mutation.isPending
+            className={`px-4 py-2 text-white rounded-md flex items-center gap-2 ${mutation.isPending
                 ? "bg-blue-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
-            }`}
+              }`}
           >
             {mutation.isPending && (
               <svg
