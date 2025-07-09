@@ -35,9 +35,15 @@ declare global {
     interface IUser {
         email: string;
         name: string;
-        _id: string;
+        _id?: string;
     }
 
+
+    interface IUserUpdatePayload {
+        id: number;
+        name: string;
+        email: string;
+    }
     interface IFetchAccount {
         user: IUser;
     }
@@ -51,18 +57,17 @@ declare global {
     }
 
     export interface IMessage {
-        _id: string;             
-        senderId: string;       
-        receiverId: string;    
-        message: string;        
+        _id: string;
+        senderId: string;
+        receiverId: string;
+        message: string;
         createdAt: string;
-        updatedAt: string; 
+        updatedAt: string;
     }
 
-    export interface IOnlineUser
-     {
-        online: string[] 
-     }
+    export interface IOnlineUser {
+        online: string[]
+    }
 
 
 }

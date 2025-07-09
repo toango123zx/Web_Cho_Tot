@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEY } from "../../config/key";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import { updateUserAPI } from "@/services/api";
 
 interface IUser {
   id: number;
@@ -27,19 +28,7 @@ const UserEditModal = (props: any) => {
   }, [dataUser]);
 
   const mutation = useMutation({
-    mutationFn: async (payload: IUser) => {
-      const res = await fetch(`http://localhost:8000/users/${payload.id}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          email: payload.email,
-          name: payload.name,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      return res.json();
-    },
+    mutationFn: (payload: IUser) => updateUserAPI(payload),
     onSuccess: () => {
       toast.success("Update thành công");
       setIsOpenUpdateModal(false);
@@ -48,7 +37,6 @@ const UserEditModal = (props: any) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAllUser() });
     },
   });
-
   const handleSubmit = () => {
     if (!email) return alert("Email is empty");
     if (!name) return alert("Name is empty");
@@ -108,11 +96,10 @@ const UserEditModal = (props: any) => {
           <button
             onClick={handleSubmit}
             disabled={mutation.isPending}
-            className={`px-4 py-2 text-white rounded-md flex items-center gap-2 ${
-              mutation.isPending
+            className={`px-4 py-2 text-white rounded-md flex items-center gap-2 ${mutation.isPending
                 ? "bg-blue-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
-            }`}
+              }`}
           >
             {mutation.isPending && (
               <svg
