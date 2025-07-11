@@ -1,12 +1,11 @@
-import React from 'react'
+import { Header } from '@/components/commons'
 
 const HomePage = () => {
-  return (
-    <div>
-      Home Page
-    </div>
-  )
+	return (
+		<div>
+			<Header />
+		</div>
+	)
 }
 
 export default HomePage
-
