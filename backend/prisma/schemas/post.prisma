@@ -1,0 +1,100 @@
+enum AgePostEnum {
+    PUPPY     @map("chó con")
+    YOUNG_DOG @map("chó nhỏ")
+    ADULT_DOG @map("chó trưởng thành")
+    OTHER     @map("khác")
+
+    @@map("Age_Post_Enum")
+}
+
+enum SizePostEnum {
+    MINI   @map("mini")
+    SMALL  @map("nhỏ")
+    MEDIUM @map("vừa")
+    LARGE  @map("lớn")
+
+    @@map("Size_Post_Enum")
+}
+
+enum PostStatusEnum {
+    PENDING   @map("đang chờ xét duyệt")
+    PUBLISHED @map("đã đăng tin")
+    EXPIRED   @map("quá hạn")
+    DELETED   @map("đã xóa")
+
+    @@map("Post_Status_Enum")
+}
+
+model category {
+    id        String    @id @default(uuid())
+    name      String
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    createdAt DateTime  @default(now()) @map("created_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+    posts     posts[]
+
+    @@map("Category")
+}
+
+model posts {
+    id          String         @id @default(uuid())
+    /// @DtoUpdateHidden
+    userId      String         @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    user        users          @relation(fields: [userId], references: [id])
+    title       String
+    /// @DtoUpdateHidden
+    categoryId  String         @map("category_id")
+    /// @DtoRelationCanConnectOnCreate
+    category    category       @relation(fields: [categoryId], references: [id])
+    description String
+    age         AgePostEnum
+    size        SizePostEnum
+    /// @minimum 0
+    price       Int
+    address     String
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    createdAt   DateTime       @default(now()) @map("created_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updatedAt   DateTime       @updatedAt @map("updated_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt   DateTime?      @map("deleted_at")
+    status      PostStatusEnum
+
+    postImages   postImages[]
+    postArchives postArchives[]
+
+    @@map("Posts")
+}
+
+model postImages {
+    id     String @id @default(uuid())
+    /// @DtoUpdateHidden
+    postId String @map("post_id")
+    /// @DtoRelationCanConnectOnCreate
+    post   posts  @relation(fields: [postId], references: [id])
+    url    String @map("url")
+
+    @@map("Post_Images")
+}
+
+model postArchives {
+    id     String @id @default(uuid())
+    /// @DtoUpdateHidden
+    userId String @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    user   users  @relation(fields: [userId], references: [id])
+    /// @DtoUpdateHidden
+    postId String @map("post_id")
+    /// @DtoRelationCanConnectOnCreate
+    post   posts  @relation(fields: [postId], references: [id])
+
+    @@map("Post_Archives")
+}

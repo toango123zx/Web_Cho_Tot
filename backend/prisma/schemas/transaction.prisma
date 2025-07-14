@@ -1,0 +1,32 @@
+enum TransactionTargetEnum {
+    deposit @map("nạp tiền")
+    usage   @map("Sử dụng")
+
+    @@map("Transaction_Target_Enum")
+}
+
+enum TransactionStatusEnum {
+    pending   @map("Chưa thanh toán")
+    completed @map("đã thanh toán")
+    cancelled @map("Hủy")
+
+    @@map("Transaction_Status_Enum")
+}
+
+model transaction {
+    id          String                @id @default(uuid())
+    /// @DtoUpdateHidden
+    userId      String                @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    user        users                 @relation(fields: [userId], references: [id])
+    /// @DtoUpdateHidden
+    amount      Int                   @map("amount")
+    description String
+    target      TransactionTargetEnum
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    createdAt   DateTime              @default(now()) @map("created_at")
+    status      TransactionStatusEnum
+
+    @@map("Transaction")
+}
