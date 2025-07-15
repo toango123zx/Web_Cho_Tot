@@ -1,9 +1,8 @@
-import { Header } from '@/components/commons'
 
 const HomePage = () => {
 	return (
 		<div>
-			<Header />
+			Home Page
 		</div>
 	)
 }
