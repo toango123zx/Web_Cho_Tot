@@ -24,15 +24,18 @@ export default function LoginForm() {
             <div className="text-left">
               <img src="/image/logo.png" alt="Chợ Tốt" className="h-8 mb-2" />
             </div>
-            <div className="bg-yellow-100 border border-yellow-300 text-sm rounded p-3">
-              Chưa có tài khoản? Tạo tài khoản để nhận <b>20,000 VNĐ</b> <br />
-              <Button
-                variant="link"
-                className="text-blue-600 p-0 h-auto font-medium"
-                onClick={() => navigate("/register")}
-              >
-                Tạo tài khoản
-              </Button>
+            <div className="bg-yellow-100 border border-yellow-300 text-sm rounded p-3 flex items-start gap-2">
+              <span className="text-xl mt-1">🎁</span>
+              <div>
+                Chưa có tài khoản? Tạo tài khoản để nhận <b>20,000 VNĐ</b> (quy đổi 20,000 Đồng Tốt). <br />
+                <Button
+                  variant="link"
+                  className="text-blue-600 p-0 h-auto font-medium"
+                  onClick={() => navigate("/register")}
+                >
+                  Tạo tài khoản
+                </Button>
+              </div>
             </div>
           </div>
 
