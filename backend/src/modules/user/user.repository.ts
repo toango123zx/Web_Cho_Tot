@@ -23,4 +23,12 @@ export class UserRepository {
 			},
 		});
 	}
+
+	async findUserByUserId({ userId }: { userId: string }): Promise<UsersEntity | null> {
+		return this.prismaService.users.findFirst({
+			where: {
+				id: userId,
+			},
+		});
+	}
 }

@@ -50,7 +50,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 			userId: account.userId,
 		};
 
-		const accesToken = this.jwtService.sign(payloadAccessToken, {
+		const accessToken = this.jwtService.sign(payloadAccessToken, {
 			expiresIn: jwtConfig.expiresInAccessKey,
 			secret: jwtConfig.secretAccessKey,
 		});
@@ -73,8 +73,8 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
 		return {
 			success: true,
-			data: { accessToken: accesToken },
-			cookie: { accessToken: accesToken, refreshToken: refreshToken },
+			data: { accessToken: accessToken },
+			cookie: { accessToken: accessToken, refreshToken: refreshToken },
 		};
 	}
 }
