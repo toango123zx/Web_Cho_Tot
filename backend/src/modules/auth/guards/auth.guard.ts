@@ -13,7 +13,7 @@ import {
 import { jwtConfig } from 'src/configs';
 import { UserInformationDto } from 'src/modules/user/dtos';
 
-import { UserRepository } from 'src/modules/user/user.repository';
+import { UserRepository } from 'src/modules/users/users.repository';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -45,9 +45,7 @@ export class AuthGuard implements CanActivate {
 				secret: jwtConfig.secretAccessKey,
 			});
 			user = new UserInformationDto(
-				await this.userRepository.findUserByUserId({
-					userId: payload.userId,
-				}),
+				await this.userRepository.findUserByUserId(payload.userId),
 			);
 
 			const requiredRole: string = this.reflector.getAllAndOverride<RoleUserEnum>(
