@@ -11,6 +11,9 @@ export class UserRepository {
 	async findUsers(pagination: IPaginationQuery): Promise<[UsersEntity[], number]> {
 		const [users, totalRecords] = await Promise.all([
 			this.prismaService.users.findMany({
+				where: {
+					deletedAt: null,
+				},
 				skip: pagination.skip,
 				take: pagination.take,
 			}),
@@ -23,6 +26,18 @@ export class UserRepository {
 		return this.prismaService.users.findFirst({
 			where: {
 				id: userId,
+				deletedAt: null,
+			},
+		});
+	}
+
+	async deleteUserByUserId(userId: string): Promise<UsersEntity> {
+		return this.prismaService.users.update({
+			where: {
+				id: userId,
+			},
+			data: {
+				deletedAt: new Date(),
 			},
 		});
 	}

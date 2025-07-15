@@ -28,6 +28,9 @@ model users {
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
     createdAt   DateTime        @default(now()) @map("created_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt DateTime? @map("deleted_at")
 
     accounts              accounts?
     socialAccounts        socialAccounts?
