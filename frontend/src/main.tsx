@@ -12,6 +12,7 @@ import HomePage from './pages/home.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Layout from './layout.tsx'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import UpdateProfile from './pages/update.profile.tsx'
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: "/register",
         element: <RegisterPage />,
+      },
+      {
+        path: "/user/settings/profile",
+        element: <UpdateProfile />,
       },
     ]
   },
