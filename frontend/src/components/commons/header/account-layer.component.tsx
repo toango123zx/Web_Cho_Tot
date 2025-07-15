@@ -14,7 +14,18 @@ export function AccountLayer({ accountLayerRef }: AccountLayerProps) {
 					alt='User Avatar'
 					className='size-12'
 				/>
-				<p className='text-lg font-bold'>Đăng nhập / Đăng ký</p>
+				<p
+					className="text-lg font-bold cursor-pointer"
+					onClick={() =>
+						window.open(
+							"/login",
+							"_blank",
+							"toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680"
+						)
+					}
+				>
+					Đăng nhập / Đăng ký
+				</p>
 			</div>
 
 			<div>
