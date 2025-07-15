@@ -1,26 +1,26 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { useNavigate } from "react-router-dom"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
+import { CalendarIcon } from "lucide-react"
+// import { useRouter } from "next/navigation" // Re-import useRouter
 
 export default function Component() {
-  const navigate = useNavigate()
+  //   const router = useRouter()
+  const [gender, setGender] = useState<string | undefined>(undefined)
+  const [dob, setDob] = useState<Date | undefined>(undefined) // Change type to Date
+
+  // Determine if any selection has been made in the security section
+  const isSecurityInfoSelected = gender !== undefined || dob !== undefined
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -33,33 +33,22 @@ export default function Component() {
               <h2 className="text-lg font-semibold text-gray-900 mb-6">Thông tin cá nhân</h2>
               <nav className="space-y-2">
                 <button
-                  onClick={() => navigate("/profile")}
+                  //   onClick={() => router.push("/profile")}
                   className="block w-full text-left px-3 py-2 text-blue-600 bg-blue-50 rounded-md text-sm font-medium"
                 >
                   Thông tin cá nhân
                 </button>
+             
                 <button
-                  onClick={() => navigate("/meetings")}
-                  className="block w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md text-sm"
-                >
-                  Lên kế hoạch cả hội
-                </button>
-                <button
-                  onClick={() => navigate("/account-settings")}
+                  //   onClick={() => router.push("/account-settings")}
                   className="block w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md text-sm"
                 >
                   Cài đặt tài khoản
                 </button>
-                <button
-                  onClick={() => navigate("/login-history")}
-                  className="block w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md text-sm"
-                >
-                  Quản lý lịch sử đăng nhập
-                </button>
+    
               </nav>
             </div>
           </div>
-
           {/* Main Content */}
           <div className="flex-1 p-8">
             <div className="max-w-2xl">
@@ -78,7 +67,7 @@ export default function Component() {
                       <Label htmlFor="phone" className="text-sm font-medium text-gray-700 mb-2 block">
                         Số điện thoại *
                       </Label>
-                      <Input id="phone" defaultValue="0974482032" className="w-full" readOnly required />
+                      <Input id="phone" defaultValue="0974482032" className="w-full" required disabled />
                     </div>
                   </div>
 
@@ -131,7 +120,7 @@ export default function Component() {
                     <div className="flex items-center justify-between">
                       <span className="text-gray-900">vvm1004@gmail.com</span>
                       <button
-                        onClick={() => navigate("/change-email")}
+                        // onClick={() => router.push("/change-email")}
                         className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                       >
                         Thay đổi
@@ -142,8 +131,8 @@ export default function Component() {
                   <div className="grid grid-cols-2 gap-6 mb-8">
                     <div>
                       <Label className="text-sm font-medium text-gray-700 mb-2 block">Giới tính</Label>
-                      <Select>
-                        <SelectTrigger>
+                      <Select onValueChange={setGender} value={gender}>
+                        <SelectTrigger className="cursor-pointer">
                           <SelectValue placeholder="Chọn giới tính" />
                         </SelectTrigger>
                         <SelectContent>
@@ -155,20 +144,47 @@ export default function Component() {
                     </div>
                     <div>
                       <Label className="text-sm font-medium text-gray-700 mb-2 block">Ngày, tháng, năm sinh</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Chọn ngày sinh" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1990">1990</SelectItem>
-                          <SelectItem value="1991">1991</SelectItem>
-                          <SelectItem value="1992">1992</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !dob && "text-muted-foreground",
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dob ? format(dob, "dd/MM/yyyy") : <span>Chọn ngày sinh</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={dob}
+                            onSelect={setDob}
+                            captionLayout="dropdown"
+                            hidden={{
+                              before: new Date(1900, 0, 1),
+                              after: new Date(new Date().getFullYear(), 11, 31),
+                            }}
+                          />
+
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </div>
 
-                  <Button className="bg-gray-600 hover:bg-gray-700 text-white px-8">LƯU THAY ĐỔI</Button>
+                  <Button
+                    disabled={!isSecurityInfoSelected}
+                    className={cn(
+                      "text-white px-8",
+                      isSecurityInfoSelected
+                        ? "bg-[#FF8800] hover:bg-orange-600 cursor-pointer"
+                        : "bg-[#C0C0C0] cursor-default pointer-events-none"
+                    )}
+                  >
+                    LƯU THAY ĐỔI
+                  </Button>
                 </CardContent>
               </Card>
             </div>
