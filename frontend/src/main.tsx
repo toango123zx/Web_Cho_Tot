@@ -15,47 +15,43 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import UpdateProfile from './pages/update.profile.tsx'
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: (
-      <Layout />
-    ),
-    children: [
-      {
-        path: "/",
-        element: <HomePage />,
-      },
+	{
+		path: '/',
+		element: <Layout />,
+		children: [
+			{
+				path: '/',
+				element: <HomePage />,
+			},
 
-      {
-        path: "/user/settings/profile",
-        element: <UpdateProfile />,
-      },
-    ]
-  },
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    path: "/register",
-    element: <RegisterPage />,
-  },
-
+			{
+				path: '/user/settings/profile',
+				element: <UpdateProfile />,
+			},
+		],
+	},
+	{
+		path: '/login',
+		element: <LoginPage />,
+	},
+	{
+		path: '/register',
+		element: <RegisterPage />,
+	},
 ])
 const queryClient = new QueryClient()
 
-
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      {/* <AppProvider> */}
-      {/* <SocketProvider> */}
-      <RouterProvider router={router} />
-      <Toaster />
-      <ReactQueryDevtools initialIsOpen={false} />
+	<StrictMode>
+		<QueryClientProvider client={queryClient}>
+			{/* <AppProvider> */}
+			{/* <SocketProvider> */}
+			<RouterProvider router={router} />
+			<Toaster />
+			<ReactQueryDevtools initialIsOpen={false} />
 
-      {/* </SocketProvider> */}
-      {/* </AppProvider> */}
-    </QueryClientProvider>
-  </StrictMode>,
+			{/* </SocketProvider> */}
+			{/* </AppProvider> */}
+		</QueryClientProvider>
+	</StrictMode>
 )
