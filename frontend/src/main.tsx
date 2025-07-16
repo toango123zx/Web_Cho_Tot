@@ -10,9 +10,11 @@ import { Toaster } from './components/ui/sonner.tsx'
 // import { SocketProvider } from './components/context/socket.context.tsx'
 import HomePage from './pages/home.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import Layout from './layout.tsx'
+import Layout from './layout/layout.tsx'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import UpdateProfile from './pages/update.profile.tsx'
+import AccountSettings from './pages/account.setting.tsx'
+import { ProfileLayout } from './layout/layout.profile.tsx'
 
 const router = createBrowserRouter([
 	{
@@ -26,7 +28,11 @@ const router = createBrowserRouter([
 
 			{
 				path: '/user/settings/profile',
-				element: <UpdateProfile />,
+				element: <ProfileLayout><UpdateProfile /></ProfileLayout>,
+			},
+			{
+				path: '/user/settings/account',
+				element: <ProfileLayout><AccountSettings /></ProfileLayout>,
 			},
 		],
 	},

@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { X } from "lucide-react"
+import { X } from 'lucide-react'
 import { cn } from "@/lib/utils"
 
 type ChangeEmailDialogProps = {
@@ -231,7 +231,6 @@ export function ChangeEmailDialog({ isOpen, onClose, currentEmail, currentPhoneN
                   value={digit}
                   onChange={(e) => handleOtpChange(index, e.target.value)}
                   onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                  // Fix: Ensure the ref callback explicitly returns void
                   ref={(el) => {
                     otpInputsRef.current[index] = el
                   }}
