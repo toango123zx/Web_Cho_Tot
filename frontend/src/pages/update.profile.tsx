@@ -12,15 +12,22 @@ import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { CalendarIcon } from "lucide-react"
-// import { useRouter } from "next/navigation" // Re-import useRouter
+import { ChangeEmailDialog } from "@/components/dialog/change.email.dialog"
+// import { useRouter } from "next/navigation"
 
 export default function Component() {
-  //   const router = useRouter()
+  // const router = useRouter()
   const [gender, setGender] = useState<string | undefined>(undefined)
-  const [dob, setDob] = useState<Date | undefined>(undefined) // Change type to Date
+  const [dob, setDob] = useState<Date | undefined>(undefined)
+  const [referenceName, setReferenceName] = useState<string>("")
+  const [isChangeEmailDialogOpen, setIsChangeEmailDialogOpen] = useState(false) 
 
   // Determine if any selection has been made in the security section
   const isSecurityInfoSelected = gender !== undefined || dob !== undefined
+
+  // Dummy data for current user info
+  const currentUserEmail = "vvm1004@gmail.com"
+  const currentUserPhone = "0974482032"
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -33,19 +40,17 @@ export default function Component() {
               <h2 className="text-lg font-semibold text-gray-900 mb-6">Thông tin cá nhân</h2>
               <nav className="space-y-2">
                 <button
-                  //   onClick={() => router.push("/profile")}
+                  // onClick={() => router.push("/profile")}
                   className="block w-full text-left px-3 py-2 text-blue-600 bg-blue-50 rounded-md text-sm font-medium"
                 >
                   Thông tin cá nhân
                 </button>
-             
                 <button
-                  //   onClick={() => router.push("/account-settings")}
+                  // onClick={() => router.push("/account-settings")}
                   className="block w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md text-sm"
                 >
                   Cài đặt tài khoản
                 </button>
-    
               </nav>
             </div>
           </div>
@@ -53,7 +58,6 @@ export default function Component() {
           <div className="flex-1 p-8">
             <div className="max-w-2xl">
               <h1 className="text-2xl font-bold text-gray-900 mb-8">Hồ sơ cá nhân</h1>
-
               <Card className="mb-8">
                 <CardContent className="p-6">
                   <div className="grid grid-cols-2 gap-6 mb-6">
@@ -70,14 +74,12 @@ export default function Component() {
                       <Input id="phone" defaultValue="0974482032" className="w-full" required disabled />
                     </div>
                   </div>
-
                   <div className="mb-6">
                     <Label htmlFor="address" className="text-sm font-medium text-gray-700 mb-2 block">
                       Địa chỉ
                     </Label>
                     <Input id="address" placeholder="Địa chỉ" className="w-full" />
                   </div>
-
                   <div className="mb-6">
                     <Label htmlFor="introduction" className="text-sm font-medium text-gray-700 mb-2 block">
                       Giới thiệu
@@ -89,23 +91,30 @@ export default function Component() {
                     />
                     <p className="text-xs text-gray-500 mt-1">Tối đa 60 từ</p>
                   </div>
-
                   <div className="mb-6">
                     <Label htmlFor="reference" className="text-sm font-medium text-gray-700 mb-2 block">
                       Tên gợi nhớ
                     </Label>
                     <Input
                       id="reference"
-                      placeholder="http://localhost:5173/user/trang-tho"
-                      className="w-full text-blue-600"
+                      value={referenceName}
+                      onChange={(e) => setReferenceName(e.target.value)}
+                      placeholder="Tên gợi nhớ của bạn"
+                      className="w-full"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Tên gợi nhớ sau khi được cập nhật sẽ không thể thay đổi trong vòng 60 ngày tới.
+                      {referenceName ? (
+                        <>
+                          Link của bạn:{" "}
+                          <span className="text-blue-600">{`http://localhost:5173/user/${referenceName}`}</span>
+                        </>
+                      ) : (
+                        "Tên gợi nhớ sau khi được cập nhật sẽ không thể thay đổi trong vòng 60 ngày tới."
+                      )}
                     </p>
                   </div>
                 </CardContent>
               </Card>
-
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold">Thông tin bảo mật</CardTitle>
@@ -116,18 +125,19 @@ export default function Component() {
                 </CardHeader>
                 <CardContent>
                   <div className="mb-6">
-                    <Label className="text-sm font-medium text-gray-700 mb-2 block">Email</Label>
+                    <Label htmlFor="email" className="text-sm font-medium text-gray-700 mb-2 block">
+                      Email
+                    </Label>
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-900">vvm1004@gmail.com</span>
+                      <Input id="email" value={currentUserEmail} disabled className="w-full" />
                       <button
-                        // onClick={() => router.push("/change-email")}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        onClick={() => setIsChangeEmailDialogOpen(true)} // Open the dialog
+                        className="text-blue-600 hover:text-blue-800 text-sm font-medium cursor-pointer"
                       >
                         Thay đổi
                       </button>
                     </div>
                   </div>
-
                   <div className="grid grid-cols-2 gap-6 mb-8">
                     <div>
                       <Label className="text-sm font-medium text-gray-700 mb-2 block">Giới tính</Label>
@@ -168,19 +178,17 @@ export default function Component() {
                               after: new Date(new Date().getFullYear(), 11, 31),
                             }}
                           />
-
                         </PopoverContent>
                       </Popover>
                     </div>
                   </div>
-
                   <Button
                     disabled={!isSecurityInfoSelected}
                     className={cn(
                       "text-white px-8",
                       isSecurityInfoSelected
                         ? "bg-[#FF8800] hover:bg-orange-600 cursor-pointer"
-                        : "bg-[#C0C0C0] cursor-default pointer-events-none"
+                        : "bg-[#C0C0C0] cursor-default pointer-events-none",
                     )}
                   >
                     LƯU THAY ĐỔI
@@ -191,6 +199,14 @@ export default function Component() {
           </div>
         </div>
       </div>
+
+      {/* Change Email Dialog */}
+      <ChangeEmailDialog
+        isOpen={isChangeEmailDialogOpen}
+        onClose={() => setIsChangeEmailDialogOpen(false)}
+        currentEmail={currentUserEmail}
+        currentPhoneNumber={currentUserPhone}
+      />
     </div>
   )
 }
