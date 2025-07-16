@@ -17,7 +17,6 @@ export default tseslint.config([
       'react-hooks': reactHooks,
     },
     rules: {
-      // Rules từ plugin react-hooks (bắt buộc dùng để compiler hoạt động tốt)
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
     },

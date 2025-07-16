@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
-import { useCurrentApp } from "@/components/context/app.context"; // import context
+import { useCurrentApp } from "@/components/context/AppContext"; 
 import { toast } from "sonner";
 
 interface ISocketContext {
