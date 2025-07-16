@@ -7,9 +7,9 @@ import {
 	UnauthorizedException,
 } from 'src/common';
 import { jwtConfig } from 'src/configs';
-import { UserInformationDto } from 'src/modules/user/dtos';
+import { UserInformationDto } from 'src/modules/users/dtos';
 
-import { UserRepository } from 'src/modules/user/user.repository';
+import { UserRepository } from 'src/modules/users/users.repository';
 
 @Injectable()
 export class AuthRefreshTokenGuard implements CanActivate {
@@ -42,9 +42,7 @@ export class AuthRefreshTokenGuard implements CanActivate {
 				secret: jwtConfig.secretRefreshKey,
 			});
 			user = new UserInformationDto(
-				await this.userRepository.findUserByUserId({
-					userId: payload.userId,
-				}),
+				await this.userRepository.findUserByUserId(payload.userId),
 			);
 
 			request.user = user;

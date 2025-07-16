@@ -33,7 +33,7 @@ model category {
     createdAt DateTime  @default(now()) @map("created_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    updatedAt DateTime  @updatedAt() @map("updated_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
     deletedAt DateTime? @map("deleted_at")
     posts     posts[]
 
@@ -62,7 +62,7 @@ model posts {
     createdAt   DateTime       @default(now()) @map("created_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    updatedAt   DateTime       @updatedAt() @map("updated_at")
+    updatedAt   DateTime       @updatedAt @map("updated_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
     deletedAt   DateTime?      @map("deleted_at")
