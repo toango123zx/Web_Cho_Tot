@@ -7,6 +7,7 @@ import { HttpResponseBodyDto, PaginationDto } from 'src/common';
 import { UsersDto } from 'src/models';
 import { Auth, AuthRole } from 'src/modules/auth/decorators';
 import { MyInformation } from 'src/modules/users/decorators';
+import { UserInformationDto } from 'src/modules/users/dtos';
 import { DeleteUserByUserIdQuery } from 'src/modules/users/queries/implements/deleteUserByUserId.query';
 
 import { GetMeQuery, GetUserByUserIdQuery, GetUsersQuery } from './queries/implements';
@@ -31,7 +32,7 @@ export class UsersController {
 	@Auth()
 	@Get('/me')
 	async getMe(
-		@MyInformation() userInformation: UsersDto,
+		@MyInformation() userInformation: UserInformationDto,
 	): Promise<HttpResponseBodyDto<UsersDto | HttpException>> {
 		return this.queryBus.execute(new GetMeQuery(userInformation));
 	}

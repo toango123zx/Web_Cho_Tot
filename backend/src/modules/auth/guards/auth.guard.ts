@@ -11,7 +11,7 @@ import {
 	UnauthorizedException,
 } from 'src/common';
 import { jwtConfig } from 'src/configs';
-import { UserInformationDto } from 'src/modules/user/dtos';
+import { UserInformationDto } from 'src/modules/users/dtos';
 
 import { UserRepository } from 'src/modules/users/users.repository';
 

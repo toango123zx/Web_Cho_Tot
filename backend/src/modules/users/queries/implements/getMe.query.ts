@@ -1,7 +1,7 @@
 import { IQuery } from '@nestjs/cqrs';
 
-import { UsersDto } from 'src/models';
+import { UserInformationDto } from 'src/modules/users/dtos';
 
 export class GetMeQuery implements IQuery {
-	constructor(public readonly user: UsersDto) {}
+	constructor(public readonly user: UserInformationDto) {}
 }
