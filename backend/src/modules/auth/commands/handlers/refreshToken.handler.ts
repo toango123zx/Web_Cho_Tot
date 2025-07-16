@@ -2,54 +2,47 @@ import { HttpException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 
-import { hash } from 'bcrypt';
 import {
 	HttpResponseBodySuccessDto,
 	IAccessTokenPayload,
 	IRefreshTokenPayload,
 	NotFoundException,
-	UnauthorizedException,
 } from 'src/common';
 import { jwtConfig } from 'src/configs';
 
 import { AuthRepository } from '../../auth.repository';
 import { LoginResponseDto } from '../../dtos';
-import { LoginCommand } from '../implements';
+import { RefreshTokenCommand } from '../implements';
 
-@CommandHandler(LoginCommand)
-export class LoginHandler implements ICommandHandler<LoginCommand> {
+@CommandHandler(RefreshTokenCommand)
+export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand> {
 	constructor(
 		private readonly authRepository: AuthRepository,
 		private readonly jwtService: JwtService,
 	) {}
 
 	async execute(
-		command: LoginCommand,
+		command: RefreshTokenCommand,
 	): Promise<HttpResponseBodySuccessDto<LoginResponseDto> | HttpException> {
-		const { loginDto } = command;
-		const account = await this.authRepository.findAccountByEmail({
-			email: loginDto.email,
+		const { myInformation, token } = command;
+		const tokenDb = await this.authRepository.findTokenByUserId({
+			userId: myInformation.id,
+			refreshToken: token,
 		});
-		if (!account) {
-			throw new NotFoundException('user');
-		}
-
-		const hashedPassword = await hash(loginDto.password, account.salt);
-
-		if (hashedPassword !== account.password) {
-			throw new UnauthorizedException();
+		if (!tokenDb) {
+			throw new NotFoundException('token');
 		}
 
 		const payloadAccessToken: IAccessTokenPayload = {
-			userId: account.userId,
-			role: account.user.role,
+			userId: myInformation.id,
+			role: myInformation.role,
 		};
 
 		const payloadRefreshToken: IRefreshTokenPayload = {
-			userId: account.userId,
+			userId: myInformation.id,
 		};
 
-		const accessToken = this.jwtService.sign(payloadAccessToken, {
+		const accesToken = this.jwtService.sign(payloadAccessToken, {
 			expiresIn: jwtConfig.expiresInAccessKey,
 			secret: jwtConfig.secretAccessKey,
 		});
@@ -59,12 +52,13 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 			secret: jwtConfig.secretRefreshKey,
 		});
 
-		await this.authRepository.createRefreshToken({
-			token: {
+		await this.authRepository.updateRefreshTokenByTokenId({
+			tokenId: tokenDb.id,
+			tokenInformation: {
 				refreshToken: refreshToken,
 				user: {
 					connect: {
-						id: account.userId,
+						id: myInformation.id,
 					},
 				},
 			},
@@ -72,8 +66,8 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
 		return {
 			success: true,
-			data: { accessToken: accessToken },
-			cookie: { accessToken: accessToken, refreshToken: refreshToken },
+			data: { accessToken: accesToken },
+			cookie: { accessToken: accesToken, refreshToken: refreshToken },
 		};
 	}
 }

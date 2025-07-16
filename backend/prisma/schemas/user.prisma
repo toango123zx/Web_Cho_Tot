@@ -75,6 +75,7 @@ model tokens {
     /// @DtoUpdateHidden
     userId       String @map("user_id")
     /// @DtoRelationCanConnectOnCreate
+    /// @DtoRelationCanConnectOnUpdate
     user         users  @relation(fields: [userId], references: [id])
     refreshToken String @unique @map("refresh_token")
 
