@@ -31,6 +31,22 @@ export class UserRepository {
 		});
 	}
 
+	async findUserByEmail({
+		email,
+		name,
+		phoneNumber,
+	}: {
+		email: string;
+		name?: string;
+		phoneNumber?: string;
+	}): Promise<UsersEntity | null> {
+		return this.prismaService.users.findFirst({
+			where: {
+				OR: [{ email: email }, { name: name }, { phoneNumber: phoneNumber }],
+			},
+		});
+	}
+
 	async deleteUserByUserId(userId: string): Promise<UsersEntity> {
 		return this.prismaService.users.update({
 			where: {

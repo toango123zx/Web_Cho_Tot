@@ -5,7 +5,7 @@ import { genSalt, hash } from 'bcrypt';
 import { ConflictException, HttpResponseBodySuccessDto } from 'src/common';
 import { CreateAccountsDto } from 'src/models';
 
-import { UserRepository } from 'src/modules/user/user.repository';
+import { UserRepository } from 'src/modules/users/users.repository';
 
 import { AuthRepository } from '../../auth.repository';
 import { RegisterResponseDto } from '../../dtos';
