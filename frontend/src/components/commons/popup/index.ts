@@ -1,2 +1,2 @@
-export * from './global-popup.component'
+export * from './Global-Popup'
 export * from './useGlobalPopup.hook'

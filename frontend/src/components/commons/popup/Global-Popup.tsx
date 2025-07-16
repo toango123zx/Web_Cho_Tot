@@ -94,7 +94,7 @@ const POPUP_VARIANTS: Record<PopupVariant, VariantConfig> = {
 
 export function GlobalPopup({
 	isOpen = false,
-	onClose = () => {},
+	onClose = () => { },
 	variant = 'info',
 	title = '',
 	message = '',
@@ -111,12 +111,9 @@ export function GlobalPopup({
 }: GlobalPopupProps) {
 	const [isVisible, setIsVisible] = useState<boolean>(false)
 	const [isAnimating, setIsAnimating] = useState<boolean>(false)
-
-	const handleClose = useCallback(() => {
-		return (): void => {
-			if (closable) {
-				onClose()
-			}
+	const handleClose = useCallback((): void => {
+		if (closable) {
+			onClose()
 		}
 	}, [closable, onClose])
 
@@ -193,7 +190,6 @@ export function GlobalPopup({
 						label: 'Xác nhận',
 						variant: 'primary',
 						onClick: () => {
-							console.log('Confirmed')
 							handleClose()
 						},
 					},

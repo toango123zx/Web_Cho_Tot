@@ -1,4 +1,4 @@
-import type { PopupConfig, PopupState, PopupVariant, UseGlobalPopupReturn } from './global-popup.component'
+import type { PopupConfig, PopupState, PopupVariant, UseGlobalPopupReturn } from './Global-Popup'
 import { type ReactNode, useState } from 'react'
 
 export const useGlobalPopup = (): UseGlobalPopupReturn => {

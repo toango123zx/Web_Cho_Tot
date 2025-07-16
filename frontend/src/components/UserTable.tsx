@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useFetchUser } from "../config/fetch";
-import UsersPagination from "@/components/pagination/users.pagination";
-import UserCreateModal from "@/components/modal/user.create.modal";
-import UserEditModal from "@/components/modal/user.edit.modal";
-import UserDeleteModal from "@/components/modal/user.delete.modal";
+import UsersPagination from "@/components/pagination/UserPagination";
+import UserCreateModal from "@/components/modal/UserCreate";
+import UserEditModal from "@/components/modal/UserEdit";
+import UserDeleteModal from "@/components/modal/UserDelete";
 // import { Popover } from "@/components/ui/popover";
 function UsersTable() {
     interface IUser {
@@ -15,16 +15,16 @@ function UsersTable() {
     const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
-    const [dataUser, setDataUser] = useState({});
+    const [dataUser, setDataUser] = useState<IUser | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [activePopover, setActivePopover] = useState<number | null>(null);
 
-    const handleEditUser = (user: any) => {
+    const handleEditUser = (user: IUser) => {
         setDataUser(user);
         setIsOpenUpdateModal(true);
     };
 
-    const handleDelete = (user: any) => {
+    const handleDelete = (user: IUser) => {
         setDataUser(user);
         setIsOpenDeleteModal(true);
     };

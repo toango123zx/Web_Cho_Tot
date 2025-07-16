@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { FaFacebook, FaGoogle } from 'react-icons/fa'
 import { BsApple } from 'react-icons/bs'
 
-export default function RegisterForm() {
+export default function RegisterPage() {
 	const navigate = useNavigate()
 
 	const handleRegister = (e: React.FormEvent) => {

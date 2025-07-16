@@ -2,8 +2,6 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { QUERY_KEY } from "./key";
 import { calculatePagesCount } from "../helper";
 import { getUsersPaginateAPI } from "@/services/api";
-import axios from "axios";
-import type { Province } from "@/types";
 
 export const PAGE_SIZE = 2;
 
@@ -34,17 +32,3 @@ export const useFetchUser = (currentPage: number) => {
   };
 };
 
-export const useFetchProvince = () => {
-  const queryInfo = useQuery({
-    queryKey: QUERY_KEY.getProvince(),
-    queryFn: async () => {
-      const res = await axios.get("https://provinces.open-api.vn/api/");
-      return (res.data ?? []) as Province[];
-    },
-  });
-
-  return {
-    ...queryInfo,
-    data: queryInfo?.data ?? [],
-  };
-};

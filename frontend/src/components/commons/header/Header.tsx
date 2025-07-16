@@ -1,5 +1,5 @@
-import { HeaderBottom } from './header-bottom.component'
-import { HeaderTop } from './header-top.component'
+import { HeaderBottom } from './HeaderBottom'
+import { HeaderTop } from './HeaderTop'
 
 export function Header() {
 	return (

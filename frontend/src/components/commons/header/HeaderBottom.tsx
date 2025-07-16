@@ -14,9 +14,9 @@ import {
   SquarePen,
 } from "lucide-react";
 import { useRef, useState } from "react";
-import { HeaderSearch } from "./header-search.component";
-import { AccountLayer } from "./account-layer.component";
-import { Avatar } from "./account-avatar.component";
+import { HeaderSearch } from "./HeaderSearch";
+import { AccountLayer } from "./AccountLayer";
+import { Avatar } from "./AccountAvatar";
 
 export function HeaderBottom() {
   const [isAccountLayerShown, setIsAccountLayerShown] = useState(false);

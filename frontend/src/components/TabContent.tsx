@@ -1,5 +1,5 @@
 import { useState } from "react";
-import UsersTable from "pages/users.table";
+import UsersTable from "@/components/UserTable";
 function TabsContent() {
   const [activeTab, setActiveTab] = useState<"user">("user");
 
@@ -15,7 +15,7 @@ function TabsContent() {
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
           }`}
         >
-          Userss
+          Users
         </button>
       </div>
 

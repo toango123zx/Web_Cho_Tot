@@ -10,8 +10,8 @@ import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { CalendarIcon } from "lucide-react"
-import { ChangeEmailDialog } from "@/components/dialog/change.email.dialog"
-import { AddressDialog } from "@/components/dialog/address.dialog"
+import { ChangeEmailDialog } from "@/components/dialog/ChangeEmailDialog"
+import { AddressDialog } from "@/components/dialog/AddressDialog"
 
 export default function UpdateProfile() {
   const initialUserName = "Võ Văn Minh"
@@ -122,7 +122,7 @@ export default function UpdateProfile() {
             />
             <p className="text-xs text-gray-500 mt-1">
                 <>
-                  <span className="text-blue-600">{`http://localhost:5173/user/${referenceName}`}</span>
+                  <span className="text-blue-600">{`${window.location.origin}/user/${referenceName}`}</span>
                   <br />
                   <br/>
                   Tên gợi nhớ sau khi được cập nhật sẽ không thể thay đổi trong vòng 60 ngày tới.
