@@ -6,53 +6,53 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: [
-    '@typescript-eslint/eslint-plugin', // Plugin hỗ trợ TypeScript
-    'prettier', // Tích hợp Prettier
-    'unused-imports', // Loại bỏ import và biến không sử dụng
-    'import', // Plugin cho sắp xếp import
+    '@typescript-eslint/eslint-plugin', // Plugin for TypeScript support
+    'prettier', // Prettier integration
+    'unused-imports', // Remove unused imports and variables
+    'import', // Plugin for import sorting
   ],
   extends: [
-    'eslint:recommended', // Quy tắc cơ bản từ ESLint
-    'plugin:@typescript-eslint/recommended', // Quy tắc TypeScript
-    'plugin:prettier/recommended', // Kết hợp Prettier với ESLint
-    'prettier', // Sử dụng Prettier để ghi đè ESLint trong format
+    'eslint:recommended', // Basic rules from ESLint
+    'plugin:@typescript-eslint/recommended', // TypeScript rules
+    'plugin:prettier/recommended', // Combine Prettier with ESLint
+    'prettier', // Use Prettier to override ESLint in formatting
   ],
-  root: true, // Đánh dấu đây là cấu hình gốc
+  root: true, // Mark this as the root configuration
   env: {
-    node: true, // Cấu hình môi trường Node.js
-    jest: true, // Cấu hình môi trường Jest
+    node: true, // Node.js environment configuration
+    jest: true, // Jest environment configuration
   },
-  ignorePatterns: ['.eslintrc.js', 'src/main.ts', 'pnpm-lock.yaml'], // Bỏ qua linting cho .eslintrc.js và src/main.ts
+  ignorePatterns: ['.eslintrc.js', 'src/main.ts', 'pnpm-lock.yaml'], // Ignore linting for .eslintrc.js and src/main.ts
   rules: {
-    '@typescript-eslint/explicit-function-return-type': 'error', // Yêu cầu định nghĩa kiểu trả về hàm
-    '@typescript-eslint/explicit-module-boundary-types': 'error', // Yêu cầu định nghĩa kiểu rõ ràng cho boundary module
-    '@typescript-eslint/no-explicit-any': 'error', // Cấm sử dụng kiểu any
+    '@typescript-eslint/explicit-function-return-type': 'error', // Require function return type definition
+    '@typescript-eslint/explicit-module-boundary-types': 'error', // Require explicit types for module boundaries
+    '@typescript-eslint/no-explicit-any': 'error', // Prohibit using 'any' type
 
-    // Quy tắc của Prettier
-    'prettier/prettier': 'error', // Lỗi nếu mã không tuân theo định dạng Prettier
+    // Prettier rules
+    'prettier/prettier': 'error', // Error if code doesn't follow Prettier formatting
 
-    // Quy tắc unused-imports
-    'unused-imports/no-unused-imports': 'error', // Xóa import không cần thiết
+    // unused-imports rules
+    'unused-imports/no-unused-imports': 'error', // Remove unnecessary imports
     '@typescript-eslint/no-unused-vars': [
       'warn',
       {
-        vars: 'all', // Kiểm tra tất cả các biến
-        varsIgnorePattern: '^_', // Bỏ qua biến bắt đầu với '_'
-        args: 'after-used', // Kiểm tra các tham số sau tham số được sử dụng cuối cùng
-        argsIgnorePattern: '^_', // Bỏ qua tham số bắt đầu bằng '_'
+        vars: 'all', // Check all variables
+        varsIgnorePattern: '^_', // Ignore variables starting with '_'
+        args: 'after-used', // Check parameters after the last used parameter
+        argsIgnorePattern: '^_', // Ignore parameters starting with '_'
         ignoreRestSiblings: true,
       },
     ],
 
-    // Quy tắc kiểm soát console
+    // Console control rules
     'no-console': [
       'warn',
       {
-        allow: ['warn', 'error'], // Chỉ cho phép sử dụng console.warn và console.error
+        allow: ['warn', 'error'], // Only allow console.warn and console.error
       },
     ],
 
-    // Quy tắc cho kiểu tên interface
+    // Interface naming convention rules
     '@typescript-eslint/naming-convention': [
       'error',
       {
@@ -65,30 +65,30 @@ module.exports = {
       },
     ],
 
-    // Quy tắc sắp xếp các import
+    // Import sorting rules
     'import/order': [
       'error',
       {
         "warnOnUnassignedImports": true,
-        'newlines-between': 'always', // Chèn một dòng trống giữa các nhóm import
+        'newlines-between': 'always', // Insert blank line between import groups
         groups: [
           'builtin',
           'external',
-          'internal', // Các module internal (file trong project)
+          'internal', // Internal modules (files within project)
           'index',
           'parent',
-          'sibling', // Các module thuộc parent, sibling, hay index,
+          'sibling', // Parent, sibling, or index modules
           ['type', 'object']
 
         ],
         pathGroups: [
           {
-            pattern: '@nestjs/**', // Đảm bảo các module NestJS luôn được ưu tiên import trước
+            pattern: '@nestjs/**', // Ensure NestJS modules are always imported first
             group: 'builtin',
             position: 'before',
           },
           {
-            pattern: '**/*.repository', // Đảm bảo các module NestJS luôn được ưu tiên import trước
+            pattern: '**/*.repository', // Ensure repository modules are prioritized
             group: 'internal',
             position: 'before',
           }
@@ -101,7 +101,7 @@ module.exports = {
       },
     ],
 
-    // Các quy tắc khác
-    semi: ['error', 'always'], // Bắt buộc có dấu chấm phẩy
+    // Other rules
+    semi: ['error', 'always'], // Require semicolons
   },
 };

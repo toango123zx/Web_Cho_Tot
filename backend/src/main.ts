@@ -3,9 +3,7 @@ import { AppModule } from './app.module';
 import { commonAppConfig } from './configs';
 import { setupSwagger } from './swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { ValidationException } from './common';
-import { DatabaseException } from './common/exceptions/database.exception';
-import { HttpExceptionFilter } from './common/filters/exception.filter';
+import { DatabaseException, HttpExceptionFilter, ValidationException } from './common';
 import * as morgan from 'morgan';
 import * as cookieParser from 'cookie-parser';
 
@@ -13,7 +11,7 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 
 	app.enableCors({
-		origin: ['http://localhost:5173'],
+		origin: commonAppConfig.corsOrigin,
 		credentials: true,
 	});
 	app.useGlobalPipes(

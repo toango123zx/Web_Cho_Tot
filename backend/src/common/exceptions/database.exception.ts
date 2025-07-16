@@ -1,11 +1,15 @@
-import { Catch, ExceptionFilter, ArgumentsHost, HttpException } from '@nestjs/common';
+import {
+	Catch,
+	ExceptionFilter,
+	ArgumentsHost,
+	HttpException,
+	InternalServerErrorException,
+	NotFoundException,
+	ConflictException,
+} from '@nestjs/common';
 
 import { Prisma } from '@prisma/client';
 import { Response } from 'express';
-
-import { ConflictException } from './conflict.exception';
-import { InternalServerErrorException } from './internalServerError.exception';
-import { NotFoundException } from './notFound.exception';
 
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class DatabaseException implements ExceptionFilter {

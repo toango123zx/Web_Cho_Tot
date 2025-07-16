@@ -8,5 +8,5 @@ export const commonAppConfig = {
 			}
 			return 'dev-secret';
 		})(),
-	corsOrigin: process.env.NODE_ENV === 'production' ? process.env.CORS_ORIGIN : '*',
+	corsOrigin: process.env.CORS_ORIGIN?.split(',').map((o) => o.trim()) || '*',
 };
