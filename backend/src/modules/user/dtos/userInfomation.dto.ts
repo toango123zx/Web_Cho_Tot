@@ -12,7 +12,6 @@ export class UserInformationDto {
 	bio: string;
 	gender: GenderUserEnum;
 	dob: Date;
-	nickName: string;
 	balance: number;
 
 	constructor(user: UsersEntity) {
@@ -26,7 +25,6 @@ export class UserInformationDto {
 		this.bio = user.bio;
 		this.gender = user.gender;
 		this.dob = user.dob;
-		this.nickName = user.nickName;
 		this.balance = user.balance;
 	}
 
@@ -49,7 +47,6 @@ export class UserInformationDto {
 			bio: this.bio,
 			gender: this.gender,
 			dob: this.dob,
-			nickName: this.nickName,
 			balance: this.balance,
 		} as UserInformationDto;
 	}
