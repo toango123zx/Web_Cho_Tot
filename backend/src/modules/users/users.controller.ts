@@ -1,4 +1,14 @@
-import { Controller, Delete, Get, HttpException, Param, Query } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	HttpException,
+	Param,
+	Patch,
+	Post,
+	Query,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -6,8 +16,10 @@ import { RoleUserEnum } from '@prisma/client';
 import { HttpResponseBodyDto, PaginationDto } from 'src/common';
 import { UsersDto } from 'src/models';
 import { Auth, AuthRole } from 'src/modules/auth/decorators';
+import { CreateUserCommand } from 'src/modules/users/commands/implements';
+import { UpdateUserCommand } from 'src/modules/users/commands/implements/updateUser.command';
 import { MyInformation } from 'src/modules/users/decorators';
-import { UserInformationDto } from 'src/modules/users/dtos';
+import { CreateUserDto, UpdateUserDto, UserInformationDto } from 'src/modules/users/dtos';
 import { DeleteUserByUserIdQuery } from 'src/modules/users/queries/implements/deleteUserByUserId.query';
 
 import { GetMeQuery, GetUserByUserIdQuery, GetUsersQuery } from './queries/implements';
@@ -51,5 +63,22 @@ export class UsersController {
 		@Param('userId') userId: string,
 	): Promise<HttpResponseBodyDto<UsersDto | HttpException>> {
 		return this.queryBus.execute(new DeleteUserByUserIdQuery(userId));
+	}
+
+	@AuthRole(RoleUserEnum.ADMIN)
+	@Post()
+	async createUser(
+		@Body() createUserDto: CreateUserDto,
+	): Promise<HttpResponseBodyDto<CreateUserDto | HttpException>> {
+		return this.commandBus.execute(new CreateUserCommand(createUserDto));
+	}
+
+	@Auth()
+	@Patch('/:userId')
+	async updateUserByUserId(
+		@Param('userId') userId: string,
+		@Body() updateUserDto: UpdateUserDto,
+	): Promise<HttpResponseBodyDto<UsersDto | HttpException>> {
+		return this.commandBus.execute(new UpdateUserCommand(userId, updateUserDto));
 	}
 }

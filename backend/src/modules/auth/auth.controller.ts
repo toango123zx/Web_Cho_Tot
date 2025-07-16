@@ -10,9 +10,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
 import { HttpResponseBodyDto, SetCookieInterceptor } from 'src/common';
-
-import { MyInformation } from '../user/decorators';
-import { UserInformationDto } from '../user/dtos';
+import { MyInformation } from 'src/modules/users/decorators';
+import { UserInformationDto } from 'src/modules/users/dtos';
 
 import {
 	LoginCommand,
