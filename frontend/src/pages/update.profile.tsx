@@ -20,7 +20,7 @@ export default function Component() {
   const [gender, setGender] = useState<string | undefined>(undefined)
   const [dob, setDob] = useState<Date | undefined>(undefined)
   const [referenceName, setReferenceName] = useState<string>("")
-  const [isChangeEmailDialogOpen, setIsChangeEmailDialogOpen] = useState(false) 
+  const [isChangeEmailDialogOpen, setIsChangeEmailDialogOpen] = useState(false)
 
   // Determine if any selection has been made in the security section
   const isSecurityInfoSelected = gender !== undefined || dob !== undefined
@@ -103,14 +103,12 @@ export default function Component() {
                       className="w-full"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      {referenceName ? (
-                        <>
-                          Link của bạn:{" "}
-                          <span className="text-blue-600">{`http://localhost:5173/user/${referenceName}`}</span>
-                        </>
-                      ) : (
-                        "Tên gợi nhớ sau khi được cập nhật sẽ không thể thay đổi trong vòng 60 ngày tới."
-                      )}
+                      <>
+                        <span className="text-blue-600">{`http://localhost:5173/user/${referenceName}`}</span>
+                        <br />
+                        <br />
+                        <div>Tên gợi nhớ sau khi được cập nhật sẽ không thể thay đổi trong vòng 60 ngày tới.</div>
+                      </>
                     </p>
                   </div>
                 </CardContent>
