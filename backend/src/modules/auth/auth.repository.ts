@@ -5,6 +5,7 @@ import {
 	CreateAccountsDto,
 	CreateTokensDto,
 	TokensEntity,
+	UpdateTokensDto,
 } from 'src/models';
 
 import { PrismaService } from '../database/services';
@@ -26,6 +27,23 @@ export class AuthRepository {
 				user: {
 					email: email,
 				},
+			},
+		});
+	}
+
+	async findTokenByUserId({
+		userId,
+		refreshToken,
+	}: {
+		userId?: string;
+		refreshToken: string;
+	}): Promise<TokensEntity | null> {
+		return this.prismaService.tokens.findFirst({
+			where: {
+				user: {
+					id: userId,
+				},
+				refreshToken: refreshToken,
 			},
 		});
 	}
@@ -56,6 +74,24 @@ export class AuthRepository {
 						id: token.user.connect.id,
 					},
 				},
+			},
+		});
+	}
+
+	async updateRefreshTokenByTokenId({
+		tokenId,
+		tokenInformation,
+	}: {
+		tokenId: string;
+		tokenInformation: UpdateTokensDto;
+	}): Promise<TokensEntity> {
+		return this.prismaService.tokens.update({
+			where: {
+				id: tokenId,
+				userId: tokenInformation.user.connect.id,
+			},
+			data: {
+				refreshToken: tokenInformation.refreshToken,
 			},
 		});
 	}

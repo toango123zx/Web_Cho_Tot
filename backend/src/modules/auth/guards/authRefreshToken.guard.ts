@@ -1,13 +1,9 @@
 import { CanActivate, ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
-import { Reflector } from '@nestjs/core/services/reflector.service';
 import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 
-import { RoleUserEnum } from '@prisma/client';
 import {
-	ForbiddenException,
 	IAccessTokenPayload,
 	OptionalException,
-	ROLE_KEY,
 	UnauthorizedException,
 } from 'src/common';
 import { jwtConfig } from 'src/configs';
@@ -16,15 +12,15 @@ import { UserInformationDto } from 'src/modules/user/dtos';
 import { UserRepository } from 'src/modules/user/user.repository';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AuthRefreshTokenGuard implements CanActivate {
 	constructor(
-		private reflector: Reflector,
 		private readonly jwtService: JwtService,
 		private readonly userRepository: UserRepository,
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		let accessToken: string | undefined;
+		let refreshToken: string | undefined;
 		let user: UserInformationDto;
 		let request;
 
@@ -32,17 +28,18 @@ export class AuthGuard implements CanActivate {
 			case 'http': {
 				request = context.switchToHttp().getRequest<Response>();
 				accessToken = request.cookies.accessToken;
+				refreshToken = request.cookies.refreshToken;
 				break;
 			}
 		}
 
-		if (!accessToken) {
+		if (!accessToken && !refreshToken) {
 			throw new UnauthorizedException();
 		}
 
 		try {
-			const payload: IAccessTokenPayload = this.jwtService.verify(accessToken, {
-				secret: jwtConfig.secretAccessKey,
+			const payload: IAccessTokenPayload = this.jwtService.verify(refreshToken, {
+				secret: jwtConfig.secretRefreshKey,
 			});
 			user = new UserInformationDto(
 				await this.userRepository.findUserByUserId({
@@ -50,16 +47,8 @@ export class AuthGuard implements CanActivate {
 				}),
 			);
 
-			const requiredRole: string = this.reflector.getAllAndOverride<RoleUserEnum>(
-				ROLE_KEY,
-				[context.getHandler(), context.getClass()],
-			);
-
-			if (requiredRole && (!user.role || requiredRole !== user.role)) {
-				throw new ForbiddenException();
-			}
-
 			request.user = user;
+			request.refreshToken = refreshToken;
 		} catch (error) {
 			if (error instanceof TokenExpiredError) {
 				throw new OptionalException(HttpStatus.UNAUTHORIZED, error.message);

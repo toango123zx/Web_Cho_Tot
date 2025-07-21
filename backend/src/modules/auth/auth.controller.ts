@@ -1,10 +1,25 @@
-import { Body, Controller, HttpException, Post, UseInterceptors } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	HttpException,
+	Post,
+	Put,
+	UseInterceptors,
+} from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
 import { HttpResponseBodyDto, SetCookieInterceptor } from 'src/common';
 
-import { LoginCommand, RegisterCommand } from './commands/implements';
+import { MyInformation } from '../user/decorators';
+import { UserInformationDto } from '../user/dtos';
+
+import {
+	LoginCommand,
+	RefreshTokenCommand,
+	RegisterCommand,
+} from './commands/implements';
+import { AuthRefreshToken, RefreshToken } from './decorators';
 import {
 	LoginRequestDto,
 	LoginResponseDto,
@@ -30,5 +45,15 @@ export class AuthController {
 		@Body() registerDto: RegisterRequestDto,
 	): Promise<HttpResponseBodyDto<RegisterResponseDto | HttpException>> {
 		return this.commandBus.execute(new RegisterCommand(registerDto));
+	}
+
+	@Put('refresh-token')
+	@AuthRefreshToken()
+	@UseInterceptors(SetCookieInterceptor)
+	async refreshToken(
+		@MyInformation() myInformation: UserInformationDto,
+		@RefreshToken() token: string,
+	): Promise<HttpResponseBodyDto<LoginResponseDto | HttpException>> {
+		return this.commandBus.execute(new RefreshTokenCommand(myInformation, token));
 	}
 }
