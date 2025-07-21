@@ -1,0 +1,46 @@
+enum TypeMessageEnum {
+    TEXT  @map("text")
+    IMAGE @map("image")
+
+    @@map("Type_Message_Enum")
+}
+
+model chatRooms {
+    id           String   @id @default(uuid())
+    /// @DtoUpdateHidden
+    firstUserId  String   @map("first_user_id")
+    /// @DtoRelationCanConnectOnCreate
+    firstUser    users    @relation(name: "FirstUser", fields: [firstUserId], references: [id], map: "first_user")
+    /// @DtoUpdateHidden
+    secondUserId String   @map("second_user_id")
+    /// @DtoRelationCanConnectOnCreate
+    secondUser   users    @relation(name: "SecondUser", fields: [secondUserId], references: [id], map: "second_user")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updatedAt    DateTime @updatedAt @map("updated_at")
+
+    messages messages[]
+
+    @@unique([firstUserId, secondUserId], name: "unique_chat_room_users")
+    @@map("Chat_Rooms")
+}
+
+model messages {
+    id        String          @id @default(uuid())
+    /// @DtoUpdateHidden
+    roomId    String          @map("room_id")
+    /// @DtoRelationCanConnectOnCreate
+    room      chatRooms       @relation(fields: [roomId], references: [id])
+    /// @DtoUpdateHidden
+    userId    String          @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    user      users           @relation(fields: [userId], references: [id])
+    content   String
+    type      TypeMessageEnum
+    isRead    Boolean         @default(false) @map("is_read")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    createdAt DateTime        @default(now()) @map("created_at")
+
+    @@map("Messages")
+}

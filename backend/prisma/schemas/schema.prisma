@@ -13,3 +13,25 @@ datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
 }
+
+generator nestjsDto {
+    provider                        = "prisma-generator-nestjs-dto"
+    output                          = "../../src/models"
+    outputToNestJsResourceStructure = "true"
+    exportRelationModifierClasses   = "true"
+    reExport                        = "true"
+    generateFileTypes               = "all"
+    createDtoPrefix                 = "Create"
+    updateDtoPrefix                 = "Update"
+    dtoSuffix                       = "Dto"
+    entityPrefix                    = ""
+    entitySuffix                    = "Entity"
+    fileNamingStyle                 = "camel"
+    flatResourceStructure           = "false"
+    classValidation                 = "true"
+    noDependencies                  = "false"
+    outputType                      = "class"
+    prettier                        = "true"
+    requiredResponseApiProperty     = "true"
+    outputApiPropertyType           = "true"
+}
