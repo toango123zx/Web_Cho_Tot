@@ -24,9 +24,10 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 		const { registerDto } = command;
 		const user = await this.userRepository.findUserByEmail({
 			email: registerDto.email,
+			name: registerDto.name,
 		});
 		if (user) {
-			throw new ConflictException('username or email');
+			throw new ConflictException('name or email');
 		}
 
 		const salt = await genSalt(10);
@@ -38,12 +39,6 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 				create: {
 					name: registerDto.name,
 					email: registerDto.email,
-					phoneNumber: registerDto.phoneNumber,
-					address: registerDto.address,
-					gender: registerDto.gender,
-					dob: registerDto.dateOfBirth,
-					bio: registerDto.bio,
-					nickName: registerDto.nickName,
 				},
 			},
 		};

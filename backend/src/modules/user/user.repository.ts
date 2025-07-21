@@ -8,10 +8,18 @@ import { PrismaService } from '../database/services';
 export class UserRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async findUserByEmail({ email }: { email: string }): Promise<UsersEntity | null> {
+	async findUserByEmail({
+		email,
+		name,
+		phoneNumber,
+	}: {
+		email: string;
+		name?: string;
+		phoneNumber?: string;
+	}): Promise<UsersEntity | null> {
 		return this.prismaService.users.findFirst({
 			where: {
-				email: email,
+				OR: [{ email: email }, { name: name }, { phoneNumber: phoneNumber }],
 			},
 		});
 	}
