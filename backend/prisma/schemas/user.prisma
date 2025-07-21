@@ -14,21 +14,20 @@ enum GenderUserEnum {
 }
 
 model users {
-    id          String         @id @default(uuid())
-    name        String
-    role        RoleUserEnum
-    email       String         @unique
-    address     String
-    phoneNumber String         @unique @map("phone_number")
-    avatar      String
-    bio         String
-    gender      GenderUserEnum
-    dob         DateTime
-    nickName    String         @unique @map("nick_name")
-    balance     Int
+    id          String          @id @default(uuid())
+    name        String          @unique
+    role        RoleUserEnum    @default(USER)
+    email       String          @unique
+    address     String?
+    phoneNumber String?         @unique @map("phone_number")
+    avatar      String?         @default("https://i.pinimg.com/1200x/cd/4b/d9/cd4bd9b0ea2807611ba3a67c331bff0b.jpg")
+    bio         String?
+    gender      GenderUserEnum?
+    dob         DateTime?       @map("date_of_birth")
+    balance     Int?            @default(0)
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    createdAt   DateTime       @default(now()) @map("created_at")
+    createdAt   DateTime        @default(now()) @map("created_at")
 
     accounts              accounts?
     socialAccounts        socialAccounts?
@@ -48,11 +47,11 @@ model accounts {
     id        String   @id @default(uuid())
     /// @DtoUpdateHidden
     userId    String   @unique @map("user_id")
-    /// @DtoRelationCanConnectOnCreate
+    /// @DtoRelationCanCreateOnCreate
     user      users    @relation(fields: [userId], references: [id])
     password  String
     salt      String
-    verify    Boolean
+    verify    Boolean  @default(false)
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
     createdAt DateTime @default(now()) @map("created_at")
