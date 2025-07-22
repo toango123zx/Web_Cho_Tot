@@ -31,3 +31,4 @@ export const useFetchUser = (currentPage: number) => {
     totalPages: queryInfo?.data?.totalPages ?? 0,
   };
 };
+

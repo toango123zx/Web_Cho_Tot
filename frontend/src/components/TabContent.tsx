@@ -1,5 +1,5 @@
 import { useState } from "react";
-import UsersTable from "@/pages/UserTable";
+import UsersTable from "@/components/UserTable";
 function TabsContent() {
   const [activeTab, setActiveTab] = useState<"user">("user");
 
