@@ -1,3 +1,3 @@
-import GoodCoinIcon from './good-coin.svg'
+import GoodCoinIcon from './good-coin.svg';
 
-export { GoodCoinIcon }
+export { GoodCoinIcon };

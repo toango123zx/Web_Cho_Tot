@@ -1,27 +1,34 @@
-import axios from "@/services/AxiosCustomize";
+import axios from '@/services/AxiosCustomize';
 
-export const getUsersAPI = () => {
-  return axios.get<IBackendRes<IModelPaginate<IUserTable>>>("/api/users");
+export const getUsersAPI = async () => {
+	const res = await axios.get('/users', {
+		withCredentials: true,
+	});
+
+	return res.data as IModelPaginate<IUser[]>;
 };
 
-export const getUsersPaginateAPI = (page: number, limit: number) => {
-  return axios.get("/users", {
-    params: { _page: page, _limit: limit },
-  });
+export const getUsersPaginateAPI = async (page: number, limit: number) => {
+	const res = await axios.get('/users', {
+		params: { page, limit },
+		withCredentials: true,
+	});
+
+	return res.data as IModelPaginate<IUser[]>;
 };
 
-export const createUserAPI = (payload: IUser) => {
-  return axios.post("/api/users", payload);
+export const createUserAPI = (payload: IUserCreation) => {
+	return axios.post('/users', payload);
 };
 
-export const deleteUserAPI = (id: number) => {
-  return axios.delete(`/api/users/${id}`);
+export const deleteUserAPI = (id: string) => {
+	return axios.delete(`/users/${id}`);
 };
 
-export const updateUserAPI = ({ id, ...rest }: IUserUpdatePayload) => {
-  return axios.put(`/api/users/${id}`, rest);
+export const updateUserAPI = (id: string, payload: IUserUpdatePayload) => {
+	return axios.patch(`/users/${id}`, payload);
 };
 
 export const getOnlineUsersAPI = () => {
-  return axios.get<IBackendRes<IOnlineUser>>("/api/users/online");
+	return axios.get<IBackendRes<IOnlineUser>>('/users/online');
 };

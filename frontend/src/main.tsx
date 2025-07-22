@@ -15,6 +15,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import UpdateProfile from 'pages/UpdateProfile.tsx';
 import AccountSettings from 'pages/AccountSetting.tsx';
 import { ProfileLayout } from '@/layout/LayoutProfile.tsx';
+import AdminLayout from './layout/AdminLayout.tsx';
+import AdminDashboard from './pages/admin/Dashboard.tsx';
+import UserManagement from './pages/admin/UserManagement.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -44,6 +47,22 @@ const router = createBrowserRouter([
 			},
 		],
 	},
+
+	{
+		path: '/admin',
+		element: <AdminLayout />,
+		children: [
+			{
+				path: 'dashboard',
+				element: <AdminDashboard />,
+			},
+			{
+				path: 'users-management',
+				element: <UserManagement />,
+			},
+		],
+	},
+
 	{
 		path: '/login',
 		element: <LoginPage />,
@@ -56,16 +75,15 @@ const router = createBrowserRouter([
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')!).render(
-	<StrictMode>
+	<>
 		<QueryClientProvider client={queryClient}>
 			{/* <AppProvider> */}
 			{/* <SocketProvider> */}
 			<RouterProvider router={router} />
 			<Toaster />
 			<ReactQueryDevtools initialIsOpen={false} />
-
 			{/* </SocketProvider> */}
 			{/* </AppProvider> */}
 		</QueryClientProvider>
-	</StrictMode>,
+	</>,
 );

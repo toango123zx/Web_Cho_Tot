@@ -15,4 +15,4 @@ export const RELATIVE_SITES = [
 		name: 'Việc Làm tốt',
 		href: 'https://www.vieclamtot.com',
 	},
-]
+];

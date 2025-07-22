@@ -1,30 +1,50 @@
+type UserRole = 'ADMIN' | 'USER';
+type Gender = 'MALE' | 'FEMALE' | 'OTHER';
+
 interface IUser {
-  _id: string;
-  email: string;
-  name: string;
+	id: string;
+	name: string;
+	role: UserRole;
+	email: string;
+	address: string | null;
+	phoneNumber: string | null;
+	avatar: string;
+	bio: string | null;
+	gender: Gender | null;
+	dob: string | null;
+	balance: number;
+	createdAt: string;
+	deletedAt: string | null;
+}
+
+interface IUserCreation {
+	email: string;
+	password: string;
+	name: string;
+	gender: Gender | null;
+	// role: UserRole;
+	phoneNumber: string | null;
+	address: string | null;
+	dateOfBirth: string | null;
+	bio: string | null;
 }
 
 interface ILogin {
-  access_token: string;
-  user: IUser;
+	accessToken: string;
 }
 
 interface IRegister {
-  _id: string;
-  createdAt: string;
+	_id: string;
+	createdAt: string;
 }
 
 interface IUserUpdatePayload {
-  id: number;
-  name: string;
-  email: string;
-}
-
-interface IFetchAccount {
-  user: IUser;
-}
-
-interface IUserTable extends IUser {
-  createdAt: string;
-  updatedAt: string;
+	name: string | null;
+	address: string | null;
+	phoneNumber: string | null;
+	avatar: string | null;
+	bio: string | null;
+	gender: Gender | null;
+	dateOfBirth: string | null;
+	avatar: string | null;
 }

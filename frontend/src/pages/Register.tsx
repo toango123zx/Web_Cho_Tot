@@ -21,11 +21,7 @@ export default function RegisterPage() {
 					{/* Logo */}
 					<div className="text-left">
 						<div className="text-left">
-							<img
-								src="/image/logo.png"
-								alt="Chợ Tốt"
-								className="h-8 mb-8"
-							/>
+							<img src="/image/logo.png" alt="Chợ Tốt" className="h-8 mb-8" />
 						</div>
 						<h2 className="text-xl font-semibold">Đăng ký tài khoản</h2>
 					</div>
@@ -34,46 +30,26 @@ export default function RegisterPage() {
 					<form onSubmit={handleRegister} className="space-y-4">
 						<div className="space-y-2">
 							<Label htmlFor="name">Họ và tên</Label>
-							<Input
-								id="name"
-								type="text"
-								placeholder="Nhập họ và tên"
-								required
-							/>
+							<Input id="name" type="text" placeholder="Nhập họ và tên" required />
 						</div>
 
 						<div className="space-y-2">
 							<Label htmlFor="email">Email</Label>
-							<Input
-								id="email"
-								type="email"
-								placeholder="Nhập email"
-								required
-							/>
+							<Input id="email" type="email" placeholder="Nhập email" required />
 						</div>
 
 						<div className="space-y-2">
 							<Label htmlFor="password">Mật khẩu</Label>
-							<Input
-								id="password"
-								type="password"
-								placeholder="Tạo mật khẩu"
-								required
-							/>
+							<Input id="password" type="password" placeholder="Tạo mật khẩu" required />
 						</div>
 
-						<Button
-							type="submit"
-							className="w-full bg-orange-500 hover:bg-orange-600"
-						>
+						<Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600">
 							ĐĂNG KÝ
 						</Button>
 					</form>
 
 					<div className="relative text-center text-sm text-gray-500">
-						<span className="bg-white px-2 relative z-10">
-							Hoặc đăng nhập bằng
-						</span>
+						<span className="bg-white px-2 relative z-10">Hoặc đăng nhập bằng</span>
 						<div className="absolute top-1/2 left-0 w-full border-t border-gray-200 z-0"></div>
 					</div>
 
