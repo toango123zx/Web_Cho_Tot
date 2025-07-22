@@ -19,6 +19,7 @@ async function bootstrap() {
 			transform: true,
 			whitelist: true,
 			exceptionFactory: (errors) => ValidationException.fromValidationError(errors),
+			forbidNonWhitelisted: true,
 		}),
 	);
 	app.useGlobalFilters(new HttpExceptionFilter(), new DatabaseException());
