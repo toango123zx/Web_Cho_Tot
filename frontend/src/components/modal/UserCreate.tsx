@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEY } from '../../config/key';
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
-import { createUserAPI } from '@/services/api';
+import { createUserAPI } from '@/services/api/user';
 
 interface IUser {
 	name: string;

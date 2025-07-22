@@ -1,7 +1,7 @@
 export const QUERY_KEY = {
-  getAllUser: () => ["fetchUser"],
-  getUserPaginate: (page: number) => {
-    return ["fetchUser", page];
-  },
-  getProvince: () => ["fetchProvince"],
+	getAllUser: () => ['fetchUser'],
+	getUserPaginate: (page: number) => {
+		return ['fetchUser', page];
+	},
+	getProvince: () => ['fetchProvince'],
 };
