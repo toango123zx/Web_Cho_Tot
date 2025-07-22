@@ -1,6 +1,7 @@
 import { fetchAccountAPI } from '@/services/api/auth';
 import { createContext, useContext, useEffect, useState } from 'react';
 import PacmanLoader from 'react-spinners/PacmanLoader';
+import { toast } from 'sonner';
 
 interface IAppContext {
 	isAuthenticated: boolean;
@@ -21,7 +22,6 @@ export const AppProvider = (props: TProps) => {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [user, setUser] = useState<IUser | null>(null);
 	const [isAppLoading, setIsAppLoading] = useState<boolean>(true);
-
 	useEffect(() => {
 		const fetchAccount = async () => {
 			const accessToken = localStorage.getItem('access_token');
@@ -29,28 +29,38 @@ export const AppProvider = (props: TProps) => {
 				setIsAppLoading(false);
 				return;
 			}
+
 			try {
 				const res = await fetchAccountAPI();
-				if (res.data) {
-					setUser(res.data.user);
+				const result = res.data;
+
+				if (result.success && result.data) {
+					setUser(result.data);
 					setIsAuthenticated(true);
 				} else {
-					const errorMsg = Array.isArray(res.message)
-						? res.message[0]
-						: res.message;
-					console.error('Error fetching account info:', errorMsg);
+					toast.error(result.message || 'Lấy thông tin tài khoản thất bại');
 				}
-			} catch (error: any) {
-				const errMsg =
-					error?.response?.data?.message ||
-					'An error occurred while fetching account info.';
-				console.error(errMsg);
+			} catch (err: any) {
+				toast.error(err?.response?.data?.message || 'Có lỗi khi fetch account');
 			} finally {
 				setIsAppLoading(false);
 			}
 		};
 
 		fetchAccount();
+
+		const handleMessage = (event: MessageEvent) => {
+			if (event.origin !== window.origin) return;
+			if (event.data?.type === 'auth_success') {
+				fetchAccount();
+			}
+		};
+
+		window.addEventListener('message', handleMessage);
+
+		return () => {
+			window.removeEventListener('message', handleMessage);
+		};
 	}, []);
 
 	return (
@@ -88,9 +98,7 @@ export const useCurrentApp = () => {
 	const currentAppContext = useContext(CurrentAppContext);
 
 	if (!currentAppContext) {
-		throw new Error(
-			'useCurrentApp has to be used within <CurrentAppContext.Provider>',
-		);
+		throw new Error('useCurrentApp has to be used within <CurrentAppContext.Provider>');
 	}
 
 	return currentAppContext;
