@@ -1,56 +1,75 @@
-import { AlertCircle, AlertTriangle, CheckCircle, Info, type LucideIcon, X, XCircle } from 'lucide-react'
-import { type ReactNode, useCallback, useEffect, useState } from 'react'
+import {
+	AlertCircle,
+	AlertTriangle,
+	CheckCircle,
+	Info,
+	type LucideIcon,
+	X,
+	XCircle,
+} from 'lucide-react';
+import { type ReactNode, useCallback, useEffect, useState } from 'react';
 
-export type PopupVariant = 'confirm' | 'info' | 'warning' | 'error' | 'success' | 'custom'
-export type PopupSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'
-export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'success'
+export type PopupVariant =
+	| 'confirm'
+	| 'info'
+	| 'warning'
+	| 'error'
+	| 'success'
+	| 'custom';
+export type PopupSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'success';
 
 export interface PopupButton {
-	label: string
-	variant?: ButtonVariant
-	onClick: () => void
-	disabled?: boolean
-	className?: string
+	label: string;
+	variant?: ButtonVariant;
+	onClick: () => void;
+	disabled?: boolean;
+	className?: string;
 }
 
 export interface VariantConfig {
-	icon: LucideIcon | null
-	iconColor: string
-	bgColor: string
-	borderColor: string
+	icon: LucideIcon | null;
+	iconColor: string;
+	bgColor: string;
+	borderColor: string;
 }
 
 export interface GlobalPopupProps {
-	isOpen?: boolean
-	onClose?: () => void
-	variant?: PopupVariant
-	title?: string
-	message?: string | ReactNode
-	showCloseButton?: boolean
-	closable?: boolean
-	size?: PopupSize
-	animation?: boolean
-	customIcon?: LucideIcon | null
-	customContent?: ReactNode
-	buttons?: PopupButton[]
-	autoClose?: number | null
-	backdrop?: boolean
-	className?: string
+	isOpen?: boolean;
+	onClose?: () => void;
+	variant?: PopupVariant;
+	title?: string;
+	message?: string | ReactNode;
+	showCloseButton?: boolean;
+	closable?: boolean;
+	size?: PopupSize;
+	animation?: boolean;
+	customIcon?: LucideIcon | null;
+	customContent?: ReactNode;
+	buttons?: PopupButton[];
+	autoClose?: number | null;
+	backdrop?: boolean;
+	className?: string;
 }
 
-export type PopupConfig = Omit<GlobalPopupProps, 'isOpen' | 'onClose'>
+export type PopupConfig = Omit<GlobalPopupProps, 'isOpen' | 'onClose'>;
 
 export interface PopupState {
-	isOpen: boolean
-	config: PopupConfig
+	isOpen: boolean;
+	config: PopupConfig;
 }
 
 export interface UseGlobalPopupReturn {
-	popupState: PopupState
-	showPopup: (config: PopupConfig) => void
-	hidePopup: () => void
-	confirm: (title: string, message: string | ReactNode, onConfirm?: () => void, onCancel?: () => void) => void
-	alert: (title: string, message: string | ReactNode, variant?: PopupVariant) => void
+	popupState: PopupState;
+	showPopup: (config: PopupConfig) => void;
+	hidePopup: () => void;
+	confirm: (
+		title: string,
+		message: string | ReactNode,
+		onConfirm?: () => void,
+		onCancel?: () => void,
+	) => void;
+	alert: (title: string, message: string | ReactNode, variant?: PopupVariant) => void;
 }
 
 const POPUP_VARIANTS: Record<PopupVariant, VariantConfig> = {
@@ -90,11 +109,11 @@ const POPUP_VARIANTS: Record<PopupVariant, VariantConfig> = {
 		bgColor: 'bg-gray-50',
 		borderColor: 'border-gray-200',
 	},
-}
+};
 
 export function GlobalPopup({
 	isOpen = false,
-	onClose = () => { },
+	onClose = () => {},
 	variant = 'info',
 	title = '',
 	message = '',
@@ -109,62 +128,62 @@ export function GlobalPopup({
 	backdrop = true,
 	className = '',
 }: GlobalPopupProps) {
-	const [isVisible, setIsVisible] = useState<boolean>(false)
-	const [isAnimating, setIsAnimating] = useState<boolean>(false)
+	const [isVisible, setIsVisible] = useState<boolean>(false);
+	const [isAnimating, setIsAnimating] = useState<boolean>(false);
 	const handleClose = useCallback((): void => {
 		if (closable) {
-			onClose()
+			onClose();
 		}
-	}, [closable, onClose])
+	}, [closable, onClose]);
 
 	useEffect(() => {
 		if (isOpen) {
-			setIsVisible(true)
-			setTimeout(() => setIsAnimating(true), 10)
+			setIsVisible(true);
+			setTimeout(() => setIsAnimating(true), 10);
 		} else {
-			setIsAnimating(false)
-			setTimeout(() => setIsVisible(false), animation ? 300 : 0)
+			setIsAnimating(false);
+			setTimeout(() => setIsVisible(false), animation ? 300 : 0);
 		}
-	}, [isOpen, animation])
+	}, [isOpen, animation]);
 
 	useEffect(() => {
 		if (autoClose && isOpen) {
 			const timer = setTimeout(() => {
-				handleClose()
-			}, autoClose)
-			return () => clearTimeout(timer)
+				handleClose();
+			}, autoClose);
+			return () => clearTimeout(timer);
 		}
-	}, [isOpen, autoClose, handleClose])
+	}, [isOpen, autoClose, handleClose]);
 
 	// Xử lý ESC key
 	useEffect(() => {
 		const handleEscape = (e: KeyboardEvent): void => {
 			if (e.key === 'Escape' && closable && isOpen) {
-				handleClose()
+				handleClose();
 			}
-		}
+		};
 
 		if (isOpen) {
-			document.addEventListener('keydown', handleEscape)
-			document.body.style.overflow = 'hidden'
+			document.addEventListener('keydown', handleEscape);
+			document.body.style.overflow = 'hidden';
 		}
 
 		return () => {
-			document.removeEventListener('keydown', handleEscape)
-			document.body.style.overflow = 'unset'
-		}
-	}, [isOpen, closable, handleClose])
+			document.removeEventListener('keydown', handleEscape);
+			document.body.style.overflow = 'unset';
+		};
+	}, [isOpen, closable, handleClose]);
 
 	const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>): void => {
 		if (e.target === e.currentTarget && backdrop && closable) {
-			handleClose()
+			handleClose();
 		}
-	}
+	};
 
-	if (!isVisible) return null
+	if (!isVisible) return null;
 
-	const variantConfig: VariantConfig = POPUP_VARIANTS[variant] || POPUP_VARIANTS.info
-	const IconComponent = customIcon || variantConfig.icon
+	const variantConfig: VariantConfig = POPUP_VARIANTS[variant] || POPUP_VARIANTS.info;
+	const IconComponent = customIcon || variantConfig.icon;
 
 	// Size configurations
 	const sizeClasses: Record<PopupSize, string> = {
@@ -174,7 +193,7 @@ export function GlobalPopup({
 		xl: 'max-w-xl',
 		'2xl': 'max-w-2xl',
 		full: 'max-w-full mx-4',
-	}
+	};
 
 	// Default buttons cho các variant
 	const getDefaultButtons = (): PopupButton[] => {
@@ -190,10 +209,10 @@ export function GlobalPopup({
 						label: 'Xác nhận',
 						variant: 'primary',
 						onClick: () => {
-							handleClose()
+							handleClose();
 						},
 					},
-				]
+				];
 			case 'error':
 			case 'warning':
 				return [
@@ -202,7 +221,7 @@ export function GlobalPopup({
 						variant: 'primary',
 						onClick: handleClose,
 					},
-				]
+				];
 			case 'success':
 				return [
 					{
@@ -210,7 +229,7 @@ export function GlobalPopup({
 						variant: 'primary',
 						onClick: handleClose,
 					},
-				]
+				];
 			default:
 				return [
 					{
@@ -218,22 +237,23 @@ export function GlobalPopup({
 						variant: 'secondary',
 						onClick: handleClose,
 					},
-				]
+				];
 		}
-	}
+	};
 
 	const renderButtons = (): ReactNode => {
-		const buttonsToRender: PopupButton[] = buttons.length > 0 ? buttons : getDefaultButtons()
+		const buttonsToRender: PopupButton[] =
+			buttons.length > 0 ? buttons : getDefaultButtons();
 
 		const buttonVariants: Record<ButtonVariant, string> = {
 			primary: 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600',
 			secondary: 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300',
 			danger: 'bg-red-600 hover:bg-red-700 text-white border-red-600',
 			success: 'bg-green-600 hover:bg-green-700 text-white border-green-600',
-		}
+		};
 
 		return (
-			<div className='flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6'>
+			<div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-6">
 				{buttonsToRender.map((button: PopupButton, index: number) => (
 					<button
 						key={index}
@@ -251,8 +271,8 @@ export function GlobalPopup({
 					</button>
 				))}
 			</div>
-		)
-	}
+		);
+	};
 
 	return (
 		<div
@@ -265,7 +285,7 @@ export function GlobalPopup({
 		>
 			{/* Backdrop */}
 			<div
-				className='absolute inset-0 bg-black/55 bg-opacity-50 transition-opacity duration-300'
+				className="absolute inset-0 bg-black/55 bg-opacity-50 transition-opacity duration-300"
 				style={{ opacity: isAnimating ? 1 : 0 }}
 			/>
 
@@ -283,21 +303,21 @@ export function GlobalPopup({
 				{showCloseButton && closable && (
 					<button
 						onClick={handleClose}
-						className='absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10'
+						className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10"
 					>
 						<X size={20} />
 					</button>
 				)}
 
 				{/* Content */}
-				<div className='p-6'>
+				<div className="p-6">
 					{customContent ? (
 						customContent
 					) : (
 						<>
 							{/* Header với Icon */}
 							{(IconComponent || title) && (
-								<div className='flex items-start gap-4 mb-4'>
+								<div className="flex items-start gap-4 mb-4">
 									{IconComponent && (
 										<div
 											className={`
@@ -310,8 +330,10 @@ export function GlobalPopup({
 									)}
 
 									{title && (
-										<div className='flex-1'>
-											<h3 className='text-lg font-semibold text-gray-900 mb-1'>{title}</h3>
+										<div className="flex-1">
+											<h3 className="text-lg font-semibold text-gray-900 mb-1">
+												{title}
+											</h3>
 										</div>
 									)}
 								</div>
@@ -331,5 +353,5 @@ export function GlobalPopup({
 				</div>
 			</div>
 		</div>
-	)
+	);
 }

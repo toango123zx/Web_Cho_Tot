@@ -1,27 +1,37 @@
-import type { PopupConfig, PopupState, PopupVariant, UseGlobalPopupReturn } from './Global-Popup'
-import { type ReactNode, useState } from 'react'
+import type {
+	PopupConfig,
+	PopupState,
+	PopupVariant,
+	UseGlobalPopupReturn,
+} from './Global-Popup';
+import { type ReactNode, useState } from 'react';
 
 export const useGlobalPopup = (): UseGlobalPopupReturn => {
 	const [popupState, setPopupState] = useState<PopupState>({
 		isOpen: false,
 		config: {},
-	})
+	});
 
 	const showPopup = (config: PopupConfig): void => {
 		setPopupState({
 			isOpen: true,
 			config,
-		})
-	}
+		});
+	};
 
 	const hidePopup = (): void => {
-		setPopupState(prev => ({
+		setPopupState((prev) => ({
 			...prev,
 			isOpen: false,
-		}))
-	}
+		}));
+	};
 
-	const confirm = (title: string, message: string | ReactNode, onConfirm?: () => void, onCancel?: () => void): void => {
+	const confirm = (
+		title: string,
+		message: string | ReactNode,
+		onConfirm?: () => void,
+		onCancel?: () => void,
+	): void => {
 		showPopup({
 			variant: 'confirm',
 			title,
@@ -31,23 +41,27 @@ export const useGlobalPopup = (): UseGlobalPopupReturn => {
 					label: 'Hủy',
 					variant: 'secondary',
 					onClick: () => {
-						onCancel?.()
-						hidePopup()
+						onCancel?.();
+						hidePopup();
 					},
 				},
 				{
 					label: 'Xác nhận',
 					variant: 'primary',
 					onClick: () => {
-						onConfirm?.()
-						hidePopup()
+						onConfirm?.();
+						hidePopup();
 					},
 				},
 			],
-		})
-	}
+		});
+	};
 
-	const alert = (title: string, message: string | ReactNode, variant: PopupVariant = 'info'): void => {
+	const alert = (
+		title: string,
+		message: string | ReactNode,
+		variant: PopupVariant = 'info',
+	): void => {
 		showPopup({
 			variant,
 			title,
@@ -59,8 +73,8 @@ export const useGlobalPopup = (): UseGlobalPopupReturn => {
 					onClick: hidePopup,
 				},
 			],
-		})
-	}
+		});
+	};
 
 	return {
 		popupState,
@@ -68,5 +82,5 @@ export const useGlobalPopup = (): UseGlobalPopupReturn => {
 		hidePopup,
 		confirm,
 		alert,
-	}
-}
+	};
+};

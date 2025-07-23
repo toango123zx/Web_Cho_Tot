@@ -35,9 +35,7 @@ export const AppProvider = (props: TProps) => {
 					setUser(res.data.user);
 					setIsAuthenticated(true);
 				} else {
-					const errorMsg = Array.isArray(res.message)
-						? res.message[0]
-						: res.message;
+					const errorMsg = Array.isArray(res.message) ? res.message[0] : res.message;
 					console.error('Error fetching account info:', errorMsg);
 				}
 			} catch (error: any) {
@@ -88,9 +86,7 @@ export const useCurrentApp = () => {
 	const currentAppContext = useContext(CurrentAppContext);
 
 	if (!currentAppContext) {
-		throw new Error(
-			'useCurrentApp has to be used within <CurrentAppContext.Provider>',
-		);
+		throw new Error('useCurrentApp has to be used within <CurrentAppContext.Provider>');
 	}
 
 	return currentAppContext;
