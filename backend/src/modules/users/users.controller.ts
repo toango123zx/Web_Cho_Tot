@@ -17,12 +17,18 @@ import { HttpResponseBodyDto, PaginationDto } from 'src/common';
 import { UsersDto } from 'src/models';
 import { Auth, AuthRole } from 'src/modules/auth/decorators';
 import {
+	ChangePasswordCommand,
 	CreateUserCommand,
 	DeleteUserCommand,
 } from 'src/modules/users/commands/implements';
 import { UpdateUserCommand } from 'src/modules/users/commands/implements/updateUser.command';
 import { MyInformation } from 'src/modules/users/decorators';
-import { CreateUserDto, UpdateUserDto, UserInformationDto } from 'src/modules/users/dtos';
+import {
+	ChangePasswordDto,
+	CreateUserDto,
+	UpdateUserDto,
+	UserInformationDto,
+} from 'src/modules/users/dtos';
 
 import { GetMeQuery, GetUserByUserIdQuery, GetUsersQuery } from './queries/implements';
 
@@ -82,5 +88,16 @@ export class UsersController {
 		@Body() updateUserDto: UpdateUserDto,
 	): Promise<HttpResponseBodyDto<UsersDto | HttpException>> {
 		return this.commandBus.execute(new UpdateUserCommand(userId, updateUserDto));
+	}
+
+	@Auth()
+	@Post('/change-password')
+	async changePassword(
+		@Body() changePasswordDto: ChangePasswordDto,
+		@MyInformation() userInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<UsersDto | HttpException>> {
+		return this.commandBus.execute(
+			new ChangePasswordCommand(changePasswordDto, userInformation),
+		);
 	}
 }
