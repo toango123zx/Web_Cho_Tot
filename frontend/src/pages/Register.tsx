@@ -105,6 +105,7 @@ export default function RegisterPage() {
 
 					<div className="relative text-center text-sm text-gray-500">
 						<span className="bg-white px-2 relative z-10">Hoặc đăng nhập bằng</span>
+						<span className="bg-white px-2 relative z-10">Hoặc đăng nhập bằng</span>
 						<div className="absolute top-1/2 left-0 w-full border-t border-gray-200 z-0"></div>
 					</div>
 
