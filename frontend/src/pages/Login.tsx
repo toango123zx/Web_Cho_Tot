@@ -21,17 +21,13 @@ export default function LoginForm() {
 					{/* Logo + Banner */}
 					<div className="text-center">
 						<div className="text-left">
-							<img
-								src="/image/logo.png"
-								alt="Chợ Tốt"
-								className="h-8 mb-2"
-							/>
+							<img src="/image/logo.png" alt="Chợ Tốt" className="h-8 mb-2" />
 						</div>
 						<div className="bg-yellow-100 border border-yellow-300 text-sm rounded p-3 flex items-start gap-2">
 							<span className="text-xl mt-1">🎁</span>
 							<div>
-								Chưa có tài khoản? Tạo tài khoản để nhận <b>20,000 VNĐ</b>{' '}
-								(quy đổi 20,000 Đồng Tốt). <br />
+								Chưa có tài khoản? Tạo tài khoản để nhận <b>20,000 VNĐ</b> (quy đổi 20,000
+								Đồng Tốt). <br />
 								<Button
 									variant="link"
 									className="text-blue-600 p-0 h-auto font-medium"
@@ -46,22 +42,12 @@ export default function LoginForm() {
 					<form onSubmit={handleLogin} className="space-y-4">
 						<div className="space-y-2">
 							<Label htmlFor="email">Email</Label>
-							<Input
-								id="email"
-								type="email"
-								placeholder="Nhập email"
-								required
-							/>
+							<Input id="email" type="email" placeholder="Nhập email" required />
 						</div>
 
 						<div className="space-y-2">
 							<Label htmlFor="password">Mật khẩu</Label>
-							<Input
-								id="password"
-								type="password"
-								placeholder="Nhập mật khẩu"
-								required
-							/>
+							<Input id="password" type="password" placeholder="Nhập mật khẩu" required />
 							<Button
 								type="button"
 								variant="link"
@@ -72,18 +58,13 @@ export default function LoginForm() {
 							</Button>
 						</div>
 
-						<Button
-							type="submit"
-							className="w-full bg-orange-500 hover:bg-orange-600"
-						>
+						<Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600">
 							ĐĂNG NHẬP
 						</Button>
 					</form>
 
 					<div className="relative text-center text-sm text-gray-500">
-						<span className="bg-white px-2 relative z-10">
-							Hoặc đăng nhập bằng
-						</span>
+						<span className="bg-white px-2 relative z-10">Hoặc đăng nhập bằng</span>
 						<div className="absolute top-1/2 left-0 w-full border-t border-gray-200 z-0"></div>
 					</div>
 

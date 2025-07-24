@@ -152,8 +152,8 @@ export default function UpdateProfile() {
 								<span className="text-blue-600">{`${window.location.origin}/user/${referenceName}`}</span>
 								<br />
 								<br />
-								Tên gợi nhớ sau khi được cập nhật sẽ không thể thay đổi
-								trong vòng 60 ngày tới.
+								Tên gợi nhớ sau khi được cập nhật sẽ không thể thay đổi trong vòng 60 ngày
+								tới.
 							</>
 						</p>
 					</div>
@@ -161,12 +161,10 @@ export default function UpdateProfile() {
 			</Card>
 			<Card>
 				<CardHeader>
-					<CardTitle className="text-lg font-semibold">
-						Thông tin bảo mật
-					</CardTitle>
+					<CardTitle className="text-lg font-semibold">Thông tin bảo mật</CardTitle>
 					<p className="text-sm text-gray-600">
-						Những thông tin dưới đây sẽ mang tính bảo mật. Chỉ bạn mới có thể
-						thấy và chỉnh sửa những thông tin này.
+						Những thông tin dưới đây sẽ mang tính bảo mật. Chỉ bạn mới có thể thấy và
+						chỉnh sửa những thông tin này.
 					</p>
 				</CardHeader>
 				<CardContent>
@@ -178,12 +176,7 @@ export default function UpdateProfile() {
 							Email
 						</Label>
 						<div className="flex items-center justify-between gap-2">
-							<Input
-								id="email"
-								value={currentUserEmail}
-								disabled
-								className="flex-1"
-							/>
+							<Input id="email" value={currentUserEmail} disabled className="flex-1" />
 							<button
 								onClick={() => setIsChangeEmailDialogOpen(true)}
 								className="text-blue-600 hover:text-blue-800 text-sm font-medium cursor-pointer w-fit"
@@ -222,11 +215,7 @@ export default function UpdateProfile() {
 										)}
 									>
 										<CalendarIcon className="mr-2 h-4 w-4" />
-										{dob ? (
-											format(dob, 'dd/MM/yyyy')
-										) : (
-											<span>Chọn ngày sinh</span>
-										)}
+										{dob ? format(dob, 'dd/MM/yyyy') : <span>Chọn ngày sinh</span>}
 									</Button>
 								</PopoverTrigger>
 								<PopoverContent className="w-auto p-0" align="start">
@@ -237,11 +226,7 @@ export default function UpdateProfile() {
 										captionLayout="dropdown"
 										hidden={{
 											before: new Date(1900, 0, 1),
-											after: new Date(
-												new Date().getFullYear(),
-												11,
-												31,
-											),
+											after: new Date(new Date().getFullYear(), 11, 31),
 										}}
 									/>
 								</PopoverContent>

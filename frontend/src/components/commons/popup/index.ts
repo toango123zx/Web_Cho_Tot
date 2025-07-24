@@ -1,2 +1,2 @@
-export * from './Global-Popup'
-export * from './useGlobalPopup.hook'
+export * from './Global-Popup';
+export * from './useGlobalPopup.hook';
