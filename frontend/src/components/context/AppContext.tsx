@@ -1,7 +1,7 @@
-import { fetchAccountAPI } from '@/services/api/auth';
+import { useAccount } from '@/config/useAccount';
+import { useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useState } from 'react';
 import PacmanLoader from 'react-spinners/PacmanLoader';
-import { toast } from 'sonner';
 
 interface IAppContext {
 	isAuthenticated: boolean;
@@ -22,46 +22,29 @@ export const AppProvider = (props: TProps) => {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [user, setUser] = useState<IUser | null>(null);
 	const [isAppLoading, setIsAppLoading] = useState<boolean>(true);
+	const queryClient = useQueryClient();
+	const { data, isLoading } = useAccount();
 	useEffect(() => {
-		const fetchAccount = async () => {
-			const accessToken = localStorage.getItem('access_token');
-			if (!accessToken) {
-				setIsAppLoading(false);
-				return;
-			}
+		if (data) {
+			setUser(data);
+			setIsAuthenticated(true);
+		} else {
+			setUser(null);
+			setIsAuthenticated(false);
+		}
+		setIsAppLoading(isLoading);
+	}, [data, isLoading]);
 
-			try {
-				const res = await fetchAccountAPI();
-				const result = res.data;
-
-				if (result.success && result.data) {
-					setUser(result.data);
-					setIsAuthenticated(true);
-				} else {
-					toast.error(result.message || 'Lấy thông tin tài khoản thất bại');
-				}
-			} catch (err: any) {
-				toast.error(err?.response?.data?.message || 'Có lỗi khi fetch account');
-			} finally {
-				setIsAppLoading(false);
+	useEffect(() => {
+		const onStorageChange = (event: StorageEvent) => {
+			if (event.key === 'access_token' && event.newValue) {
+				queryClient.invalidateQueries({ queryKey: ['account'] });
 			}
 		};
 
-		fetchAccount();
-
-		const handleMessage = (event: MessageEvent) => {
-			if (event.origin !== window.origin) return;
-			if (event.data?.type === 'auth_success') {
-				fetchAccount();
-			}
-		};
-
-		window.addEventListener('message', handleMessage);
-
-		return () => {
-			window.removeEventListener('message', handleMessage);
-		};
-	}, []);
+		window.addEventListener('storage', onStorageChange);
+		return () => window.removeEventListener('storage', onStorageChange);
+	}, [queryClient]);
 
 	return (
 		<>
