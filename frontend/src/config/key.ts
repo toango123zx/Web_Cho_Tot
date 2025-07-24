@@ -3,5 +3,5 @@ export const QUERY_KEY = {
 	getUserPaginate: (page: number) => {
 		return ['fetchUser', page];
 	},
-	getProvince: () => ['fetchProvince'],
+	getAccount: () => ['account'],
 };

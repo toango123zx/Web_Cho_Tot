@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
 import { BsApple } from 'react-icons/bs';
 import { useCurrentApp } from '@/components/context/AppContext';
-import { useLogin } from '@/config/useLogin';
+import { useLogin } from '@/services/query/auth';
 
 export default function LoginForm() {
 	const navigate = useNavigate();

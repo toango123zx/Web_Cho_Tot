@@ -2,7 +2,7 @@ import { useState } from 'react';
 import UserEditModal from '@/components/modal/UserEdit';
 import UserDeleteModal from '@/components/modal/UserDelete';
 import UsersPagination from './pagination/UserPagnation';
-import { useFetchUser } from '@/config/useFetchUser';
+import { useFetchUser } from '@/services/query/users';
 // import { Popover } from "@/components/ui/popover";
 function UsersTable() {
 	interface IUser {

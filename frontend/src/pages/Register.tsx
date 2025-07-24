@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
 import { BsApple } from 'react-icons/bs';
-import { useRegister } from '@/config/useRegister';
+import { useRegister } from '@/services/query/auth';
 
 export default function RegisterPage() {
 	const navigate = useNavigate();

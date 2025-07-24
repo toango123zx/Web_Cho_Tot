@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { QUERY_KEY } from './key';
-import { calculatePagesCount } from '../helper';
+import { QUERY_KEY } from '../../config/key';
+import { calculatePagesCount } from '../../helper';
 import { getUsersPaginateAPI } from '@/services/api/user';
 
 export const PAGE_SIZE = 2;

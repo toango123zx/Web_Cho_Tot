@@ -1,7 +1,8 @@
-import { useAccount } from '@/config/useAccount';
 import { useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useState } from 'react';
 import PacmanLoader from 'react-spinners/PacmanLoader';
+import { QUERY_KEY } from '@/config/key';
+import { useAccount } from '@/services/query/auth';
 
 interface IAppContext {
 	isAuthenticated: boolean;
@@ -38,7 +39,7 @@ export const AppProvider = (props: TProps) => {
 	useEffect(() => {
 		const onStorageChange = (event: StorageEvent) => {
 			if (event.key === 'access_token' && event.newValue) {
-				queryClient.invalidateQueries({ queryKey: ['account'] });
+				queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAccount() });
 			}
 		};
 
