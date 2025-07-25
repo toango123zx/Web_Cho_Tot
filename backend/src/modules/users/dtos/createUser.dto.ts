@@ -71,9 +71,9 @@ export class CreateUserDto {
 
 	@ApiProperty({
 		type: 'string',
-		required: true,
+		required: false,
 	})
-	@IsNotEmpty()
+	@IsOptional()
 	@IsString()
 	@AutoTrim()
 	address: string;
@@ -91,9 +91,9 @@ export class CreateUserDto {
 
 	@ApiProperty({
 		type: 'string',
-		required: true,
+		required: false,
 	})
-	@IsNotEmpty()
+	@IsOptional()
 	@IsString()
 	@AutoTrim()
 	bio: string;

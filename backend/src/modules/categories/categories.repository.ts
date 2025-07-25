@@ -19,8 +19,15 @@ export class CategoriesRepository {
 				},
 				skip: pagination.skip,
 				take: pagination.take,
+				orderBy: {
+					createdAt: 'asc',
+				},
 			}),
-			this.prismaService.category.count(),
+			this.prismaService.category.count({
+				where: {
+					deletedAt: null,
+				},
+			}),
 		]);
 		return [categories, totalRecords];
 	}
@@ -28,6 +35,7 @@ export class CategoriesRepository {
 	async findCategoryById(categoryId: string): Promise<CategoryEntity> {
 		return this.prismaService.category.findFirst({
 			where: { id: categoryId, deletedAt: null },
+			include: { posts: true },
 		});
 	}
 
