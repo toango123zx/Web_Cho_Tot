@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { genSalt, hash } from 'bcrypt';
 import { ConflictException, HttpResponseBodySuccessDto } from 'src/common';
-import { CreateAccountsDto, UsersDto } from 'src/models';
+import { UsersDto } from 'src/models';
 
 import { AuthRepository } from 'src/modules/auth/auth.repository';
 import { UserRepository } from 'src/modules/users/users.repository';
@@ -33,7 +33,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
 		const salt = await genSalt(10);
 		const hashedPassword = await hash(createUserDto.password, salt);
-		const accountData: CreateAccountsDto = {
+		const accountData = {
 			password: hashedPassword,
 			salt: salt,
 			user: {
@@ -45,6 +45,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 					gender: createUserDto.gender,
 					dob: createUserDto.dateOfBirth,
 					bio: createUserDto.bio,
+					role: createUserDto.role,
 				},
 			},
 		};

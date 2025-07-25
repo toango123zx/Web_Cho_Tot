@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { GenderUserEnum } from '@prisma/client';
+import { GenderUserEnum, RoleUserEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import {
 	IsDateString,
@@ -47,6 +47,17 @@ export class CreateUserDto {
 	name: string;
 
 	@ApiProperty({
+		enum: RoleUserEnum,
+		enumName: 'RoleUserEnum',
+		default: RoleUserEnum.USER,
+		required: false,
+	})
+	@IsOptional()
+	@IsEnum(RoleUserEnum)
+	@Transform(({ value }) => value || RoleUserEnum.USER)
+	role: RoleUserEnum;
+
+	@ApiProperty({
 		type: 'string',
 		enum: GenderUserEnum,
 		required: false,
@@ -71,9 +82,9 @@ export class CreateUserDto {
 
 	@ApiProperty({
 		type: 'string',
-		required: true,
+		required: false,
 	})
-	@IsNotEmpty()
+	@IsOptional()
 	@IsString()
 	@AutoTrim()
 	address: string;
@@ -91,9 +102,9 @@ export class CreateUserDto {
 
 	@ApiProperty({
 		type: 'string',
-		required: true,
+		required: false,
 	})
-	@IsNotEmpty()
+	@IsOptional()
 	@IsString()
 	@AutoTrim()
 	bio: string;
