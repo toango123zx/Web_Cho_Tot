@@ -67,6 +67,7 @@ model socialAccounts {
     /// @DtoUpdateHidden
     userId   String @unique @map("user_id")
     /// @DtoRelationCanConnectOnCreate
+    /// @DtoRelationCanCreateOnCreate
     user     users  @relation(fields: [userId], references: [id])
     googleId String @map("google_id")
 
