@@ -1,5 +1,7 @@
 import { GoodCoinIcon } from '@/assets/icons';
 import { ChevronRight, Pencil, Star } from 'lucide-react';
+import { use } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface AccountLayerProps {
 	accountLayerRef: React.RefObject<HTMLDivElement | null>;
@@ -25,6 +27,7 @@ export function AccountLayer({
 			'_blank',
 			'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
 		);
+	const navigate = useNavigate();
 
 	return (
 		<div
@@ -203,7 +206,9 @@ export function AccountLayer({
 							className="size-5"
 							alt="settings"
 						/>
-						<span>Cài đặt tài khoản</span>
+						<span onClick={() => navigate('/user/settings/profile')}>
+							Cài đặt tài khoản
+						</span>{' '}
 					</div>
 
 					<div className="hover:bg-gray-100 px-3 py-2 flex items-center gap-2">

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,6 +16,8 @@ export default function LoginForm() {
 	const [errorMessage, setErrorMessage] = useState('');
 	const [successMessage, setSuccessMessage] = useState('');
 	const { setIsAuthenticated } = useCurrentApp();
+	const location = useLocation();
+	const from = location.state?.from?.pathname || '/';
 
 	const { mutate: login, isPending } = useLogin();
 
@@ -40,7 +42,8 @@ export default function LoginForm() {
 						setIsAuthenticated(true);
 						setSuccessMessage('Đăng nhập thành công!');
 						setErrorMessage('');
-						setTimeout(() => window.close(), 1500);
+						window.close();
+						navigate(from, { replace: true });
 					} else {
 						setErrorMessage(res.message || 'Đăng nhập thất bại');
 						setSuccessMessage('');

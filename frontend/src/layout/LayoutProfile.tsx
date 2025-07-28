@@ -13,51 +13,44 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
 	let title = 'Thông tin cá nhân';
 	if (location.pathname === '/user/settings/account') {
 		title = 'Cài đặt tài khoản';
-	} else if (location.pathname === '/user/settings/profile') {
-		title = 'Thông tin cá nhân';
 	}
 
 	return (
-		<div className="min-h-screen bg-gray-50 py-8">
-			<div className="max-w-5xl mx-auto px-4">
-				<h1 className="text-2xl font-bold text-gray-900 mb-6">{title}</h1>
-				<div className="flex bg-white shadow-md rounded-lg overflow-hidden">
-					{/* Sidebar */}
-					<div className="w-64 border-r">
-						<div className="p-6">
-							<h2 className="text-lg font-semibold text-gray-900 mb-6">
+		<div className="min-h-screen bg-gray-100 py-8">
+			<div className="max-w-6xl mx-auto px-4">
+				<h1 className="text-xl font-bold text-gray-900 mb-6">{title}</h1>
+				<div className="flex">
+					<div className="w-64 bg-white rounded-md shadow border border-gray-200 pl-2 pt-2 pb-2 h-fit">
+						<nav className="space-y-2">
+							<button
+								onClick={() => navigate('/user/settings/profile')}
+								className={cn(
+									'block w-full text-left px-3 py-2 rounded-md text-sm font-medium cursor-pointer',
+									location.pathname === '/user/settings/profile'
+										? 'text-[#222222]'
+										: 'text-[#8c8c8c]',
+								)}
+							>
 								Thông tin cá nhân
-							</h2>
-							<nav className="space-y-2">
-								<button
-									onClick={() => navigate('/user/settings/profile')}
-									className={cn(
-										'block w-full text-left px-3 py-2 rounded-md text-sm font-medium cursor-pointer',
-										location.pathname === '/user/settings/profile'
-											? 'text-blue-600 bg-blue-50'
-											: 'text-gray-700 hover:bg-gray-100',
-									)}
-								>
-									Thông tin cá nhân
-								</button>
-								<button
-									onClick={() => navigate('/user/settings/account')}
-									className={cn(
-										'block w-full text-left px-3 py-2 rounded-md text-sm font-medium cursor-pointer',
-										location.pathname === '/user/settings/account'
-											? 'text-blue-600 bg-blue-50'
-											: 'text-gray-700 hover:bg-gray-100',
-									)}
-								>
-									Cài đặt tài khoản
-								</button>
-							</nav>
-						</div>
+							</button>
+
+							<button
+								onClick={() => navigate('/user/settings/account')}
+								className={cn(
+									'block w-full text-left px-3 py-2 rounded-md text-sm font-medium cursor-pointer',
+									location.pathname === '/user/settings/account'
+										? 'text-[#222222]'
+										: 'text-[#8c8c8c]',
+								)}
+							>
+								Cài đặt tài khoản
+							</button>
+						</nav>
 					</div>
 
-					{/* Main Content */}
-					<div className="flex-1 p-8">
-						<div className="max-w-2xl">{children}</div>
+					{/* Main Content: margin-left để tạo khoảng cách, content rộng như ảnh thứ 2 */}
+					<div className="ml-8 flex-1">
+						<div className="bg-white shadow rounded-md p-8">{children}</div>
 					</div>
 				</div>
 			</div>
