@@ -1,20 +1,26 @@
 import axios from '@/services/AxiosCustomize';
+import { sleep } from '../sleep';
 
-export const loginAPI = async (username: string, password: string) => {
-	// return axios.post<IBackendRes<ILogin>>('/auth/login', {
-	// 	email: 'admin@example.com',
-	// 	password: '11aaBB**',
-	// });
-	return axios.post<IBackendRes<ILogin>>('/auth/login', {
-		email: 'admin1@gmail.com',
-		password: 'Admin@123',
-	});
+export const loginAPI = async (email: string, password: string) => {
+	await sleep(3000);
+	const res = await axios.post('/auth/login', { email, password });
+
+	return res.data as IBackendRes<ILogin>;
 };
 
 export const registerAPI = async (name: string, email: string, password: string) => {
-	return axios.post<IBackendRes<IRegister>>('/auth/register', {
+	const res = await axios.post('/auth/register', {
 		name,
 		email,
 		password,
 	});
+
+	return res.data as IBackendRes<IRegister>;
+};
+
+export const fetchAccountAPI = async () => {
+	await sleep(1500);
+	const res = await axios.get('/users/me');
+
+	return res.data as IBackendRes<IFetchAccount>;
 };

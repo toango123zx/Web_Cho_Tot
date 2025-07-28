@@ -16,7 +16,7 @@ export function AccountLayer({
 		window.open(
 			'/login',
 			'_blank',
-			'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
+			'noopener,noreferrer,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
 		);
 
 	const handleRegisterClick = () =>

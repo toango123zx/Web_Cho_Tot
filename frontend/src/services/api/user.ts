@@ -31,4 +31,5 @@ export const updateUserAPI = (id: string, payload: IUserUpdatePayload) => {
 
 export const getOnlineUsersAPI = () => {
 	return axios.get<IBackendRes<IOnlineUser>>('/users/online');
+	return axios.get<IBackendRes<IOnlineUser>>('/users/online');
 };

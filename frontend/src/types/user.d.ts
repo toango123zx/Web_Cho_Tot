@@ -29,15 +29,6 @@ interface IUserCreation {
 	bio: string | null;
 }
 
-interface ILogin {
-	accessToken: string;
-}
-
-interface IRegister {
-	_id: string;
-	createdAt: string;
-}
-
 interface IUserUpdatePayload {
 	name: string | null;
 	address: string | null;
@@ -48,3 +39,4 @@ interface IUserUpdatePayload {
 	dateOfBirth: string | null;
 	avatar: string | null;
 }
+interface IFetchAccount extends IUser {}

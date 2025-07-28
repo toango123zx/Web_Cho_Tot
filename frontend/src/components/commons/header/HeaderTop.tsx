@@ -8,7 +8,12 @@ export function HeaderTop() {
 				<ul className="flex flex-wrap gap-2 sm:gap-4">
 					{RELATIVE_SITES.map((site) => (
 						<li className="text-[12px] sm:text-sm font-normal" key={site.href}>
-							<a className="text-[12px]" href={site.href}>
+							<a
+								className="text-[12px]"
+								href={site.href}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
 								{site.name}
 							</a>
 						</li>

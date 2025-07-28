@@ -18,7 +18,11 @@ export class UserRepository {
 				skip: pagination.skip,
 				take: pagination.take,
 			}),
-			this.prismaService.users.count(),
+			this.prismaService.users.count({
+				where: {
+					deletedAt: null,
+				},
+			}),
 		]);
 		return [users, totalRecords];
 	}
@@ -118,6 +122,23 @@ export class UserRepository {
 						}),
 					},
 				},
+			},
+		});
+	}
+
+	async changePassword({
+		id,
+		newPassword,
+	}: {
+		id: string;
+		newPassword: string;
+	}): Promise<AccountsEntity> {
+		return this.prismaService.accounts.update({
+			where: {
+				id,
+			},
+			data: {
+				password: newPassword,
 			},
 		});
 	}

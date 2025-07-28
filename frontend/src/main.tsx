@@ -4,7 +4,7 @@ import './index.css';
 import LoginPage from '@/pages/Login.tsx';
 import RegisterPage from '@/pages/Register.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-// import { AppProvider } from '@/components/context/app.context.tsx'
+import { AppProvider } from '@/components/context/AppContext.tsx';
 // import ProtectedRoute from '@/components/auth/index.tsx'
 import { Toaster } from './components/ui/sonner.tsx';
 // import { SocketProvider } from './components/context/socket.context.tsx'
@@ -77,13 +77,14 @@ const queryClient = new QueryClient();
 createRoot(document.getElementById('root')!).render(
 	<>
 		<QueryClientProvider client={queryClient}>
-			{/* <AppProvider> */}
-			{/* <SocketProvider> */}
-			<RouterProvider router={router} />
-			<Toaster />
-			<ReactQueryDevtools initialIsOpen={false} />
-			{/* </SocketProvider> */}
-			{/* </AppProvider> */}
+			<AppProvider>
+				{/* <SocketProvider> */}
+				<RouterProvider router={router} />
+				<Toaster />
+				<ReactQueryDevtools initialIsOpen={false} />
+
+				{/* </SocketProvider> */}
+			</AppProvider>
 		</QueryClientProvider>
 	</>,
 );

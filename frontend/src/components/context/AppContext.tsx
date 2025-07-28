@@ -1,6 +1,8 @@
-import { fetchAccountAPI } from '@/services/api/auth';
+import { useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useState } from 'react';
 import PacmanLoader from 'react-spinners/PacmanLoader';
+import { QUERY_KEY } from '@/config/key';
+import { useAccount } from '@/services/query/auth';
 
 interface IAppContext {
 	isAuthenticated: boolean;
@@ -21,35 +23,29 @@ export const AppProvider = (props: TProps) => {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 	const [user, setUser] = useState<IUser | null>(null);
 	const [isAppLoading, setIsAppLoading] = useState<boolean>(true);
+	const queryClient = useQueryClient();
+	const { data, isLoading } = useAccount();
+	useEffect(() => {
+		if (data) {
+			setUser(data);
+			setIsAuthenticated(true);
+		} else {
+			setUser(null);
+			setIsAuthenticated(false);
+		}
+		setIsAppLoading(isLoading);
+	}, [data, isLoading]);
 
 	useEffect(() => {
-		const fetchAccount = async () => {
-			const accessToken = localStorage.getItem('access_token');
-			if (!accessToken) {
-				setIsAppLoading(false);
-				return;
-			}
-			try {
-				const res = await fetchAccountAPI();
-				if (res.data) {
-					setUser(res.data.user);
-					setIsAuthenticated(true);
-				} else {
-					const errorMsg = Array.isArray(res.message) ? res.message[0] : res.message;
-					console.error('Error fetching account info:', errorMsg);
-				}
-			} catch (error: any) {
-				const errMsg =
-					error?.response?.data?.message ||
-					'An error occurred while fetching account info.';
-				console.error(errMsg);
-			} finally {
-				setIsAppLoading(false);
+		const onStorageChange = (event: StorageEvent) => {
+			if (event.key === 'access_token' && event.newValue) {
+				queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAccount() });
 			}
 		};
 
-		fetchAccount();
-	}, []);
+		window.addEventListener('storage', onStorageChange);
+		return () => window.removeEventListener('storage', onStorageChange);
+	}, [queryClient]);
 
 	return (
 		<>
