@@ -1,8 +1,7 @@
 interface IBackendRes<T> {
-	error?: string | string[];
-	message: string;
-	statusCode: number | string;
+	message?: string;
 	data?: T;
+	success: boolean;
 }
 
 interface IModelPaginate<T> {

@@ -1,17 +1,27 @@
 interface IUser {
-	_id: string;
-	email: string;
+	id: string;
 	name: string;
+	role: 'USER' | 'ADMIN' | string;
+	email: string;
+	address: string | null;
+	phoneNumber: string | null;
+	avatar: string;
+	bio: string | null;
+	gender: 'male' | 'female' | 'other' | null;
+	dob: string | null; // ISO format (e.g., "1990-01-01") if available
+	balance: number;
 }
 
 interface ILogin {
-	access_token: string;
-	user: IUser;
+	accessToken: string;
 }
 
 interface IRegister {
-	_id: string;
+	id: string;
+	userId: string;
+	verify: boolean;
 	createdAt: string;
+	name: string;
 }
 
 interface IUserUpdatePayload {
@@ -20,9 +30,7 @@ interface IUserUpdatePayload {
 	email: string;
 }
 
-interface IFetchAccount {
-	user: IUser;
-}
+interface IFetchAccount extends IUser {}
 
 interface IUserTable extends IUser {
 	createdAt: string;

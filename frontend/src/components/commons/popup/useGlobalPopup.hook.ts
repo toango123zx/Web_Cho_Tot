@@ -3,7 +3,7 @@ import type {
 	PopupState,
 	PopupVariant,
 	UseGlobalPopupReturn,
-} from './Global-Popup';
+} from './GlobalPopup';
 import { type ReactNode, useState } from 'react';
 
 export const useGlobalPopup = (): UseGlobalPopupReturn => {

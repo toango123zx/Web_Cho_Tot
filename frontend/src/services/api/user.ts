@@ -11,17 +11,17 @@ export const getUsersPaginateAPI = (page: number, limit: number) => {
 };
 
 export const createUserAPI = (payload: IUser) => {
-	return axios.post('/api/users', payload);
+	return axios.post('/users', payload);
 };
 
 export const deleteUserAPI = (id: number) => {
-	return axios.delete(`/api/users/${id}`);
+	return axios.delete(`/users/${id}`);
 };
 
 export const updateUserAPI = ({ id, ...rest }: IUserUpdatePayload) => {
-	return axios.put(`/api/users/${id}`, rest);
+	return axios.put(`/users/${id}`, rest);
 };
 
 export const getOnlineUsersAPI = () => {
-	return axios.get<IBackendRes<IOnlineUser>>('/api/users/online');
+	return axios.get<IBackendRes<IOnlineUser>>('/users/online');
 };

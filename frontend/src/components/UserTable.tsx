@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { useFetchUser } from '../config/fetch';
-import UserCreateModal from '@/components/modal/UserCreate';
 import UserEditModal from '@/components/modal/UserEdit';
 import UserDeleteModal from '@/components/modal/UserDelete';
 import UsersPagination from './pagination/UserPagnation';
+import { useFetchUser } from '@/services/query/users';
 // import { Popover } from "@/components/ui/popover";
 function UsersTable() {
 	interface IUser {
@@ -12,7 +11,6 @@ function UsersTable() {
 		email: string;
 	}
 
-	const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
 	const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
 	const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
 	const [dataUser, setDataUser] = useState<IUser | null>(null);
@@ -40,10 +38,7 @@ function UsersTable() {
 			{/* Header */}
 			<div className="flex justify-between items-center mb-4">
 				<h2 className="text-xl font-semibold">Table Users</h2>
-				<button
-					onClick={() => setIsOpenCreateModal(true)}
-					className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-				>
+				<button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
 					Add New
 				</button>
 			</div>
@@ -107,10 +102,6 @@ function UsersTable() {
 			/>
 
 			{/* Modals */}
-			<UserCreateModal
-				isOpenCreateModal={isOpenCreateModal}
-				setIsOpenCreateModal={setIsOpenCreateModal}
-			/>
 			<UserEditModal
 				isOpenUpdateModal={isOpenUpdateModal}
 				setIsOpenUpdateModal={setIsOpenUpdateModal}
