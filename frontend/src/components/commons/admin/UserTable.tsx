@@ -38,7 +38,6 @@ export function UserTable({ onView, onEdit }: Props) {
 	});
 
 	const filtered = useMemo(() => {
-		console.log(users);
 		if (!users?.success) return [];
 
 		return users.data.filter(
@@ -88,97 +87,107 @@ export function UserTable({ onView, onEdit }: Props) {
 				placeholder="Tìm kiếm tên hoặc email..."
 				value={search}
 				onChange={(e) => setSearch(e.target.value)}
+				className="mb-4"
 			/>
 
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Avatar</TableHead>
-						<TableHead>Tên</TableHead>
-						<TableHead>Email</TableHead>
-						<TableHead>Vai trò</TableHead>
-						<TableHead>Số dư</TableHead>
-						<TableHead className="text-right">Hành động</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{isFetching ? (
-						<TableRow>
-							<TableCell colSpan={6}>
-								<div className="flex h-24 justify-center items-center">
-									<Loader className="animate-spin" />
-								</div>
-							</TableCell>
-						</TableRow>
-					) : filtered.length === 0 ? (
-						<TableRow>
-							<TableCell colSpan={6}>
-								<div className="text-center h-24 flex items-center justify-center">
-									Không tìm thấy người dùng
-								</div>
-							</TableCell>
-						</TableRow>
-					) : (
-						filtered.map((user) => (
-							<TableRow key={user.id}>
-								<TableCell>
-									<img
-										src={user.avatar}
-										alt="avatar"
-										className="w-8 h-8 rounded-full object-cover"
-									/>
-								</TableCell>
-								<TableCell>{user.name}</TableCell>
-								<TableCell>{user.email}</TableCell>
-								<TableCell className="capitalize">{user.role}</TableCell>
-								<TableCell>{user.balance.toLocaleString()}₫</TableCell>
-								<TableCell className="text-right space-x-1">
-									<Button
-										disabled={deleteUser.isPending}
-										size="icon"
-										variant="outline"
-										onClick={() => onView(user)}
-									>
-										<Eye className="w-4 h-4" />
-									</Button>
-									<Button
-										disabled={deleteUser.isPending}
-										size="icon"
-										variant="outline"
-										onClick={() => onEdit(user)}
-									>
-										<Pencil className="w-4 h-4" />
-									</Button>
-									<Button
-										disabled={deleteUser.isPending}
-										size="icon"
-										variant="destructive"
-										onClick={() => handleDeleteUser(user)}
-									>
-										{deletingUserId === user.id ? (
-											<Loader className="animate-spin" />
-										) : (
-											<Trash className="w-4 h-4" />
-										)}
-									</Button>
-								</TableCell>
+			<div className="overflow-x-auto -mx-4 sm:mx-0">
+				<div className="inline-block min-w-full align-middle">
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead className="w-[50px]">Avatar</TableHead>
+								<TableHead className="min-w-[120px]">Tên</TableHead>
+								<TableHead className="min-w-[180px]">Email</TableHead>
+								<TableHead className="min-w-[100px]">Vai trò</TableHead>
+								<TableHead className="min-w-[100px]">Số dư</TableHead>
+								<TableHead className="w-[120px] text-right">Hành động</TableHead>
 							</TableRow>
-						))
-					)}
-				</TableBody>
-			</Table>
+						</TableHeader>
+						<TableBody>
+							{isFetching ? (
+								<TableRow>
+									<TableCell colSpan={6}>
+										<div className="flex h-24 justify-center items-center">
+											<Loader className="animate-spin" />
+										</div>
+									</TableCell>
+								</TableRow>
+							) : filtered.length === 0 ? (
+								<TableRow>
+									<TableCell colSpan={6}>
+										<div className="text-center h-24 flex items-center justify-center">
+											Không tìm thấy người dùng
+										</div>
+									</TableCell>
+								</TableRow>
+							) : (
+								filtered.map((user) => (
+									<TableRow key={user.id}>
+										<TableCell>
+											<img
+												src={user.avatar}
+												alt="avatar"
+												className="w-8 h-8 rounded-full object-cover"
+											/>
+										</TableCell>
+										<TableCell>{user.name}</TableCell>
+										<TableCell>{user.email}</TableCell>
+										<TableCell className="capitalize">{user.role}</TableCell>
+										<TableCell>{user.balance.toLocaleString()}₫</TableCell>
+										<TableCell className="text-right space-x-1">
+											<Button
+												disabled={deleteUser.isPending}
+												size="icon"
+												variant="outline"
+												onClick={() => onView(user)}
+											>
+												<Eye className="w-4 h-4" />
+											</Button>
+											<Button
+												disabled={deleteUser.isPending}
+												size="icon"
+												variant="outline"
+												onClick={() => onEdit(user)}
+											>
+												<Pencil className="w-4 h-4" />
+											</Button>
+											<Button
+												disabled={deleteUser.isPending}
+												size="icon"
+												variant="destructive"
+												onClick={() => handleDeleteUser(user)}
+											>
+												{deletingUserId === user.id ? (
+													<Loader className="animate-spin" />
+												) : (
+													<Trash className="w-4 h-4" />
+												)}
+											</Button>
+										</TableCell>
+									</TableRow>
+								))
+							)}
+						</TableBody>
+					</Table>
+				</div>
+			</div>
 
 			{users?.success && users.pagination.totalPages > 1 && (
-				<div className="flex justify-between items-center pt-2">
-					<Button onClick={() => goToPage(page - 1)} disabled={page === 1}>
+				<div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4">
+					<Button
+						onClick={() => goToPage(page - 1)}
+						disabled={page === 1}
+						className="w-full sm:w-auto"
+					>
 						Trang trước
 					</Button>
-					<span>
+					<span className="text-sm text-gray-600">
 						Trang {page} / {users.pagination.totalPages}
 					</span>
 					<Button
 						onClick={() => goToPage(page + 1)}
 						disabled={page === users.pagination.totalPages}
+						className="w-full sm:w-auto"
 					>
 						Trang sau
 					</Button>

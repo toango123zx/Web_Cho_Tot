@@ -12,7 +12,7 @@ export const trimData = <T>(data: Record<string, unknown>, removeEmpty = true) =
 	const result: Record<string, unknown> = {};
 
 	Object.entries(data).forEach(([key, value]) => {
-		if (removeEmpty && !!result[key]) {
+		if (removeEmpty && !value) {
 			return;
 		}
 

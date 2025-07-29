@@ -29,12 +29,16 @@ export default function UserManagement() {
 
 	return (
 		<>
-			<div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-				<h1 className="text-2xl font-bold">Quản lý người dùng</h1>
-				<Button onClick={openCreateForm}>+ Thêm người dùng</Button>
+			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+				<h1 className="text-xl sm:text-2xl font-bold">Quản lý người dùng</h1>
+				<Button onClick={openCreateForm} className="w-full sm:w-auto">
+					+ Thêm người dùng
+				</Button>
 			</div>
 
-			<UserTable onView={handleViewUser} onEdit={openEditForm} />
+			<div className="bg-white rounded-lg shadow p-4 overflow-x-auto">
+				<UserTable onView={handleViewUser} onEdit={openEditForm} />
+			</div>
 
 			{/* Form thêm / cập nhật */}
 			<CreateOrUpdateUserForm

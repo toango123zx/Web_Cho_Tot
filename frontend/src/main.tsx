@@ -18,6 +18,7 @@ import { ProfileLayout } from '@/layout/LayoutProfile.tsx';
 import AdminLayout from './layout/AdminLayout.tsx';
 import AdminDashboard from './pages/admin/Dashboard.tsx';
 import UserManagement from './pages/admin/UserManagement.tsx';
+import AuthLayout from './layout/AuthLayout.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -64,12 +65,17 @@ const router = createBrowserRouter([
 	},
 
 	{
-		path: '/login',
-		element: <LoginPage />,
-	},
-	{
-		path: '/register',
-		element: <RegisterPage />,
+		element: <AuthLayout />,
+		children: [
+			{
+				path: '/login',
+				element: <LoginPage />,
+			},
+			{
+				path: '/register',
+				element: <RegisterPage />,
+			},
+		],
 	},
 ]);
 const queryClient = new QueryClient();

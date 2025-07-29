@@ -22,12 +22,10 @@ export const createUserValidationSchema: ValidationSchema<IUserCreation> = {
 	address: {
 		fieldName: 'Địa chỉ',
 		errorMessage: 'Vui lòng nhập địa chỉ',
-		required: true,
 	},
 	bio: {
 		fieldName: 'Tiểu sử',
 		errorMessage: 'Vui lòng nhập tiểu sử',
-		required: true,
 	},
 	dateOfBirth: {
 		fieldName: 'Ngày sinh',
@@ -41,7 +39,7 @@ export const createUserValidationSchema: ValidationSchema<IUserCreation> = {
 		fieldName: 'Số điện thoại',
 		errorMessage: 'Vui lòng nhập số điện thoại hợp lệ',
 		customValidate: ({ phoneNumber }) => {
-			return !!Number(phoneNumber);
+			return phoneNumber ? !!Number(phoneNumber) : true;
 		},
 	},
 };
@@ -49,7 +47,6 @@ export const createUserValidationSchema: ValidationSchema<IUserCreation> = {
 export const updateUserValidationSchema: ValidationSchema<IUserUpdatePayload> = {
 	name: {
 		fieldName: 'Họ tên',
-		required: true,
 		errorMessage: 'Họ tên bắt buộc và phải có ít nhất 3 ký tự',
 	},
 	address: {

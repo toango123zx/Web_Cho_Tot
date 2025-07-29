@@ -18,14 +18,16 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
 	}
 
 	return (
-		<div className="min-h-screen bg-gray-50 py-8">
+		<div className="min-h-screen bg-gray-50 py-4 sm:py-8">
 			<div className="max-w-5xl mx-auto px-4">
-				<h1 className="text-2xl font-bold text-gray-900 mb-6">{title}</h1>
-				<div className="flex bg-white shadow-md rounded-lg overflow-hidden">
+				<h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+					{title}
+				</h1>
+				<div className="flex flex-col sm:flex-row bg-white shadow-md rounded-lg overflow-hidden">
 					{/* Sidebar */}
-					<div className="w-64 border-r">
-						<div className="p-6">
-							<h2 className="text-lg font-semibold text-gray-900 mb-6">
+					<div className="w-full sm:w-64 border-b sm:border-b-0 sm:border-r">
+						<div className="p-4 sm:p-6">
+							<h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
 								Thông tin cá nhân
 							</h2>
 							<nav className="space-y-2">
@@ -56,7 +58,7 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
 					</div>
 
 					{/* Main Content */}
-					<div className="flex-1 p-8">
+					<div className="flex-1 p-4 sm:p-8">
 						<div className="max-w-2xl">{children}</div>
 					</div>
 				</div>

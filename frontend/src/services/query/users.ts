@@ -16,7 +16,6 @@ interface UserQueryProps {
 }
 
 export function useUserQueryWithPagination({ page, limit }: UserQueryProps) {
-	loginAPI('', '').then(() => {});
 	const query = useQuery({
 		queryKey: QUERY_KEY.getUserPaginate(page),
 		queryFn: () => getUsersPaginateAPI(page, limit),
