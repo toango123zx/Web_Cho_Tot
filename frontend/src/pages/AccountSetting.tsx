@@ -1,7 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { PasswordChangedModal } from '@/components/modals/PasswordChangedModal';
+import { useChangePassword } from '@/services/query';
+import { useCurrentApp } from '@/components/context/AppContext';
 
 function validatePassword(password: string) {
 	return {
@@ -13,9 +18,14 @@ function validatePassword(password: string) {
 }
 
 export default function AccountSettingsPage() {
+	const navigate = useNavigate();
+	const { mutate: changePassword, isPending } = useChangePassword();
+
 	const [currentPassword, setCurrentPassword] = useState('');
 	const [newPassword, setNewPassword] = useState('');
 	const [confirmNewPassword, setConfirmNewPassword] = useState('');
+	const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+	const { setIsAuthenticated } = useCurrentApp();
 	const [errors, setErrors] = useState({
 		currentPassword: '',
 		newPassword: '',
@@ -50,15 +60,29 @@ export default function AccountSettingsPage() {
 		}
 
 		setErrors(newErrors);
-
 		if (Object.values(newErrors).some((msg) => msg !== '')) return;
 
-		console.log('Changing password:', { currentPassword, newPassword });
-
-		setCurrentPassword('');
-		setNewPassword('');
-		setConfirmNewPassword('');
-		setErrors({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
+		changePassword(
+			{ currentPassword, newPassword },
+			{
+				onSuccess: (res) => {
+					if (res.success) {
+						setIsSuccessModalOpen(true);
+						setCurrentPassword('');
+						setNewPassword('');
+						setConfirmNewPassword('');
+						setErrors({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
+					} else {
+						toast.error(res.message || 'Đổi mật khẩu thất bại. Vui lòng thử lại.');
+					}
+				},
+				onError: (error: any) => {
+					const message =
+						error?.response?.data?.message || 'Đổi mật khẩu thất bại. Vui lòng thử lại.';
+					toast.error(message);
+				},
+			},
+		);
 	};
 
 	return (
@@ -108,10 +132,21 @@ export default function AccountSettingsPage() {
 
 			<Button
 				onClick={handlePasswordChange}
+				disabled={isPending}
 				className="bg-[#FF8800] hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-semibold"
 			>
-				ĐỔI MẬT KHẨU
+				{isPending ? 'ĐANG ĐỔI...' : 'ĐỔI MẬT KHẨU'}
 			</Button>
+
+			<PasswordChangedModal
+				open={isSuccessModalOpen}
+				onClose={() => setIsSuccessModalOpen(false)}
+				onLoginClick={() => {
+					localStorage.removeItem('access_token');
+					setIsAuthenticated(false);
+					navigate('/login');
+				}}
+			/>
 		</div>
 	);
 }

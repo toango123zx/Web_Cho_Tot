@@ -1,6 +1,5 @@
 import { GoodCoinIcon } from '@/assets/icons';
 import { ChevronRight, Pencil, Star } from 'lucide-react';
-import { use } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface AccountLayerProps {

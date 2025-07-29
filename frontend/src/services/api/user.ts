@@ -33,3 +33,11 @@ export const getOnlineUsersAPI = () => {
 	return axios.get<IBackendRes<IOnlineUser>>('/users/online');
 	return axios.get<IBackendRes<IOnlineUser>>('/users/online');
 };
+
+export const changePasswordAPI = async (data: {
+	currentPassword: string;
+	newPassword: string;
+}) => {
+	const res = await axios.post('/users/change-password', data);
+	return res.data as IBackendRes<IChangePassword>;
+};

@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { QUERY_KEY } from '@/config/key';
 import { loginAPI } from '../api/auth';
 import {
+	changePasswordAPI,
 	createUserAPI,
 	deleteUserAPI,
 	getUsersPaginateAPI,
@@ -59,3 +60,10 @@ export function useUserMutations() {
 
 	return { createUser, updateUser, deleteUser };
 }
+
+export const useChangePassword = () => {
+	return useMutation({
+		mutationFn: (data: { currentPassword: string; newPassword: string }) =>
+			changePasswordAPI(data),
+	});
+};

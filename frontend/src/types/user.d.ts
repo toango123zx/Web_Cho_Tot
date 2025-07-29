@@ -40,3 +40,9 @@ interface IUserUpdatePayload {
 	avatar: string | null;
 }
 interface IFetchAccount extends IUser {}
+
+interface IChangePassword {
+	id: string;
+	userId: string;
+	verify: boolean;
+}
