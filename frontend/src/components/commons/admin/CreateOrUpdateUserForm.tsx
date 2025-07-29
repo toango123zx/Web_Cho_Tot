@@ -97,7 +97,6 @@ export default function CreateOrUpdateUserForm({
 
 	const validateUpdatationForm = () => {
 		const { isValid, errors } = validate(formData, updateUserValidationSchema);
-		console.log(isValid);
 
 		setErrors(errors as Record<keyof IUserCreation, string>);
 		return isValid;
@@ -105,8 +104,6 @@ export default function CreateOrUpdateUserForm({
 
 	const validateCreationForm = () => {
 		const { isValid, errors } = validate(formData, createUserValidationSchema);
-		console.log(isValid);
-
 		setErrors(errors);
 		return isValid;
 	};

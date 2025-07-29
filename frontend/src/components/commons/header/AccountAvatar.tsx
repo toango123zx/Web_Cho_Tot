@@ -1,35 +1,41 @@
-import { CircleUserRound } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-export interface AvatarProps {
+interface AvatarProps {
 	isLoggedIn: boolean;
-	username?: string;
+	username: string;
 	avatarURL?: string;
 	size?: number;
 }
 
-export function Avatar({ isLoggedIn, username, avatarURL, size = 18 }: AvatarProps) {
-	if (!isLoggedIn) {
+export function Avatar({ isLoggedIn, username, avatarURL, size = 28 }: AvatarProps) {
+	if (!isLoggedIn || !avatarURL) {
 		return (
-			<div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-300 flex items-center justify-center">
-				<CircleUserRound size={18} className="w-4 h-4 sm:w-5 sm:h-5" />
+			<div
+				className={cn(
+					'rounded-full bg-gray-300 flex items-center justify-center text-white text-xs font-medium',
+					'w-[28px] h-[28px]',
+				)}
+				style={{ width: size, height: size }}
+			>
+				{username?.charAt(0).toUpperCase() || 'U'}
 			</div>
 		);
 	}
 
-	return !avatarURL ? (
-		<div
-			style={{ width: size, height: size }}
-			className="inline-flex items-center justify-center rounded-full bg-red-400 text-white"
-		>
-			{username?.charAt(0).toUpperCase() || 'U'}
-		</div>
-	) : (
+	return (
 		<img
 			src={avatarURL}
-			width={size}
-			height={size}
-			className="inline-flex items-center justify-center rounded-full object-cover"
-			alt={username || 'User Avatar'}
+			alt={username}
+			className="rounded-full object-cover"
+			style={{
+				width: size,
+				height: size,
+			}}
+			onError={(e) => {
+				e.currentTarget.onerror = null;
+				e.currentTarget.src =
+					'https://ui-avatars.com/api/?name=' + encodeURIComponent(username);
+			}}
 		/>
 	);
 }

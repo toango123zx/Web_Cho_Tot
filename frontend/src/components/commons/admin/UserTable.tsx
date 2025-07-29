@@ -38,7 +38,6 @@ export function UserTable({ onView, onEdit }: Props) {
 	});
 
 	const filtered = useMemo(() => {
-		console.log(users);
 		if (!users?.success) return [];
 
 		return users.data.filter(

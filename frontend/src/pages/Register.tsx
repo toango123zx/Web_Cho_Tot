@@ -35,7 +35,6 @@ export default function RegisterPage() {
 			{ name: trimmedName, email: trimmedEmail, password: trimmedPassword },
 			{
 				onSuccess: (res) => {
-					console.log(res);
 					if (res.success) {
 						setSuccessMessage('Đăng ký thành công!');
 						setErrorMessage('');

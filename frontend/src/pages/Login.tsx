@@ -44,10 +44,15 @@ export default function LoginForm() {
 						setIsAuthenticated(true);
 						setSuccessMessage('Đăng nhập thành công!');
 						setErrorMessage('');
-						await refetch();
+
+						const bc = new BroadcastChannel('auth_channel');
+						bc.postMessage('logged_in');
+						bc.close();
+
 						if (isPopup) {
 							window.close();
 						} else {
+							await refetch();
 							navigate(from, { replace: true });
 						}
 					} else {

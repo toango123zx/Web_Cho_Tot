@@ -17,17 +17,20 @@ import { useRef, useState } from 'react';
 import { HeaderSearch } from './HeaderSearch';
 import { AccountLayer } from './AccountLayer';
 import { Avatar } from './AccountAvatar';
+import { useCurrentApp } from '@/components/context/AppContext';
 
 export function HeaderBottom() {
 	const [isAccountLayerShown, setIsAccountLayerShown] = useState(false);
-	const isLoggedIn = false;
-	const username = 'Đạt Ngô';
+	const { isAuthenticated, user } = useCurrentApp();
+	const isLoggedIn = isAuthenticated;
+	const username = user?.name || 'Unknown';
+	// const isLoggedIn = false;
+	// const username = 'Đạt Ngô';
 
 	const accountLayerRef = useRef<HTMLDivElement>(null);
 
 	useClickOutside(accountLayerRef, () => {
 		setIsAccountLayerShown(false);
-		console.log('object');
 	});
 
 	const handleToggleAccountLayer = (e: React.MouseEvent) => {
@@ -44,7 +47,8 @@ export function HeaderBottom() {
 						alt="Logo Chotot"
 						className="h-8 sm:h-9 w-auto"
 					/>
-				</a>
+				</a>{' '}
+				{/* avatarURL={user?.avatar} */}
 			</figure>
 
 			{/* Categories */}
@@ -100,7 +104,7 @@ export function HeaderBottom() {
 						<Avatar
 							isLoggedIn={isLoggedIn}
 							username={username}
-							avatarURL="https://static.chotot.com/storage/marketplace/common/png/default_user.png"
+							avatarURL={user?.avatar}
 							size={isLoggedIn ? 28 : 18}
 						/>
 					) : (
@@ -116,6 +120,7 @@ export function HeaderBottom() {
 						<AccountLayer
 							isLoggedIn={isLoggedIn}
 							username={username}
+							user={user ?? undefined}
 							accountLayerRef={accountLayerRef}
 						/>
 					)}

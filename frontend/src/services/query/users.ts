@@ -51,7 +51,6 @@ export function useUserMutations() {
 		mutationFn: ({ id, data }: { id: string; data: IUserUpdatePayload }) =>
 			updateUserAPI(id, data),
 		onSuccess: (res: any) => {
-			console.log('Update user response:', res);
 			if (res.data.success) {
 				toast.success(res.message || 'Cập nhật người dùng thành công');
 				queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAllUser() });

@@ -21,6 +21,5 @@ export const registerAPI = async (name: string, email: string, password: string)
 export const fetchAccountAPI = async () => {
 	await sleep(1500);
 	const res = await axios.get('/users/me');
-	console.log('fetchAccountAPI', res.data);
 	return res.data as IBackendRes<IFetchAccount>;
 };

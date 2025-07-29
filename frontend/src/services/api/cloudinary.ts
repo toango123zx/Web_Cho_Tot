@@ -19,7 +19,6 @@ export const uploadFileToCloudinary = async (
 			data: response.data,
 		};
 	} catch (error) {
-		console.log(error);
 		return {
 			success: false,
 			message: 'Không thể upload ảnh vì một số lí do, hãy thử lại sau',
