@@ -13,12 +13,13 @@ export function AccountLayer({
 	isLoggedIn,
 	username,
 }: AccountLayerProps) {
-	const handleLoginClick = () =>
+	const handleLoginClick = () => {
 		window.open(
-			'/login',
+			'/login?popup=1',
 			'_blank',
 			'noopener,noreferrer,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
 		);
+	};
 
 	const handleRegisterClick = () =>
 		window.open(

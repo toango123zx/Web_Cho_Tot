@@ -15,7 +15,11 @@ export function PasswordChangedModal({
 }: PasswordChangedModalProps) {
 	return (
 		<Dialog open={open} onOpenChange={onClose}>
-			<DialogContent className="text-center max-w-sm rounded-xl [&>button.absolute]:hidden">
+			<DialogContent
+				className="text-center max-w-sm rounded-xl [&>button.absolute]:hidden"
+				onInteractOutside={(e) => e.preventDefault()}
+			>
+				{' '}
 				<div className="flex justify-center mb-4">
 					<div className="bg-yellow-400 p-4 rounded-full">
 						<Lock className="text-white w-8 h-8" />

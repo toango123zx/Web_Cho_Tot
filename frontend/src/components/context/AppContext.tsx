@@ -27,6 +27,7 @@ export const AppProvider = (props: TProps) => {
 	const { data, isLoading } = useAccount();
 	useEffect(() => {
 		if (data) {
+			console.log('User data fetched:', data);
 			setUser(data);
 			setIsAuthenticated(true);
 		} else {

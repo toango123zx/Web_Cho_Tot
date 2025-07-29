@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
 import { BsApple } from 'react-icons/bs';
 import { useCurrentApp } from '@/components/context/AppContext';
-import { useLogin } from '@/services/query/auth';
+import { useAccount, useLogin } from '@/services/query/auth';
 
 export default function LoginForm() {
 	const navigate = useNavigate();
@@ -18,6 +18,8 @@ export default function LoginForm() {
 	const { setIsAuthenticated } = useCurrentApp();
 	const location = useLocation();
 	const from = location.state?.from?.pathname || '/';
+	const { refetch } = useAccount();
+	const isPopup = new URLSearchParams(location.search).get('popup') === '1';
 
 	const { mutate: login, isPending } = useLogin();
 
@@ -36,14 +38,18 @@ export default function LoginForm() {
 		login(
 			{ email: trimmedEmail, password: trimmedPassword },
 			{
-				onSuccess: (res) => {
+				onSuccess: async (res) => {
 					if (res.success) {
 						localStorage.setItem('access_token', res.data.accessToken);
 						setIsAuthenticated(true);
 						setSuccessMessage('Đăng nhập thành công!');
 						setErrorMessage('');
-						window.close();
-						navigate(from, { replace: true });
+						await refetch();
+						if (isPopup) {
+							window.close();
+						} else {
+							navigate(from, { replace: true });
+						}
 					} else {
 						setErrorMessage(res.message || 'Đăng nhập thất bại');
 						setSuccessMessage('');
@@ -120,6 +126,11 @@ export default function LoginForm() {
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
 								required
+								onKeyDown={(e) => {
+									if (e.key === 'Enter') {
+										handleLogin(e);
+									}
+								}}
 							/>
 						</div>
 
@@ -132,6 +143,11 @@ export default function LoginForm() {
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 								required
+								onKeyDown={(e) => {
+									if (e.key === 'Enter') {
+										handleLogin(e);
+									}
+								}}
 							/>
 							<Button
 								variant="link"
