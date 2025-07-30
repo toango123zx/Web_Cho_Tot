@@ -16,13 +16,13 @@ import { cn } from '@/lib/utils';
 import { CalendarIcon, UploadCloud } from 'lucide-react';
 import { AddressDialog } from '@/components/dialog/AddressDialog';
 import { useCurrentApp } from '@/components/context/AppContext';
-import { useUserMutations } from '@/services/query';
 import { uploadFileToCloudinary } from '@/services/api/cloudinary';
 import { toast } from 'sonner';
+import { useUpdateUserProfile } from '@/services/query';
 
 export default function UpdateProfile() {
 	const { user } = useCurrentApp();
-	const { updateUser } = useUserMutations();
+	const updateUser = useUpdateUserProfile();
 
 	const [userName, setUserName] = useState('');
 	const [userIntroduction, setUserIntroduction] = useState('');
@@ -213,7 +213,7 @@ export default function UpdateProfile() {
 
 			{/* Basic information */}
 			<div className="mb-8 space-y-6">
-				<div className="grid grid-cols-2 gap-6">
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 					<div>
 						<Label
 							htmlFor="name"
@@ -303,7 +303,7 @@ export default function UpdateProfile() {
 					<Input id="email" value={user?.email ?? ''} disabled />
 				</div>
 
-				<div className="grid grid-cols-2 gap-6">
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 					<div>
 						<Label className="text-sm font-medium text-gray-700 mb-2 block">
 							Giới tính

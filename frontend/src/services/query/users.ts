@@ -89,3 +89,25 @@ export const useChangePassword = () => {
 			changePasswordAPI(data),
 	});
 };
+
+export const useUpdateUserProfile = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({ id, data }: { id: string; data: IUserUpdatePayload }) =>
+			updateUserAPI(id, data),
+		onSuccess: (res: any) => {
+			if (res.data.success) {
+				toast.success(res.message || 'Cập nhật người dùng thành công');
+				queryClient.invalidateQueries({ queryKey: ['account'] });
+			} else {
+				toast.error(res.message || 'Cập nhật người dùng thất bại');
+			}
+		},
+		onError: (err: any) => {
+			const message = err?.response?.data?.message || 'Cập nhật người dùng thất bại';
+			toast.error(message);
+			console.error('Update user error:', err);
+		},
+	});
+};
