@@ -5,7 +5,7 @@ import LoginPage from '@/pages/Login.tsx';
 import RegisterPage from '@/pages/Register.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AppProvider } from '@/components/context/AppContext.tsx';
-// import ProtectedRoute from '@/components/auth/index.tsx'
+import ProtectedRoute from '@/components/auth/index.tsx';
 import { Toaster } from './components/ui/sonner.tsx';
 // import { SocketProvider } from './components/context/socket.context.tsx'
 import HomePage from '@/pages/Home.tsx';
@@ -33,17 +33,21 @@ const router = createBrowserRouter([
 			{
 				path: '/user/settings/profile',
 				element: (
-					<ProfileLayout>
-						<UpdateProfile />
-					</ProfileLayout>
+					<ProtectedRoute>
+						<ProfileLayout>
+							<UpdateProfile />
+						</ProfileLayout>
+					</ProtectedRoute>
 				),
 			},
 			{
 				path: '/user/settings/account',
 				element: (
-					<ProfileLayout>
-						<AccountSettings />
-					</ProfileLayout>
+					<ProtectedRoute>
+						<ProfileLayout>
+							<AccountSettings />
+						</ProfileLayout>
+					</ProtectedRoute>
 				),
 			},
 		],
@@ -81,7 +85,7 @@ const router = createBrowserRouter([
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')!).render(
-	<>
+	<StrictMode>
 		<QueryClientProvider client={queryClient}>
 			<AppProvider>
 				{/* <SocketProvider> */}
@@ -92,5 +96,5 @@ createRoot(document.getElementById('root')!).render(
 				{/* </SocketProvider> */}
 			</AppProvider>
 		</QueryClientProvider>
-	</>,
+	</StrictMode>,
 );

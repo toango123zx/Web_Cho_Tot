@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
 	Select,
 	SelectContent,
@@ -10,51 +9,111 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { CalendarIcon } from 'lucide-react';
-import { ChangeEmailDialog } from '@/components/dialog/ChangeEmailDialog';
+import { CalendarIcon, UploadCloud } from 'lucide-react';
 import { AddressDialog } from '@/components/dialog/AddressDialog';
+import { useCurrentApp } from '@/components/context/AppContext';
+import { uploadFileToCloudinary } from '@/services/api/cloudinary';
+import { toast } from 'sonner';
+import { useUpdateUserProfile } from '@/services/query';
 
 export default function UpdateProfile() {
-	const initialUserName = 'Võ Văn Minh';
-	const initialUserIntroduction = '';
-	const initialReferenceName = '';
-	const initialGender = undefined;
-	const initialDob = undefined;
-	const initialUserAddress = {
+	const { user } = useCurrentApp();
+	const updateUser = useUpdateUserProfile();
+
+	const [userName, setUserName] = useState('');
+	const [userIntroduction, setUserIntroduction] = useState('');
+	const [gender, setGender] = useState<string | undefined>(undefined);
+	const [dob, setDob] = useState<Date | undefined>(undefined);
+	const [phoneNumber, setPhoneNumber] = useState('');
+
+	const [userAddress, setUserAddress] = useState({
 		province: '',
 		provinceLabel: '',
 		ward: '',
 		wardLabel: '',
 		specificAddress: '',
-	};
-
-	const [userName, setUserName] = useState(initialUserName);
-	const [userIntroduction, setUserIntroduction] = useState(initialUserIntroduction);
-	const [referenceName, setReferenceName] = useState(initialReferenceName);
-	const [gender, setGender] = useState<string | undefined>(initialGender);
-	const [dob, setDob] = useState<Date | undefined>(initialDob);
-	const [userAddress, setUserAddress] = useState(initialUserAddress);
-
-	const [isChangeEmailDialogOpen, setIsChangeEmailDialogOpen] = useState(false);
+	});
 	const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
 
-	const currentUserEmail = 'vvm1004@gmail.com';
-	const currentUserPhone = '0974482032';
+	const [avatarFile, setAvatarFile] = useState<File | null>(null);
+	const [previewAvatar, setPreviewAvatar] = useState<string | null>(null);
+
+	const [initialUserInfo, setInitialUserInfo] = useState({
+		name: '',
+		bio: '',
+		gender: undefined as string | undefined,
+		dob: undefined as Date | undefined,
+		phoneNumber: '',
+		address: {
+			province: '',
+			provinceLabel: '',
+			ward: '',
+			wardLabel: '',
+			specificAddress: '',
+		},
+		avatar: '',
+	});
+
+	useEffect(() => {
+		if (user) {
+			const parsedDob = user.dob ? new Date(user.dob) : undefined;
+			const initial = {
+				name: user.name ?? '',
+				bio: user.bio ?? '',
+				gender: user.gender ?? undefined,
+				dob: parsedDob,
+				phoneNumber: user.phoneNumber ?? '',
+				address: {
+					province: '',
+					provinceLabel: '',
+					ward: '',
+					wardLabel: '',
+					specificAddress: user.address ?? '',
+				},
+				avatar: user.avatar ?? '',
+			};
+			setUserName(initial.name);
+			setUserIntroduction(initial.bio);
+			setGender(initial.gender);
+			setDob(initial.dob);
+			setPhoneNumber(initial.phoneNumber);
+			setUserAddress(initial.address);
+			setInitialUserInfo(initial);
+			setPreviewAvatar(null);
+			setAvatarFile(null);
+		}
+	}, [user]);
+
+	useEffect(() => {
+		return () => {
+			if (previewAvatar && previewAvatar.startsWith('blob:')) {
+				URL.revokeObjectURL(previewAvatar);
+			}
+		};
+	}, [previewAvatar]);
+
+	const isPhoneNumberValid = /^\d{10}$/.test(phoneNumber.trim());
+	const isBioValid = userIntroduction.trim().split(/\s+/).length <= 80;
+
+	const addressChanged =
+		userAddress.province !== initialUserInfo.address.province ||
+		userAddress.provinceLabel !== initialUserInfo.address.provinceLabel ||
+		userAddress.ward !== initialUserInfo.address.ward ||
+		userAddress.wardLabel !== initialUserInfo.address.wardLabel ||
+		userAddress.specificAddress.trim() !== initialUserInfo.address.specificAddress.trim();
 
 	const hasChanges =
-		userName !== initialUserName ||
-		userIntroduction !== initialUserIntroduction ||
-		referenceName !== initialReferenceName ||
-		gender !== initialGender ||
-		dob !== initialDob ||
-		userAddress.province !== initialUserAddress.province ||
-		userAddress.ward !== initialUserAddress.ward ||
-		userAddress.specificAddress !== initialUserAddress.specificAddress;
+		userName.trim() !== initialUserInfo.name.trim() ||
+		userIntroduction.trim() !== initialUserInfo.bio.trim() ||
+		gender !== initialUserInfo.gender ||
+		dob?.toISOString() !== initialUserInfo.dob?.toISOString() ||
+		addressChanged ||
+		phoneNumber.trim() !== initialUserInfo.phoneNumber.trim() ||
+		avatarFile !== null;
 
 	const formatAddressDisplay = () => {
 		const parts: string[] = [];
@@ -64,200 +123,250 @@ export default function UpdateProfile() {
 		return parts.join(', ') || 'Địa chỉ';
 	};
 
-	return (
-		<div className="p-4 sm:p-6">
-			<h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-8">
-				Hồ sơ cá nhân
-			</h1>
-			<Card className="mb-4 sm:mb-8">
-				<CardContent className="p-4 sm:p-6">
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
-						<div>
-							<Label
-								htmlFor="name"
-								className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block"
-							>
-								Họ và tên *
-							</Label>
-							<Input
-								id="name"
-								value={userName}
-								onChange={(e) => setUserName(e.target.value)}
-								className="w-full"
-								required
-							/>
-						</div>
-						<div>
-							<Label
-								htmlFor="phone"
-								className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block"
-							>
-								Số điện thoại *
-							</Label>
-							<Input
-								id="phone"
-								defaultValue="0974482032"
-								className="w-full"
-								required
-								disabled
-							/>
-						</div>
-					</div>
-					<div className="mb-4 sm:mb-6">
-						<Label
-							htmlFor="address"
-							className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block"
-						>
-							Địa chỉ
-						</Label>
-						<Input
-							id="address"
-							placeholder="Địa chỉ"
-							className="w-full cursor-pointer"
-							readOnly
-							value={formatAddressDisplay()}
-							onClick={() => setIsAddressDialogOpen(true)}
-						/>
-					</div>
-					<div className="mb-4 sm:mb-6">
-						<Label
-							htmlFor="introduction"
-							className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block"
-						>
-							Giới thiệu
-						</Label>
-						<Textarea
-							id="introduction"
-							placeholder="Viết vài dòng giới thiệu về gian hàng của bạn..."
-							className="w-full min-h-[100px] resize-none"
-							value={userIntroduction}
-							onChange={(e) => setUserIntroduction(e.target.value)}
-						/>
-						<p className="text-xs text-gray-500 mt-1">Tối đa 60 từ</p>
-					</div>
-					<div className="mb-4 sm:mb-6">
-						<Label
-							htmlFor="reference"
-							className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block"
-						>
-							Tên gợi nhớ
-						</Label>
-						<Input
-							id="reference"
-							value={referenceName}
-							onChange={(e) => setReferenceName(e.target.value)}
-							placeholder="Tên gợi nhớ của bạn"
-							className="w-full"
-						/>
-						<p className="text-xs text-gray-500 mt-1">
-							<>
-								<span className="text-blue-600">{`${window.location.origin}/user/${referenceName}`}</span>
-								<br />
-								<br />
-								Tên gợi nhớ sau khi được cập nhật sẽ không thể thay đổi trong vòng 60 ngày
-								tới.
-							</>
-						</p>
-					</div>
-				</CardContent>
-			</Card>
-			<Card>
-				<CardHeader>
-					<CardTitle className="text-base sm:text-lg font-semibold">
-						Thông tin bảo mật
-					</CardTitle>
-					<p className="text-xs sm:text-sm text-gray-600">
-						Những thông tin dưới đây sẽ mang tính bảo mật. Chỉ bạn mới có thể thấy và
-						chỉnh sửa những thông tin này.
-					</p>
-				</CardHeader>
-				<CardContent>
-					<div className="mb-4 sm:mb-6">
-						<Label
-							htmlFor="email"
-							className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block"
-						>
-							Email
-						</Label>
-						<div className="flex items-center justify-between gap-2">
-							<Input id="email" value={currentUserEmail} disabled className="flex-1" />
-							<button
-								onClick={() => setIsChangeEmailDialogOpen(true)}
-								className="text-blue-600 hover:text-blue-800 text-sm font-medium cursor-pointer w-fit"
-							>
-								Thay đổi
-							</button>
-						</div>
-					</div>
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-						<div>
-							<Label className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
-								Giới tính
-							</Label>
-							<Select onValueChange={setGender} value={gender}>
-								<SelectTrigger className="cursor-pointer">
-									<SelectValue placeholder="Chọn giới tính" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="male">Nam</SelectItem>
-									<SelectItem value="female">Nữ</SelectItem>
-									<SelectItem value="other">Khác</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
-						<div>
-							<Label className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
-								Ngày, tháng, năm sinh
-							</Label>
-							<Popover>
-								<PopoverTrigger asChild>
-									<Button
-										variant={'outline'}
-										className={cn(
-											'w-full justify-start text-left font-normal',
-											!dob && 'text-muted-foreground',
-										)}
-									>
-										<CalendarIcon className="mr-2 h-4 w-4" />
-										{dob ? format(dob, 'dd/MM/yyyy') : <span>Chọn ngày sinh</span>}
-									</Button>
-								</PopoverTrigger>
-								<PopoverContent className="w-auto p-0" align="start">
-									<Calendar
-										mode="single"
-										selected={dob}
-										onSelect={setDob}
-										captionLayout="dropdown"
-										hidden={{
-											before: new Date(1900, 0, 1),
-											after: new Date(new Date().getFullYear(), 11, 31),
-										}}
-									/>
-								</PopoverContent>
-							</Popover>
-						</div>
-					</div>
-					<Button
-						disabled={!hasChanges}
-						className={cn(
-							'text-white px-8',
-							hasChanges
-								? 'bg-[#FF8800] hover:bg-orange-600 cursor-pointer'
-								: 'bg-[#C0C0C0] cursor-default pointer-events-none',
-						)}
-					>
-						LƯU THAY ĐỔI
-					</Button>
-				</CardContent>
-			</Card>
+	const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+		if (previewAvatar && previewAvatar.startsWith('blob:')) {
+			URL.revokeObjectURL(previewAvatar);
+		}
+		setAvatarFile(file);
+		setPreviewAvatar(URL.createObjectURL(file));
+	};
 
-			{/* Dialogs */}
-			<ChangeEmailDialog
-				isOpen={isChangeEmailDialogOpen}
-				onClose={() => setIsChangeEmailDialogOpen(false)}
-				currentEmail={currentUserEmail}
-				currentPhoneNumber={currentUserPhone}
-			/>
+	const handleSave = async () => {
+		if (!user?.id || !isBioValid) return;
+		if (phoneNumber.trim() !== '' && !isPhoneNumberValid) return;
+
+		let uploadedAvatarUrl = user?.avatar ?? '';
+
+		if (avatarFile) {
+			const res = await uploadFileToCloudinary(avatarFile);
+			if (!res.success || !res.data?.secure_url) {
+				toast.error('Không thể tải lên ảnh đại diện. Vui lòng thử lại!');
+				setAvatarFile(null);
+				if (previewAvatar?.startsWith('blob:')) {
+					URL.revokeObjectURL(previewAvatar);
+					setPreviewAvatar(null);
+				}
+				return;
+			}
+			uploadedAvatarUrl = res.data.secure_url;
+		}
+
+		const fullAddressParts: string[] = [];
+		if (userAddress.specificAddress)
+			fullAddressParts.push(userAddress.specificAddress.trim());
+		if (userAddress.wardLabel) fullAddressParts.push(userAddress.wardLabel);
+		if (userAddress.provinceLabel) fullAddressParts.push(userAddress.provinceLabel);
+
+		const fullAddress = fullAddressParts.join(', ');
+
+		const data: IUserUpdatePayload = {
+			name: userName.trim(),
+			bio: userIntroduction.trim(),
+			gender: gender ? (gender.toUpperCase() as Gender) : null,
+			address: fullAddress,
+			avatar: uploadedAvatarUrl,
+			dateOfBirth: dob ? dob.toISOString() : null,
+		};
+
+		if (phoneNumber.trim() !== '') {
+			data.phoneNumber = phoneNumber.trim();
+		}
+
+		updateUser.mutate({ id: user.id, data });
+	};
+
+	return (
+		<div>
+			<h1 className="text-xl font-bold text-gray-900 mb-8">Hồ sơ cá nhân</h1>
+
+			{/* Avatar */}
+			<div className="mb-6">
+				<Label className="text-sm font-medium text-gray-700 mb-2 block">
+					Ảnh đại diện
+				</Label>
+				<div className="flex items-center space-x-4">
+					<img
+						src={previewAvatar || user?.avatar || '/placeholder-avatar.png'}
+						alt="avatar"
+						className="w-20 h-20 rounded-full object-cover border"
+					/>
+					<div>
+						<input
+							type="file"
+							accept="image/*"
+							id="avatar-upload"
+							className="hidden"
+							onChange={handleAvatarChange}
+						/>
+						<label
+							htmlFor="avatar-upload"
+							className="cursor-pointer inline-flex items-center px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded"
+						>
+							<UploadCloud className="w-4 h-4 mr-2" />
+							Chọn ảnh
+						</label>
+					</div>
+				</div>
+			</div>
+
+			{/* Basic information */}
+			<div className="mb-8 space-y-6">
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+					<div>
+						<Label
+							htmlFor="name"
+							className="text-sm font-medium text-gray-700 mb-2 block"
+						>
+							Họ và tên
+						</Label>
+						<Input
+							id="name"
+							value={userName}
+							onChange={(e) => setUserName(e.target.value)}
+							required
+						/>
+					</div>
+					<div>
+						<Label
+							htmlFor="phone"
+							className="text-sm font-medium text-gray-700 mb-2 block"
+						>
+							Số điện thoại
+						</Label>
+						<Input
+							id="phone"
+							value={phoneNumber}
+							onChange={(e) => setPhoneNumber(e.target.value)}
+						/>
+						{phoneNumber.trim() !== '' && !isPhoneNumberValid && (
+							<p className="text-sm text-red-500 mt-1">
+								Số điện thoại phải có đúng 10 chữ số
+							</p>
+						)}
+					</div>
+				</div>
+
+				<div>
+					<Label
+						htmlFor="address"
+						className="text-sm font-medium text-gray-700 mb-2 block"
+					>
+						Địa chỉ
+					</Label>
+					<Input
+						id="address"
+						readOnly
+						className="cursor-pointer"
+						value={formatAddressDisplay()}
+						onClick={() => setIsAddressDialogOpen(true)}
+					/>
+				</div>
+
+				<div>
+					<Label
+						htmlFor="introduction"
+						className="text-sm font-medium text-gray-700 mb-2 block"
+					>
+						Giới thiệu
+					</Label>
+					<textarea
+						id="introduction"
+						placeholder="Viết vài dòng giới thiệu về gian hàng của bạn..."
+						className="w-full min-h-[100px] max-h-[150px] resize-y overflow-y-auto border border-gray-300 rounded-md px-3 py-2"
+						value={userIntroduction}
+						onChange={(e) => setUserIntroduction(e.target.value)}
+					/>
+					<p className="text-xs mt-1">
+						{isBioValid ? (
+							<span className="text-gray-500">Tối đa 80 từ</span>
+						) : (
+							<span className="text-red-500">Vượt quá 80 từ</span>
+						)}
+					</p>
+				</div>
+			</div>
+
+			{/* Security information */}
+			<div className="mb-8 space-y-6">
+				<h2 className="text-lg font-semibold">Thông tin bảo mật</h2>
+				<p className="text-sm text-gray-600">
+					Những thông tin dưới đây sẽ mang tính bảo mật. Chỉ bạn mới có thể thấy và chỉnh
+					sửa.
+				</p>
+
+				<div>
+					<Label htmlFor="email" className="text-sm font-medium text-gray-700 mb-2 block">
+						Email
+					</Label>
+					<Input id="email" value={user?.email ?? ''} disabled />
+				</div>
+
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+					<div>
+						<Label className="text-sm font-medium text-gray-700 mb-2 block">
+							Giới tính
+						</Label>
+						<Select onValueChange={setGender} value={gender}>
+							<SelectTrigger>
+								<SelectValue placeholder="Chọn giới tính" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="MALE">Nam</SelectItem>
+								<SelectItem value="FEMALE">Nữ</SelectItem>
+								<SelectItem value="OTHER">Khác</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+					<div>
+						<Label className="text-sm font-medium text-gray-700 mb-2 block">
+							Ngày, tháng, năm sinh
+						</Label>
+						<Popover>
+							<PopoverTrigger asChild>
+								<Button
+									variant="outline"
+									className={cn(
+										'w-full justify-start text-left font-normal',
+										!dob && 'text-muted-foreground',
+									)}
+								>
+									<CalendarIcon className="mr-2 h-4 w-4" />
+									{dob ? format(dob, 'dd/MM/yyyy') : <span>Chọn ngày sinh</span>}
+								</Button>
+							</PopoverTrigger>
+							<PopoverContent className="w-auto p-0" align="start">
+								<Calendar
+									mode="single"
+									selected={dob}
+									onSelect={setDob}
+									captionLayout="dropdown"
+									hidden={{
+										before: new Date(1900, 0, 1),
+										after: new Date(new Date().getFullYear(), 11, 31),
+									}}
+								/>
+							</PopoverContent>
+						</Popover>
+					</div>
+				</div>
+
+				<Button
+					onClick={handleSave}
+					disabled={!hasChanges || !isBioValid}
+					className={cn(
+						'text-white px-8',
+						hasChanges && isBioValid
+							? 'bg-[#FF8800] hover:bg-orange-600'
+							: 'bg-[#C0C0C0] cursor-not-allowed pointer-events-none',
+					)}
+				>
+					LƯU THAY ĐỔI
+				</Button>
+			</div>
+
+			{/* Address */}
 			<AddressDialog
 				isOpen={isAddressDialogOpen}
 				onClose={() => setIsAddressDialogOpen(false)}

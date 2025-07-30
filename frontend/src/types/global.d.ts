@@ -3,3 +3,5 @@
 /// <reference path="./files.d.ts" />
 /// <reference path="./axios.d.ts" />
 /// <reference path="./auth.d.ts" />
+/// <reference path="./cloudinary.d.ts" />
+/// <reference path="./api.d.ts" />

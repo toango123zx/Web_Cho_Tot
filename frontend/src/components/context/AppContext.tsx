@@ -1,7 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useState } from 'react';
 import PacmanLoader from 'react-spinners/PacmanLoader';
-import { QUERY_KEY } from '@/config/key';
 import { useAccount } from '@/services/query/auth';
 
 interface IAppContext {
@@ -24,7 +23,8 @@ export const AppProvider = (props: TProps) => {
 	const [user, setUser] = useState<IUser | null>(null);
 	const [isAppLoading, setIsAppLoading] = useState<boolean>(true);
 	const queryClient = useQueryClient();
-	const { data, isLoading } = useAccount();
+	const { data, isLoading, refetch } = useAccount();
+
 	useEffect(() => {
 		if (data) {
 			setUser(data);
@@ -37,14 +37,15 @@ export const AppProvider = (props: TProps) => {
 	}, [data, isLoading]);
 
 	useEffect(() => {
-		const onStorageChange = (event: StorageEvent) => {
-			if (event.key === 'access_token' && event.newValue) {
-				queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAccount() });
+		const bc = new BroadcastChannel('auth_channel');
+
+		bc.onmessage = (event) => {
+			if (event.data === 'logged_in') {
+				refetch();
 			}
 		};
 
-		window.addEventListener('storage', onStorageChange);
-		return () => window.removeEventListener('storage', onStorageChange);
+		return () => bc.close();
 	}, [queryClient]);
 
 	return (

@@ -1,23 +1,27 @@
 import { GoodCoinIcon } from '@/assets/icons';
 import { ChevronRight, Pencil, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface AccountLayerProps {
 	accountLayerRef: React.RefObject<HTMLDivElement | null>;
 	isLoggedIn: boolean;
 	username?: string;
+	user?: { avatar?: string };
 }
 
 export function AccountLayer({
 	accountLayerRef,
 	isLoggedIn,
 	username,
+	user,
 }: AccountLayerProps) {
-	const handleLoginClick = () =>
+	const handleLoginClick = () => {
 		window.open(
-			'/login',
+			'/login?popup=1',
 			'_blank',
 			'noopener,noreferrer,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
 		);
+	};
 
 	const handleRegisterClick = () =>
 		window.open(
@@ -25,6 +29,7 @@ export function AccountLayer({
 			'_blank',
 			'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
 		);
+	const navigate = useNavigate();
 
 	return (
 		<div
@@ -33,12 +38,35 @@ export function AccountLayer({
 		>
 			<div className="flex gap-3 p-3">
 				{isLoggedIn ? (
-					<div className="size-12 rounded-full bg-red-400 inline-flex justify-center items-center text-xl font-bold text-white relative">
-						{username?.charAt(0).toUpperCase() || 'U'}
-						<span className="aspect-square rounded-full bg-[#c1c1c0]">
-							<Pencil className="absolute bottom-0 right-0 text-black" size={12} />
-						</span>
-					</div>
+					user?.avatar ? (
+						<div className="relative size-12">
+							<img
+								src={user.avatar}
+								alt={username}
+								className="size-12 rounded-full object-cover border"
+							/>
+							<button
+								type="button"
+								className="absolute bottom-0 right-0 bg-[#c1c1c0] rounded-full p-1 hover:bg-[#b0b0af]"
+								onClick={() => navigate('/user/settings/profile')}
+								title="Cập nhật thông tin"
+							>
+								<Pencil className="text-black cursor-pointer" size={10} />
+							</button>
+						</div>
+					) : (
+						<div className="size-12 rounded-full bg-red-400 inline-flex justify-center items-center text-xl font-bold text-white relative">
+							{username?.charAt(0).toUpperCase() || 'U'}
+							<button
+								type="button"
+								className="absolute bottom-0 right-0 bg-[#c1c1c0] rounded-full p-1 hover:bg-[#b0b0af]"
+								onClick={() => navigate('/user/settings/profile')}
+								title="Cập nhật thông tin"
+							>
+								<Pencil className="text-black" size={14} />
+							</button>
+						</div>
+					)
 				) : (
 					<img
 						src="https://static.chotot.com/storage/marketplace/common/png/default_user.png"
@@ -203,7 +231,9 @@ export function AccountLayer({
 							className="size-5"
 							alt="settings"
 						/>
-						<span>Cài đặt tài khoản</span>
+						<span onClick={() => navigate('/user/settings/profile')}>
+							Cài đặt tài khoản
+						</span>{' '}
 					</div>
 
 					<div className="hover:bg-gray-100 px-3 py-2 flex items-center gap-2">

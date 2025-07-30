@@ -1,117 +1,152 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { PasswordChangedModal } from '@/components/modals/PasswordChangedModal';
+import { useChangePassword } from '@/services/query';
+import { useCurrentApp } from '@/components/context/AppContext';
+
+function validatePassword(password: string) {
+	return {
+		hasUpperCase: /[A-Z]/.test(password),
+		hasLowerCase: /[a-z]/.test(password),
+		hasNumber: /[0-9]/.test(password),
+		hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+	};
+}
 
 export default function AccountSettingsPage() {
+	const navigate = useNavigate();
+	const { mutate: changePassword, isPending } = useChangePassword();
+
 	const [currentPassword, setCurrentPassword] = useState('');
 	const [newPassword, setNewPassword] = useState('');
 	const [confirmNewPassword, setConfirmNewPassword] = useState('');
-	const [allowContactByPhone, setAllowContactByPhone] = useState(false);
-
-	const passwordsMatch = newPassword === confirmNewPassword && newPassword !== '';
+	const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+	const { setIsAuthenticated } = useCurrentApp();
+	const [errors, setErrors] = useState({
+		currentPassword: '',
+		newPassword: '',
+		confirmNewPassword: '',
+	});
 
 	const handlePasswordChange = () => {
-		console.log('Changing password:', { currentPassword, newPassword });
-		setCurrentPassword('');
-		setNewPassword('');
-		setConfirmNewPassword('');
+		const validation = validatePassword(newPassword);
+
+		const newErrors = {
+			currentPassword: currentPassword ? '' : 'Vui lòng nhập mật khẩu hiện tại.',
+			newPassword: '',
+			confirmNewPassword: '',
+		};
+
+		if (!newPassword) {
+			newErrors.newPassword = 'Vui lòng nhập mật khẩu mới.';
+		} else if (
+			!validation.hasUpperCase ||
+			!validation.hasLowerCase ||
+			!validation.hasNumber ||
+			!validation.hasSpecialChar
+		) {
+			newErrors.newPassword =
+				'Mật khẩu phải chứa ít nhất 1 số, 1 chữ cái viết hoa, 1 chữ cái viết thường và 1 ký tự đặc biệt';
+		}
+
+		if (!confirmNewPassword) {
+			newErrors.confirmNewPassword = 'Vui lòng xác nhận mật khẩu mới.';
+		} else if (newPassword !== confirmNewPassword) {
+			newErrors.confirmNewPassword = 'Mật khẩu xác nhận không khớp.';
+		}
+
+		setErrors(newErrors);
+		if (Object.values(newErrors).some((msg) => msg !== '')) return;
+
+		changePassword(
+			{ currentPassword, newPassword },
+			{
+				onSuccess: (res) => {
+					if (res.success) {
+						setIsSuccessModalOpen(true);
+						setCurrentPassword('');
+						setNewPassword('');
+						setConfirmNewPassword('');
+						setErrors({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
+					} else {
+						toast.error(res.message || 'Đổi mật khẩu thất bại. Vui lòng thử lại.');
+					}
+				},
+				onError: (error: any) => {
+					const message =
+						error?.response?.data?.message || 'Đổi mật khẩu thất bại. Vui lòng thử lại.';
+					toast.error(message);
+				},
+			},
+		);
 	};
 
 	return (
-		<div className="p-0">
-			{/* <h1 className="text-2xl font-bold text-gray-900 mb-8">Cài đặt tài khoản</h1> */}
+		<div>
+			<h2 className="text-lg font-semibold mb-4">Thay đổi mật khẩu</h2>
 
-			{/* Change Password Card */}
-			<Card className="mb-8">
-				<CardHeader>
-					<CardTitle className="text-lg font-semibold">Thay đổi mật khẩu</CardTitle>
-				</CardHeader>
-				<CardContent className="p-6">
-					<div className="grid gap-4 mb-6">
-						<div className="grid gap-2">
-							<Label htmlFor="current-password">Mật khẩu hiện tại *</Label>
-							<Input
-								id="current-password"
-								type="password"
-								placeholder="Mật khẩu hiện tại *"
-								value={currentPassword}
-								onChange={(e) => setCurrentPassword(e.target.value)}
-								required
-							/>
-						</div>
-						<div className="grid gap-2">
-							<Label htmlFor="new-password">Mật khẩu mới *</Label>
-							<Input
-								id="new-password"
-								type="password"
-								placeholder="Mật khẩu mới *"
-								value={newPassword}
-								onChange={(e) => setNewPassword(e.target.value)}
-								required
-							/>
-						</div>
-						<div className="grid gap-2">
-							<Label htmlFor="confirm-new-password">Xác nhận mật khẩu mới *</Label>
-							<Input
-								id="confirm-new-password"
-								type="password"
-								placeholder="Xác nhận mật khẩu mới *"
-								value={confirmNewPassword}
-								onChange={(e) => setConfirmNewPassword(e.target.value)}
-								required
-							/>
-							{!passwordsMatch && newPassword !== '' && confirmNewPassword !== '' && (
-								<p className="text-sm text-red-500">Mật khẩu mới không khớp.</p>
-							)}
-						</div>
-					</div>
-					<Button
-						onClick={handlePasswordChange}
-						disabled={
-							!currentPassword || !newPassword || !confirmNewPassword || !passwordsMatch
-						}
-						className={cn(
-							'w-full bg-[#FF8800] hover:bg-orange-600 text-white py-2 rounded-md font-semibold',
-							(!currentPassword ||
-								!newPassword ||
-								!confirmNewPassword ||
-								!passwordsMatch) &&
-								'bg-[#C0C0C0] cursor-default pointer-events-none',
-						)}
-					>
-						ĐỔI MẬT KHẨU
-					</Button>
-				</CardContent>
-			</Card>
+			<div className="grid gap-4 mb-6">
+				<div className="grid gap-1">
+					<Input
+						type="password"
+						placeholder="Mật khẩu hiện tại *"
+						value={currentPassword}
+						onChange={(e) => setCurrentPassword(e.target.value)}
+						className={cn(errors.currentPassword && 'border-red-500')}
+					/>
+					{errors.currentPassword && (
+						<p className="text-sm text-red-500">{errors.currentPassword}</p>
+					)}
+				</div>
 
-			{/* Contact Preference Card */}
-			<Card>
-				<CardContent className="p-6">
-					<div className="flex items-center justify-between mb-4">
-						<div>
-							<CardTitle className="text-lg font-semibold">
-								Cho phép người mua liên lạc qua điện thoại
-							</CardTitle>
-							<p className="text-sm text-gray-600">
-								Khi bật tính năng này, số điện thoại sẽ hiển thị trên tất cả tin đăng của
-								bạn.
-							</p>
-						</div>
-						<Switch
-							checked={allowContactByPhone}
-							onCheckedChange={setAllowContactByPhone}
-							className="data-[state=checked]:bg-[#FF8800]"
-						/>
-					</div>
-					<a href="#" className="text-blue-600 hover:underline text-sm">
-						Yêu cầu chấm dứt tài khoản
-					</a>
-				</CardContent>
-			</Card>
+				<div className="grid gap-1">
+					<Input
+						type="password"
+						placeholder="Mật khẩu mới *"
+						value={newPassword}
+						onChange={(e) => setNewPassword(e.target.value)}
+						className={cn(errors.newPassword && 'border-red-500')}
+					/>
+					{errors.newPassword && (
+						<p className="text-sm text-red-500">{errors.newPassword}</p>
+					)}
+				</div>
+
+				<div className="grid gap-1">
+					<Input
+						type="password"
+						placeholder="Xác nhận mật khẩu mới *"
+						value={confirmNewPassword}
+						onChange={(e) => setConfirmNewPassword(e.target.value)}
+						className={cn(errors.confirmNewPassword && 'border-red-500')}
+					/>
+					{errors.confirmNewPassword && (
+						<p className="text-sm text-red-500">{errors.confirmNewPassword}</p>
+					)}
+				</div>
+			</div>
+
+			<Button
+				onClick={handlePasswordChange}
+				disabled={isPending}
+				className="bg-[#FF8800] hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-semibold"
+			>
+				{isPending ? 'ĐANG ĐỔI...' : 'ĐỔI MẬT KHẨU'}
+			</Button>
+
+			<PasswordChangedModal
+				open={isSuccessModalOpen}
+				onClose={() => setIsSuccessModalOpen(false)}
+				onLoginClick={() => {
+					localStorage.removeItem('access_token');
+					setIsAuthenticated(false);
+					navigate('/login');
+				}}
+			/>
 		</div>
 	);
 }
