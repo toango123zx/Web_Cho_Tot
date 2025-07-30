@@ -40,16 +40,14 @@ export default function LoginForm() {
 			{
 				onSuccess: async (res) => {
 					if (res.success) {
-						localStorage.setItem('access_token', res.data.accessToken);
 						setIsAuthenticated(true);
 						setSuccessMessage('Đăng nhập thành công!');
 						setErrorMessage('');
 
-						const bc = new BroadcastChannel('auth_channel');
-						bc.postMessage('logged_in');
-						bc.close();
-
 						if (isPopup) {
+							const bc = new BroadcastChannel('auth_channel');
+							bc.postMessage('logged_in');
+							bc.close();
 							window.close();
 						} else {
 							await refetch();
