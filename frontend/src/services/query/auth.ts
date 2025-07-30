@@ -30,7 +30,7 @@ export const useAccount = () => {
 			const res = await fetchAccountAPI();
 			return res.success ? res.data : null;
 		},
-		enabled: !!localStorage.getItem('access_token'),
+		// enabled: !!localStorage.getItem('access_token'),
 		staleTime: 1000 * 60 * 5,
 		retry: 1,
 		refetchOnWindowFocus: false,
