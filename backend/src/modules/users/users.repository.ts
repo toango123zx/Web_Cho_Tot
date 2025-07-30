@@ -17,6 +17,9 @@ export class UserRepository {
 				},
 				skip: pagination.skip,
 				take: pagination.take,
+				orderBy: {
+					createdAt: 'asc',
+				},
 			}),
 			this.prismaService.users.count({
 				where: {

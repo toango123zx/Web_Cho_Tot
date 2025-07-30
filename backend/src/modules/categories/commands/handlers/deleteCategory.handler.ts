@@ -22,8 +22,16 @@ export class DeleteCategoryHandler implements ICommandHandler<DeleteCategoryComm
 		const { categoryId } = command;
 
 		const category = await this.categoriesRepository.findCategoryById(categoryId);
+
 		if (!category) {
 			throw new NotFoundException('categoryId');
+		}
+
+		if (category.posts.filter((post) => post.deletedAt === null).length > 0) {
+			throw new OptionalException(
+				400,
+				'Category cannot be deleted because it has associated posts',
+			);
 		}
 
 		const deletedCategory =
