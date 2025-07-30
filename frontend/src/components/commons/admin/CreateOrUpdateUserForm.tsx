@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select';
 import { trimData } from '@/helper';
 import { useLoading } from '@/hooks';
-import { validate } from '@/lib/validation';
+import { validate, type ValidationSchema } from '@/lib/validation';
 import {
 	createUserValidationSchema,
 	updateUserValidationSchema,
@@ -61,6 +61,34 @@ export default function CreateOrUpdateUserForm({
 	const { loading: isUploadingImage, execute: uploadImage } = useLoading();
 	const { updateUser, createUser } = useUserMutations();
 
+	const resetFormData = () => {
+		setFormData({
+			name: '',
+			email: '',
+			password: '',
+			avatar: '',
+			address: '',
+			phoneNumber: '',
+			bio: '',
+			dateOfBirth: '',
+			gender: 'MALE',
+			role: 'USER',
+		});
+	};
+
+	const resetErrors = () => {
+		setErrors({
+			address: '',
+			bio: '',
+			dateOfBirth: '',
+			email: '',
+			name: '',
+			password: '',
+			phoneNumber: '',
+			gender: '',
+		});
+	};
+
 	useEffect(() => {
 		if (initialData) {
 			setFormData({
@@ -76,18 +104,7 @@ export default function CreateOrUpdateUserForm({
 				role: initialData.role,
 			});
 		} else {
-			setFormData({
-				name: '',
-				email: '',
-				password: '',
-				avatar: '',
-				address: '',
-				phoneNumber: '',
-				bio: '',
-				dateOfBirth: '',
-				gender: 'MALE',
-				role: 'USER',
-			});
+			resetFormData();
 		}
 	}, [initialData]);
 
@@ -95,16 +112,10 @@ export default function CreateOrUpdateUserForm({
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
 
-	const validateUpdatationForm = () => {
-		const { isValid, errors } = validate(formData, updateUserValidationSchema);
+	const handleValidateForm = <T,>(validationSchema: ValidationSchema<T>) => {
+		const { isValid, errors } = validate(formData, validationSchema);
 
 		setErrors(errors as Record<keyof IUserCreation, string>);
-		return isValid;
-	};
-
-	const validateCreationForm = () => {
-		const { isValid, errors } = validate(formData, createUserValidationSchema);
-		setErrors(errors);
 		return isValid;
 	};
 
@@ -125,11 +136,15 @@ export default function CreateOrUpdateUserForm({
 			} else {
 				handleCreateUser();
 			}
+
+			resetFormData();
+			resetErrors();
+			setFile(undefined);
 		});
 	};
 
 	const handleUpdateUser = (avatar: string) => {
-		const isValid = validateUpdatationForm();
+		const isValid = handleValidateForm(updateUserValidationSchema);
 		if (!initialData?.id || !isValid) return;
 
 		const { email, password, role, ...trimmedFormData } =
@@ -140,9 +155,11 @@ export default function CreateOrUpdateUserForm({
 				data: {
 					...trimmedFormData,
 					avatar,
-					dateOfBirth: trimmedFormData.dateOfBirth
-						? new Date(trimmedFormData.dateOfBirth).toISOString()
-						: '',
+					...(trimmedFormData.dateOfBirth && {
+						dateOfBirth: trimmedFormData.dateOfBirth
+							? new Date(trimmedFormData.dateOfBirth).toISOString()
+							: '',
+					}),
 				},
 			},
 			{
@@ -152,16 +169,17 @@ export default function CreateOrUpdateUserForm({
 	};
 
 	const handleCreateUser = () => {
-		const isValid = validateCreationForm();
+		const isValid = handleValidateForm(createUserValidationSchema);
 		if (!isValid) return;
 
-		const { avatar, role, ...trimmedFormData } = trimData<typeof formData>(formData);
+		const { avatar, ...trimmedFormData } = trimData<typeof formData>(formData);
+		if (trimmedFormData.dateOfBirth) {
+			trimmedFormData.dateOfBirth = new Date(trimmedFormData.dateOfBirth).toISOString();
+		}
+
 		createUser.mutate(
 			{
 				...trimmedFormData,
-				dateOfBirth: trimmedFormData.dateOfBirth
-					? new Date(trimmedFormData.dateOfBirth).toISOString()
-					: '',
 			},
 			{
 				onSuccess: onClose,

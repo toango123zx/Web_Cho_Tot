@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { QUERY_KEY } from '@/config/key';
-import { loginAPI } from '../api/auth';
 import {
 	changePasswordAPI,
 	createUserAPI,
@@ -17,7 +16,6 @@ interface UserQueryProps {
 }
 
 export function useUserQueryWithPagination({ page, limit }: UserQueryProps) {
-	loginAPI('', '').then(() => {});
 	const query = useQuery({
 		queryKey: QUERY_KEY.getUserPaginate(page),
 		queryFn: () => getUsersPaginateAPI(page, limit),
