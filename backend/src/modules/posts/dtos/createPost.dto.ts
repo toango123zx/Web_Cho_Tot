@@ -1,11 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { AgePostEnum, PostStatusEnum, SizePostEnum } from '@prisma/client';
+import { AgePostEnum, SizePostEnum } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
 	IsEnum,
 	IsNotEmpty,
-	IsOptional,
 	IsString,
 	IsInt,
 	Min,
@@ -49,15 +48,6 @@ export class CreatePostDto {
 	@IsString()
 	@IsNotEmpty()
 	address: string;
-
-	@ApiProperty({
-		enum: PostStatusEnum,
-		enumName: 'PostStatusEnum',
-		default: PostStatusEnum.PENDING,
-	})
-	@IsEnum(PostStatusEnum)
-	@IsOptional()
-	status?: PostStatusEnum = PostStatusEnum.PENDING;
 
 	@ApiProperty({ example: 'uuid-category-id', description: 'ID of the category' })
 	@IsString()

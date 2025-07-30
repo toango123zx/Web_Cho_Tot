@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { AgePostEnum, PostStatusEnum, SizePostEnum } from '@prisma/client';
+import { AgePostEnum, SizePostEnum } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
 	IsEnum,
@@ -49,16 +49,6 @@ export class UpdatePostDto {
 	@IsOptional()
 	@IsString()
 	address?: string;
-
-	@ApiProperty({
-		enum: PostStatusEnum,
-		enumName: 'PostStatusEnum',
-		required: false,
-		example: PostStatusEnum.PUBLISHED,
-	})
-	@IsOptional()
-	@IsEnum(PostStatusEnum)
-	status?: PostStatusEnum;
 
 	@ApiProperty({
 		example: 'uuid-category-id',

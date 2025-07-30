@@ -13,18 +13,20 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
 import { RoleUserEnum } from '@prisma/client';
-import { HttpResponseBodyDto, PaginationDto } from 'src/common';
+import { HttpResponseBodyDto } from 'src/common';
 import { PostsDto } from 'src/models';
 import { Auth, AuthRole } from 'src/modules/auth/decorators';
 import {
 	AcceptPostCommand,
 	CreatePostCommand,
 	DeletePostCommand,
+	TogglePostArchiveCommand,
 	UpdatePostCommand,
 } from 'src/modules/posts/commands/implements';
-import { CreatePostDto, UpdatePostDto } from 'src/modules/posts/dtos';
+import { CreatePostDto, FilterPostDto, UpdatePostDto } from 'src/modules/posts/dtos';
 import {
 	GetPostQuery,
+	GetPostsArchiveByUserQuery,
 	GetPostsByUserQuery,
 	GetPostsQuery,
 } from 'src/modules/posts/queries/implements';
@@ -41,9 +43,20 @@ export class PostsController {
 
 	@Get()
 	async getPosts(
-		@Query() pagination: PaginationDto,
+		@Query() filter: FilterPostDto,
 	): Promise<HttpResponseBodyDto<PostsDto[] | HttpException>> {
-		return this.queryBus.execute(new GetPostsQuery(pagination));
+		return this.queryBus.execute(new GetPostsQuery(filter));
+	}
+
+	@Auth()
+	@Get('/archive')
+	async getPostsArchiveByUser(
+		@Query() filter: FilterPostDto,
+		@MyInformation() userInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<PostsDto[] | HttpException>> {
+		return this.queryBus.execute(
+			new GetPostsArchiveByUserQuery(filter, userInformation.id),
+		);
 	}
 
 	@Get('/:postId')
@@ -95,9 +108,20 @@ export class PostsController {
 
 	@Get('/user/:userId')
 	async getPostsByUser(
-		@Query() pagination: PaginationDto,
+		@Query() filter: FilterPostDto,
 		@Param('userId') userId: string,
 	): Promise<HttpResponseBodyDto<PostsDto[] | HttpException>> {
-		return this.queryBus.execute(new GetPostsByUserQuery(pagination, userId));
+		return this.queryBus.execute(new GetPostsByUserQuery(filter, userId));
+	}
+
+	@Auth()
+	@Post('/:postId/toggle-archive')
+	async togglePostArchive(
+		@MyInformation() userInformation: UserInformationDto,
+		@Param('postId') postId: string,
+	): Promise<HttpResponseBodyDto<PostsDto | HttpException>> {
+		return this.commandBus.execute(
+			new TogglePostArchiveCommand(postId, userInformation),
+		);
 	}
 }

@@ -1,28 +1,30 @@
 import { Injectable } from '@nestjs/common';
 
-import { IPaginationQuery } from 'src/common';
+import { PostStatusEnum } from '@prisma/client';
 import { PostsEntity } from 'src/models';
 import { PrismaService } from 'src/modules/database/services';
 import { CreatePostDto, UpdatePostDto } from 'src/modules/posts/dtos';
+import { IFilterPostQuery } from 'src/modules/posts/interfaces';
 
 @Injectable()
 export class PostsRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
 	async findPosts(
-		pagination: IPaginationQuery,
+		filterPost: IFilterPostQuery,
 		userId?: string,
 	): Promise<[PostsEntity[], number]> {
 		const filter = {
 			deletedAt: null,
 			...(userId ? { userId } : {}),
+			...(filterPost.status ? { status: filterPost.status } : {}),
 		};
 
 		const [posts, totalRecords] = await Promise.all([
 			this.prismaService.posts.findMany({
 				where: filter,
-				skip: pagination.skip,
-				take: pagination.take,
+				skip: filterPost.skip,
+				take: filterPost.take,
 				include: {
 					postImages: true,
 					category: true,
@@ -53,17 +55,8 @@ export class PostsRepository {
 	}
 
 	async createPost(createPostDto: CreatePostDto, userId: string): Promise<PostsEntity> {
-		const {
-			categoryId,
-			postImages,
-			title,
-			description,
-			age,
-			size,
-			price,
-			address,
-			status,
-		} = createPostDto;
+		const { categoryId, postImages, title, description, age, size, price, address } =
+			createPostDto;
 
 		return this.prismaService.posts.create({
 			data: {
@@ -73,7 +66,7 @@ export class PostsRepository {
 				size,
 				price,
 				address,
-				status: status ?? 'PENDING',
+				status: PostStatusEnum.PENDING,
 				user: {
 					connect: { id: userId },
 				},
@@ -86,6 +79,18 @@ export class PostsRepository {
 						}
 					: undefined,
 			},
+			include: {
+				postImages: true,
+				category: true,
+				user: true,
+			},
+		});
+	}
+
+	async acceptPost(postId: string): Promise<PostsEntity> {
+		return this.prismaService.posts.update({
+			where: { id: postId },
+			data: { status: PostStatusEnum.PUBLISHED },
 			include: {
 				postImages: true,
 				category: true,
@@ -140,5 +145,60 @@ export class PostsRepository {
 		});
 
 		return images.length === ids.length;
+	}
+
+	async togglePostArchive(postId: string, userId: string): Promise<PostsEntity> {
+		return this.prismaService.$transaction(async (tx) => {
+			const existingPostArchive = await tx.postArchives.findFirst({
+				where: { postId, userId },
+			});
+
+			if (existingPostArchive) {
+				await tx.postArchives.delete({
+					where: { id: existingPostArchive.id },
+				});
+			} else {
+				await tx.postArchives.create({
+					data: { postId, userId },
+				});
+			}
+
+			return tx.posts.findUnique({
+				where: { id: postId },
+				include: { postImages: true, category: true, postArchives: true },
+			});
+		});
+	}
+
+	async findAllArchivedPostsByUser(
+		filterPost: IFilterPostQuery,
+		userId: string,
+	): Promise<[PostsEntity[], number]> {
+		const filter = {
+			postArchives: {
+				some: { userId },
+			},
+			deletedAt: null,
+			...(filterPost.status ? { status: filterPost.status } : {}),
+		};
+
+		const [postsArchive, totalRecords] = await Promise.all([
+			this.prismaService.posts.findMany({
+				where: filter,
+				skip: filterPost.skip,
+				take: filterPost.take,
+				include: {
+					postImages: true,
+					category: true,
+					user: true,
+				},
+			}),
+
+			this.prismaService.posts.count({
+				where: filter,
+			}),
+		]);
+
+		return [postsArchive, totalRecords];
 	}
 }
