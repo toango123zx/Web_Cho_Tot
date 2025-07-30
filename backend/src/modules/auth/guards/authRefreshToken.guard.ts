@@ -11,10 +11,13 @@ import { UserInformationDto } from 'src/modules/users/dtos';
 
 import { UserRepository } from 'src/modules/users/users.repository';
 
+import { AuthRepository } from '../auth.repository';
+
 @Injectable()
 export class AuthRefreshTokenGuard implements CanActivate {
 	constructor(
 		private readonly jwtService: JwtService,
+		private readonly authRepository: AuthRepository,
 		private readonly userRepository: UserRepository,
 	) {}
 
@@ -49,6 +52,12 @@ export class AuthRefreshTokenGuard implements CanActivate {
 			request.refreshToken = refreshToken;
 		} catch (error) {
 			if (error instanceof TokenExpiredError) {
+				if (!accessToken) {
+					await this.authRepository.deleteRefreshToken({
+						refreshToken: refreshToken,
+					});
+				}
+
 				throw new OptionalException(HttpStatus.UNAUTHORIZED, error.message);
 			}
 			if (error instanceof JsonWebTokenError) {

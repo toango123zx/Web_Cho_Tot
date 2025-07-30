@@ -174,4 +174,19 @@ export class AuthRepository {
 			},
 		});
 	}
+
+	async deleteRefreshToken({
+		refreshToken,
+		userId,
+	}: {
+		refreshToken: string;
+		userId?: string;
+	}): Promise<TokensEntity> {
+		return this.prismaService.tokens.delete({
+			where: {
+				refreshToken: refreshToken,
+				userId: userId,
+			},
+		});
+	}
 }

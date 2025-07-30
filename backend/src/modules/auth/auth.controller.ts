@@ -20,6 +20,7 @@ import { UserInformationDto } from 'src/modules/users/dtos';
 import {
 	ForgotPasswordCommand,
 	LoginCommand,
+	LogoutCommand,
 	RefreshTokenCommand,
 	RegisterCommand,
 	SendOtpToEmailCommand,
@@ -99,5 +100,15 @@ export class AuthController {
 		@Body() forgotPassword: ForgotPasswordRequestDto,
 	): Promise<HttpResponseBodyDto<ForgotPasswordResponseDto | HttpException>> {
 		return this.commandBus.execute(new ForgotPasswordCommand(forgotPassword));
+	}
+
+	@Post('logout')
+	@AuthRefreshToken()
+	@UseInterceptors(SetCookieInterceptor)
+	async logoutUser(
+		@MyInformation() myInformation: UserInformationDto,
+		@RefreshToken() token: string,
+	): Promise<HttpResponseBodyDto<string | HttpException>> {
+		return this.commandBus.execute(new LogoutCommand(myInformation, token));
 	}
 }
