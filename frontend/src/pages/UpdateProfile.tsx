@@ -65,15 +65,17 @@ export default function UpdateProfile() {
 	};
 
 	return (
-		<div className="p-6">
-			<h1 className="text-2xl font-bold text-gray-900 mb-8">Hồ sơ cá nhân</h1>
-			<Card className="mb-8">
-				<CardContent className="p-6">
-					<div className="grid grid-cols-2 gap-6 mb-6">
+		<div className="p-4 sm:p-6">
+			<h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-8">
+				Hồ sơ cá nhân
+			</h1>
+			<Card className="mb-4 sm:mb-8">
+				<CardContent className="p-4 sm:p-6">
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
 						<div>
 							<Label
 								htmlFor="name"
-								className="text-sm font-medium text-gray-700 mb-2 block"
+								className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block"
 							>
 								Họ và tên *
 							</Label>
@@ -88,7 +90,7 @@ export default function UpdateProfile() {
 						<div>
 							<Label
 								htmlFor="phone"
-								className="text-sm font-medium text-gray-700 mb-2 block"
+								className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block"
 							>
 								Số điện thoại *
 							</Label>
@@ -101,10 +103,10 @@ export default function UpdateProfile() {
 							/>
 						</div>
 					</div>
-					<div className="mb-6">
+					<div className="mb-4 sm:mb-6">
 						<Label
 							htmlFor="address"
-							className="text-sm font-medium text-gray-700 mb-2 block"
+							className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block"
 						>
 							Địa chỉ
 						</Label>
@@ -117,10 +119,10 @@ export default function UpdateProfile() {
 							onClick={() => setIsAddressDialogOpen(true)}
 						/>
 					</div>
-					<div className="mb-6">
+					<div className="mb-4 sm:mb-6">
 						<Label
 							htmlFor="introduction"
-							className="text-sm font-medium text-gray-700 mb-2 block"
+							className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block"
 						>
 							Giới thiệu
 						</Label>
@@ -133,10 +135,10 @@ export default function UpdateProfile() {
 						/>
 						<p className="text-xs text-gray-500 mt-1">Tối đa 60 từ</p>
 					</div>
-					<div className="mb-6">
+					<div className="mb-4 sm:mb-6">
 						<Label
 							htmlFor="reference"
-							className="text-sm font-medium text-gray-700 mb-2 block"
+							className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block"
 						>
 							Tên gợi nhớ
 						</Label>
@@ -161,17 +163,19 @@ export default function UpdateProfile() {
 			</Card>
 			<Card>
 				<CardHeader>
-					<CardTitle className="text-lg font-semibold">Thông tin bảo mật</CardTitle>
-					<p className="text-sm text-gray-600">
+					<CardTitle className="text-base sm:text-lg font-semibold">
+						Thông tin bảo mật
+					</CardTitle>
+					<p className="text-xs sm:text-sm text-gray-600">
 						Những thông tin dưới đây sẽ mang tính bảo mật. Chỉ bạn mới có thể thấy và
 						chỉnh sửa những thông tin này.
 					</p>
 				</CardHeader>
 				<CardContent>
-					<div className="mb-6">
+					<div className="mb-4 sm:mb-6">
 						<Label
 							htmlFor="email"
-							className="text-sm font-medium text-gray-700 mb-2 block"
+							className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block"
 						>
 							Email
 						</Label>
@@ -185,9 +189,9 @@ export default function UpdateProfile() {
 							</button>
 						</div>
 					</div>
-					<div className="grid grid-cols-2 gap-6 mb-8">
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
 						<div>
-							<Label className="text-sm font-medium text-gray-700 mb-2 block">
+							<Label className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
 								Giới tính
 							</Label>
 							<Select onValueChange={setGender} value={gender}>
@@ -202,7 +206,7 @@ export default function UpdateProfile() {
 							</Select>
 						</div>
 						<div>
-							<Label className="text-sm font-medium text-gray-700 mb-2 block">
+							<Label className="text-sm font-medium text-gray-700 mb-1.5 sm:mb-2 block">
 								Ngày, tháng, năm sinh
 							</Label>
 							<Popover>

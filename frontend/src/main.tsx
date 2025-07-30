@@ -15,6 +15,10 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import UpdateProfile from 'pages/UpdateProfile.tsx';
 import AccountSettings from 'pages/AccountSetting.tsx';
 import { ProfileLayout } from '@/layout/LayoutProfile.tsx';
+import AdminLayout from './layout/AdminLayout.tsx';
+import AdminDashboard from './pages/admin/Dashboard.tsx';
+import UserManagement from './pages/admin/UserManagement.tsx';
+import AuthLayout from './layout/AuthLayout.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -44,19 +48,40 @@ const router = createBrowserRouter([
 			},
 		],
 	},
+
 	{
-		path: '/login',
-		element: <LoginPage />,
+		path: '/admin',
+		element: <AdminLayout />,
+		children: [
+			{
+				path: 'dashboard',
+				element: <AdminDashboard />,
+			},
+			{
+				path: 'users-management',
+				element: <UserManagement />,
+			},
+		],
 	},
+
 	{
-		path: '/register',
-		element: <RegisterPage />,
+		element: <AuthLayout />,
+		children: [
+			{
+				path: '/login',
+				element: <LoginPage />,
+			},
+			{
+				path: '/register',
+				element: <RegisterPage />,
+			},
+		],
 	},
 ]);
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')!).render(
-	<StrictMode>
+	<>
 		<QueryClientProvider client={queryClient}>
 			<AppProvider>
 				{/* <SocketProvider> */}
@@ -67,5 +92,5 @@ createRoot(document.getElementById('root')!).render(
 				{/* </SocketProvider> */}
 			</AppProvider>
 		</QueryClientProvider>
-	</StrictMode>,
+	</>,
 );

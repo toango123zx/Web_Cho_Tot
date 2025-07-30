@@ -35,13 +35,13 @@ export default function RegisterPage() {
 			{ name: trimmedName, email: trimmedEmail, password: trimmedPassword },
 			{
 				onSuccess: (res) => {
-					const result = res.data;
-					if (result.success) {
+					console.log(res);
+					if (res.success) {
 						setSuccessMessage('Đăng ký thành công!');
 						setErrorMessage('');
 						setTimeout(() => navigate('/login'), 2000);
 					} else {
-						setErrorMessage(result.message || 'Đăng ký thất bại');
+						setErrorMessage(res.message || 'Đăng ký thất bại');
 						setSuccessMessage('');
 					}
 				},

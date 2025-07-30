@@ -1,33 +1,60 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { QUERY_KEY } from '../../config/key';
-import { calculatePagesCount } from '../../helper';
-import { getUsersPaginateAPI } from '@/services/api/user';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
-export const PAGE_SIZE = 2;
+import { QUERY_KEY } from '@/config/key';
+import { loginAPI } from '../api/auth';
+import {
+	createUserAPI,
+	deleteUserAPI,
+	getUsersPaginateAPI,
+	updateUserAPI,
+} from '../api/user';
 
-export const useFetchUser = (currentPage: number) => {
-	const queryInfo = useQuery({
-		queryKey: QUERY_KEY.getUserPaginate(currentPage),
-		queryFn: async () => {
-			const res = await getUsersPaginateAPI(currentPage, PAGE_SIZE);
+interface UserQueryProps {
+	page: number;
+	limit: number;
+}
 
-			const total_items = Number(res.headers['x-total-count'] ?? 0);
-			const totalPages = calculatePagesCount(PAGE_SIZE, total_items);
-			const users = res.data ?? [];
-
-			return {
-				total_items,
-				totalPages,
-				users,
-			};
-		},
-		placeholderData: keepPreviousData,
+export function useUserQueryWithPagination({ page, limit }: UserQueryProps) {
+	const query = useQuery({
+		queryKey: QUERY_KEY.getUserPaginate(page),
+		queryFn: () => getUsersPaginateAPI(page, limit),
+		staleTime: 1000 * 60 * 5, // 5 minutes
 	});
 
-	return {
-		...queryInfo,
-		data: queryInfo?.data?.users ?? [],
-		count: queryInfo?.data?.total_items ?? 0,
-		totalPages: queryInfo?.data?.totalPages ?? 0,
-	};
-};
+	return query;
+}
+
+export function useUserMutations() {
+	const queryClient = useQueryClient();
+
+	const createUser = useMutation({
+		mutationFn: createUserAPI,
+		onSuccess: () => {
+			toast.success('Tạo người dùng thành công');
+			queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAllUser() });
+		},
+		onError: () => toast.error('Tạo người dùng thất bại'),
+	});
+
+	const updateUser = useMutation({
+		mutationFn: ({ id, data }: { id: string; data: IUserUpdatePayload }) =>
+			updateUserAPI(id, data),
+		onSuccess: () => {
+			toast.success('Cập nhật người dùng thành công');
+			queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAllUser() });
+		},
+		onError: () => toast.error('Cập nhật người dùng thất bại'),
+	});
+
+	const deleteUser = useMutation({
+		mutationFn: deleteUserAPI,
+		onSuccess: () => {
+			toast.success('Xoá người dùng thành công');
+			queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAllUser() });
+		},
+		onError: () => toast.error('Xoá người dùng thất bại'),
+	});
+
+	return { createUser, updateUser, deleteUser };
+}

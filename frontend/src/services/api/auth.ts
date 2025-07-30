@@ -3,18 +3,24 @@ import { sleep } from '../sleep';
 
 export const loginAPI = async (email: string, password: string) => {
 	await sleep(3000);
-	return axios.post<IBackendRes<ILogin>>('/auth/login', { email, password });
+	const res = await axios.post('/auth/login', { email, password });
+
+	return res.data as IBackendRes<ILogin>;
 };
 
 export const registerAPI = async (name: string, email: string, password: string) => {
-	return axios.post<IBackendRes<IRegister>>('/auth/register', {
+	const res = await axios.post('/auth/register', {
 		name,
 		email,
 		password,
 	});
+
+	return res.data as IBackendRes<IRegister>;
 };
 
 export const fetchAccountAPI = async () => {
 	await sleep(1500);
-	return axios.get<IBackendRes<IFetchAccount>>('/users/me', { withCredentials: true });
+	const res = await axios.get('/users/me');
+
+	return res.data as IBackendRes<IFetchAccount>;
 };

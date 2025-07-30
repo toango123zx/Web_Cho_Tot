@@ -7,3 +7,21 @@ export const calculatePagesCount = (pageSize: number, totalCount: number) => {
 	}
 	return totalCount < pageSize ? 1 : Math.ceil(totalCount / pageSize);
 };
+
+export const trimData = <T>(data: Record<string, unknown>, removeEmpty = true) => {
+	const result: Record<string, unknown> = {};
+
+	Object.entries(data).forEach(([key, value]) => {
+		if (removeEmpty && !value) {
+			return;
+		}
+
+		if (typeof value !== 'string') {
+			result[key] = value;
+		} else {
+			result[key] = value.trim();
+		}
+	});
+
+	return result as T;
+};

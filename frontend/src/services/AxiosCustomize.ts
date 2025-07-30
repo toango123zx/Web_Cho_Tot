@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+export const baseURL = import.meta.env.VITE_BACKEND_URL;
+
 const instance = axios.create({
-	baseURL: import.meta.env.VITE_BACKEND_URL,
+	baseURL,
 	withCredentials: true,
 });
 
@@ -22,7 +24,6 @@ instance.interceptors.response.use(
 	function (response) {
 		// Any status code that lie within the range of 2xx cause this function to trigger
 		// Do something with response data
-		// return response && response.data ? response.data : response;
 		return response;
 	},
 	function (error) {

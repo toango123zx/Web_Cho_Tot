@@ -1,15 +1,25 @@
-interface IBackendRes<T> {
-	message?: string;
-	data?: T;
-	success: boolean;
-}
+type IBackendRes<T> =
+	| {
+			success: true;
+			data: T;
+	  }
+	| {
+			success: false;
+			message: string;
+	  };
 
-interface IModelPaginate<T> {
-	meta: {
-		current: number;
-		pageSize: number;
-		pages: number;
-		total: number;
-	};
-	result: T[];
-}
+type IModelPaginate<T> =
+	| {
+			success: true;
+			data: T;
+			pagination: {
+				totalItems: number;
+				itemsPerPage: number;
+				currentPage: number;
+				totalPages: number;
+			};
+	  }
+	| {
+			success: false;
+			message: string;
+	  };

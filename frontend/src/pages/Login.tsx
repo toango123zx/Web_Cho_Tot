@@ -35,15 +35,14 @@ export default function LoginForm() {
 			{ email: trimmedEmail, password: trimmedPassword },
 			{
 				onSuccess: (res) => {
-					const result = res.data;
-					if (result.success && result.data?.accessToken) {
-						localStorage.setItem('access_token', result.data.accessToken);
+					if (res.success) {
+						localStorage.setItem('access_token', res.data.accessToken);
 						setIsAuthenticated(true);
 						setSuccessMessage('Đăng nhập thành công!');
 						setErrorMessage('');
 						setTimeout(() => window.close(), 1500);
 					} else {
-						setErrorMessage(result.message || 'Đăng nhập thất bại');
+						setErrorMessage(res.message || 'Đăng nhập thất bại');
 						setSuccessMessage('');
 					}
 				},

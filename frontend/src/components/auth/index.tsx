@@ -1,4 +1,5 @@
-import { useLocation, Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
+
 import { useCurrentApp } from '@/components/context/AppContext';
 
 interface ProtectedRouteProps {

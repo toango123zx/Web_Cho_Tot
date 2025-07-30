@@ -28,7 +28,7 @@ export const useAccount = () => {
 		queryKey: QUERY_KEY.getAccount(),
 		queryFn: async () => {
 			const res = await fetchAccountAPI();
-			return res.data.data;
+			return res.success ? res.data : null;
 		},
 		enabled: !!localStorage.getItem('access_token'),
 		staleTime: 1000 * 60 * 5,
