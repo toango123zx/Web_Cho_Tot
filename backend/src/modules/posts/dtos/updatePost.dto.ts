@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { AgePostEnum, PostStatusEnum, SizePostEnum } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
 	IsEnum,
@@ -10,8 +11,6 @@ import {
 	ValidateNested,
 	IsArray,
 } from 'class-validator';
-
-import { AgePostEnum, SizePostEnum, PostStatusEnum } from './createPost.dto';
 
 export class NewPostImageDto {
 	@ApiProperty({ example: 'https://example.com/image.jpg' })

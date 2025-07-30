@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { AgePostEnum, PostStatusEnum, SizePostEnum } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
 	IsEnum,
@@ -13,27 +14,6 @@ import {
 	IsUUID,
 	ArrayMinSize,
 } from 'class-validator';
-
-export enum AgePostEnum {
-	PUPPY = 'PUPPY',
-	YOUNG_DOG = 'YOUNG_DOG',
-	ADULT_DOG = 'ADULT_DOG',
-	OTHER = 'OTHER',
-}
-
-export enum SizePostEnum {
-	MINI = 'MINI',
-	SMALL = 'SMALL',
-	MEDIUM = 'MEDIUM',
-	LARGE = 'LARGE',
-}
-
-export enum PostStatusEnum {
-	PENDING = 'PENDING',
-	PUBLISHED = 'PUBLISHED',
-	EXPIRED = 'EXPIRED',
-	DELETED = 'DELETED',
-}
 
 export class PostImageInput {
 	@ApiProperty({ example: 'https://example.com/image.jpg' })

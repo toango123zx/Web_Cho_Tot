@@ -9,12 +9,18 @@ import { CreatePostDto, UpdatePostDto } from 'src/modules/posts/dtos';
 export class PostsRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async findPosts(pagination: IPaginationQuery): Promise<[PostsEntity[], number]> {
+	async findPosts(
+		pagination: IPaginationQuery,
+		userId?: string,
+	): Promise<[PostsEntity[], number]> {
+		const filter = {
+			deletedAt: null,
+			...(userId ? { userId } : {}),
+		};
+
 		const [posts, totalRecords] = await Promise.all([
 			this.prismaService.posts.findMany({
-				where: {
-					deletedAt: null,
-				},
+				where: filter,
 				skip: pagination.skip,
 				take: pagination.take,
 				include: {
@@ -28,9 +34,7 @@ export class PostsRepository {
 			}),
 
 			this.prismaService.posts.count({
-				where: {
-					deletedAt: null,
-				},
+				where: filter,
 			}),
 		]);
 

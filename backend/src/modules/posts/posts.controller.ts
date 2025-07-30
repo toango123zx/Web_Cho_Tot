@@ -12,16 +12,22 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
+import { RoleUserEnum } from '@prisma/client';
 import { HttpResponseBodyDto, PaginationDto } from 'src/common';
 import { PostsDto } from 'src/models';
-import { Auth } from 'src/modules/auth/decorators';
+import { Auth, AuthRole } from 'src/modules/auth/decorators';
 import {
+	AcceptPostCommand,
 	CreatePostCommand,
 	DeletePostCommand,
 	UpdatePostCommand,
 } from 'src/modules/posts/commands/implements';
 import { CreatePostDto, UpdatePostDto } from 'src/modules/posts/dtos';
-import { GetPostQuery, GetPostsQuery } from 'src/modules/posts/queries/implements';
+import {
+	GetPostQuery,
+	GetPostsByUserQuery,
+	GetPostsQuery,
+} from 'src/modules/posts/queries/implements';
 import { MyInformation } from 'src/modules/users/decorators';
 import { UserInformationDto } from 'src/modules/users/dtos';
 
@@ -77,5 +83,21 @@ export class PostsController {
 		@Param('postId') postId: string,
 	): Promise<HttpResponseBodyDto<PostsDto | HttpException>> {
 		return this.commandBus.execute(new DeletePostCommand(postId, userInformation));
+	}
+
+	@AuthRole(RoleUserEnum.ADMIN)
+	@Patch('/:postId/accept')
+	async acceptPost(
+		@Param('postId') postId: string,
+	): Promise<HttpResponseBodyDto<PostsDto | HttpException>> {
+		return this.commandBus.execute(new AcceptPostCommand(postId));
+	}
+
+	@Get('/user/:userId')
+	async getPostsByUser(
+		@Query() pagination: PaginationDto,
+		@Param('userId') userId: string,
+	): Promise<HttpResponseBodyDto<PostsDto[] | HttpException>> {
+		return this.queryBus.execute(new GetPostsByUserQuery(pagination, userId));
 	}
 }
