@@ -141,4 +141,61 @@ export class PostsRepository {
 
 		return images.length === ids.length;
 	}
+
+	async togglePostArchive(postId: string, userId: string): Promise<PostsEntity> {
+		return this.prismaService.$transaction(async (tx) => {
+			const existingPostArchive = await tx.postArchives.findFirst({
+				where: { postId, userId },
+			});
+
+			if (existingPostArchive) {
+				await tx.postArchives.delete({
+					where: { id: existingPostArchive.id },
+				});
+			} else {
+				await tx.postArchives.create({
+					data: { postId, userId },
+				});
+			}
+
+			return tx.posts.findUnique({
+				where: { id: postId },
+				include: { postImages: true, category: true, postArchives: true },
+			});
+		});
+	}
+
+	async findAllArchivedPostsByUser(
+		pagination: IPaginationQuery,
+		userId: string,
+	): Promise<[PostsEntity[], number]> {
+		const [postsArchive, totalRecords] = await Promise.all([
+			this.prismaService.posts.findMany({
+				where: {
+					postArchives: {
+						some: { userId },
+					},
+					deletedAt: null,
+				},
+				skip: pagination.skip,
+				take: pagination.take,
+				include: {
+					postImages: true,
+					category: true,
+					user: true,
+				},
+			}),
+
+			this.prismaService.posts.count({
+				where: {
+					postArchives: {
+						some: { userId },
+					},
+					deletedAt: null,
+				},
+			}),
+		]);
+
+		return [postsArchive, totalRecords];
+	}
 }

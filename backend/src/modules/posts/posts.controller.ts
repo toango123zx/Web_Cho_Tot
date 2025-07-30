@@ -20,11 +20,13 @@ import {
 	AcceptPostCommand,
 	CreatePostCommand,
 	DeletePostCommand,
+	TogglePostArchiveCommand,
 	UpdatePostCommand,
 } from 'src/modules/posts/commands/implements';
 import { CreatePostDto, UpdatePostDto } from 'src/modules/posts/dtos';
 import {
 	GetPostQuery,
+	GetPostsArchiveByUserQuery,
 	GetPostsByUserQuery,
 	GetPostsQuery,
 } from 'src/modules/posts/queries/implements';
@@ -44,6 +46,17 @@ export class PostsController {
 		@Query() pagination: PaginationDto,
 	): Promise<HttpResponseBodyDto<PostsDto[] | HttpException>> {
 		return this.queryBus.execute(new GetPostsQuery(pagination));
+	}
+
+	@Auth()
+	@Get('/archive')
+	async getPostsArchiveByUser(
+		@Query() pagination: PaginationDto,
+		@MyInformation() userInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<PostsDto[] | HttpException>> {
+		return this.queryBus.execute(
+			new GetPostsArchiveByUserQuery(pagination, userInformation.id),
+		);
 	}
 
 	@Get('/:postId')
@@ -99,5 +112,16 @@ export class PostsController {
 		@Param('userId') userId: string,
 	): Promise<HttpResponseBodyDto<PostsDto[] | HttpException>> {
 		return this.queryBus.execute(new GetPostsByUserQuery(pagination, userId));
+	}
+
+	@Auth()
+	@Post('/:postId/toggle-archive')
+	async togglePostArchive(
+		@MyInformation() userInformation: UserInformationDto,
+		@Param('postId') postId: string,
+	): Promise<HttpResponseBodyDto<PostsDto | HttpException>> {
+		return this.commandBus.execute(
+			new TogglePostArchiveCommand(postId, userInformation),
+		);
 	}
 }

@@ -1,6 +1,7 @@
 import { AcceptPostHandler } from './acceptPost.handler';
 import { CreatePostHandler } from './createPost.handler';
 import { DeletePostHandler } from './deletePost.handler';
+import { TogglePostArchiveHandler } from './togglePostArchive.handler';
 import { UpdatePostHandler } from './updatePost.handler';
 
 export const PostsCommandHandlers = [
@@ -8,4 +9,5 @@ export const PostsCommandHandlers = [
 	UpdatePostHandler,
 	DeletePostHandler,
 	AcceptPostHandler,
+	TogglePostArchiveHandler,
 ];
