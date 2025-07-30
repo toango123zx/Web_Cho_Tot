@@ -48,7 +48,6 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
 						</nav>
 					</div>
 
-					{/* Main Content: margin-left để tạo khoảng cách, content rộng như ảnh thứ 2 */}
 					<div className="ml-8 flex-1">
 						<div className="bg-white shadow rounded-md p-8">{children}</div>
 					</div>

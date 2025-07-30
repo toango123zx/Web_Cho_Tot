@@ -37,7 +37,6 @@ interface IUserUpdatePayload {
 	bio: string | null;
 	gender: Gender | null;
 	dateOfBirth: string | null;
-	avatar: string | null;
 }
 interface IFetchAccount extends IUser {}
 

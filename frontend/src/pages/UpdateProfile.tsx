@@ -88,6 +88,14 @@ export default function UpdateProfile() {
 		}
 	}, [user]);
 
+	useEffect(() => {
+		return () => {
+			if (previewAvatar && previewAvatar.startsWith('blob:')) {
+				URL.revokeObjectURL(previewAvatar);
+			}
+		};
+	}, [previewAvatar]);
+
 	const isPhoneNumberValid = /^\d{10}$/.test(phoneNumber.trim());
 	const isBioValid = userIntroduction.trim().split(/\s+/).length <= 80;
 
@@ -118,6 +126,9 @@ export default function UpdateProfile() {
 	const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
+		if (previewAvatar && previewAvatar.startsWith('blob:')) {
+			URL.revokeObjectURL(previewAvatar);
+		}
 		setAvatarFile(file);
 		setPreviewAvatar(URL.createObjectURL(file));
 	};
@@ -132,6 +143,11 @@ export default function UpdateProfile() {
 			const res = await uploadFileToCloudinary(avatarFile);
 			if (!res.success || !res.data?.secure_url) {
 				toast.error('Không thể tải lên ảnh đại diện. Vui lòng thử lại!');
+				setAvatarFile(null);
+				if (previewAvatar?.startsWith('blob:')) {
+					URL.revokeObjectURL(previewAvatar);
+					setPreviewAvatar(null);
+				}
 				return;
 			}
 			uploadedAvatarUrl = res.data.secure_url;
