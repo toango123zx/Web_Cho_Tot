@@ -21,6 +21,7 @@ import {
 	LoginCommand,
 	RefreshTokenCommand,
 	RegisterCommand,
+	SendOtpToEmailCommand,
 } from './commands/implements';
 import { AuthRefreshToken, RefreshToken } from './decorators';
 import {
@@ -28,6 +29,7 @@ import {
 	LoginResponseDto,
 	RegisterRequestDto,
 	RegisterResponseDto,
+	SendOtpRequestDto,
 } from './dtos';
 import { GoogleOAuthGuard } from './guards';
 import {
@@ -80,5 +82,12 @@ export class AuthController {
 		@Req() { user }: { user: SocialAccountsEntity },
 	): Promise<HttpResponseBodyDto<LoginResponseDto | HttpException>> {
 		return this.queryBus.execute(new CheckLoginWithGoogleOauthQuery(user));
+	}
+
+	@Post('send-otp')
+	async sendOtp(
+		@Body() sendOtp: SendOtpRequestDto,
+	): Promise<HttpResponseBodyDto<string | HttpException>> {
+		return this.commandBus.execute(new SendOtpToEmailCommand(sendOtp.email));
 	}
 }
