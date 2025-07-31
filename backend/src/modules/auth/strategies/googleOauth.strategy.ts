@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
 import { Strategy, Profile } from 'passport-google-oauth20';
+import { OptionalException } from 'src/common';
 import { GoogleOauthConfig } from 'src/configs';
 import { CreateSocialAccountsDto, SocialAccountsEntity } from 'src/models';
 
@@ -27,10 +28,14 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
 		accessToken: string,
 		refreshToken: string,
 		profile: Profile,
-	): Promise<SocialAccountsEntity> {
+	): Promise<SocialAccountsEntity | HttpException> {
 		const userExist = await this.userRepository.findUserByEmail({
 			email: profile.emails[0].value,
 		});
+
+		if (userExist.deletedAt) {
+			return new OptionalException(HttpStatus.UNAUTHORIZED, 'Tài khoản đã bị khóa');
+		}
 
 		if (!userExist) {
 			const socialAccount: CreateSocialAccountsDto = {

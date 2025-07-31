@@ -1,4 +1,4 @@
-import { HttpException } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 
@@ -6,6 +6,7 @@ import {
 	HttpResponseBodySuccessDto,
 	IAccessTokenPayload,
 	IRefreshTokenPayload,
+	OptionalException,
 } from 'src/common';
 import { jwtConfig } from 'src/configs';
 
@@ -26,6 +27,9 @@ export class CheckLoginWithGoogleOauthHandler
 		command: CheckLoginWithGoogleOauthQuery,
 	): Promise<HttpResponseBodySuccessDto<LoginResponseDto> | HttpException> {
 		const { socialAccount } = command;
+		if (socialAccount instanceof HttpException) {
+			return new OptionalException(HttpStatus.UNAUTHORIZED, socialAccount.message);
+		}
 
 		const payloadAccessToken: IAccessTokenPayload = {
 			userId: socialAccount.user.id,
