@@ -4,14 +4,19 @@ import { PostStatusEnum } from '@prisma/client';
 import { PostsDto, PostsEntity } from 'src/models';
 import { PrismaService } from 'src/modules/database/services';
 import { CreatePostDto, UpdatePostDto } from 'src/modules/posts/dtos';
-import { IFilterPostQuery } from 'src/modules/posts/interfaces';
+
+interface PostFilter {
+	skip: number;
+	take: number;
+	status?: Exclude<PostStatusEnum, 'DELETED'>;
+}
 
 @Injectable()
 export class PostsRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
 	async findPosts(
-		filterPost: IFilterPostQuery,
+		filterPost: PostFilter,
 		userId?: string,
 	): Promise<[PostsDto[], number]> {
 		const filter = {
@@ -172,7 +177,7 @@ export class PostsRepository {
 	}
 
 	async findAllArchivedPostsByUser(
-		filterPost: IFilterPostQuery,
+		filterPost: PostFilter,
 		userId: string,
 	): Promise<[PostsDto[], number]> {
 		const filter = {

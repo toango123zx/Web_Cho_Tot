@@ -2,7 +2,6 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { HttpResponseBodySuccessDto } from 'src/common';
 import { PostArchivesDto } from 'src/models';
-import { IFilterPostQuery } from 'src/modules/posts/interfaces';
 
 import { PostsRepository } from '../../posts.repository';
 import { GetPostsArchiveByUserQuery } from '../implements';
@@ -18,7 +17,7 @@ export class GetPostsArchiveByUserHandler
 	): Promise<HttpResponseBodySuccessDto<PostArchivesDto[]>> {
 		const skip = (query.filter.page - 1) * query.filter.limit;
 
-		const pagination: IFilterPostQuery = {
+		const pagination = {
 			skip,
 			take: query.filter.limit,
 			...(query.filter.status && { status: query.filter.status }),
