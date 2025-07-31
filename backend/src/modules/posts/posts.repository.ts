@@ -37,8 +37,6 @@ export class PostsRepository {
 						select: {
 							id: true,
 							name: true,
-							email: true,
-							phoneNumber: true,
 							avatar: true,
 						},
 					},
@@ -200,8 +198,6 @@ export class PostsRepository {
 						select: {
 							id: true,
 							name: true,
-							email: true,
-							phoneNumber: true,
 							avatar: true,
 						},
 					},
