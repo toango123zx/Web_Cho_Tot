@@ -12,16 +12,24 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
-import { HttpResponseBodyDto, PaginationDto } from 'src/common';
+import { RoleUserEnum } from '@prisma/client';
+import { HttpResponseBodyDto } from 'src/common';
 import { PostsDto } from 'src/models';
-import { Auth } from 'src/modules/auth/decorators';
+import { Auth, AuthRole } from 'src/modules/auth/decorators';
 import {
+	AcceptPostCommand,
 	CreatePostCommand,
 	DeletePostCommand,
+	TogglePostArchiveCommand,
 	UpdatePostCommand,
 } from 'src/modules/posts/commands/implements';
-import { CreatePostDto, UpdatePostDto } from 'src/modules/posts/dtos';
-import { GetPostQuery, GetPostsQuery } from 'src/modules/posts/queries/implements';
+import { CreatePostDto, FilterPostDto, UpdatePostDto } from 'src/modules/posts/dtos';
+import {
+	GetPostQuery,
+	GetPostsArchiveByUserQuery,
+	GetPostsByUserQuery,
+	GetPostsQuery,
+} from 'src/modules/posts/queries/implements';
 import { MyInformation } from 'src/modules/users/decorators';
 import { UserInformationDto } from 'src/modules/users/dtos';
 
@@ -35,9 +43,20 @@ export class PostsController {
 
 	@Get()
 	async getPosts(
-		@Query() pagination: PaginationDto,
+		@Query() filter: FilterPostDto,
 	): Promise<HttpResponseBodyDto<PostsDto[] | HttpException>> {
-		return this.queryBus.execute(new GetPostsQuery(pagination));
+		return this.queryBus.execute(new GetPostsQuery(filter));
+	}
+
+	@Auth()
+	@Get('/archive')
+	async getPostsArchiveByUser(
+		@Query() filter: FilterPostDto,
+		@MyInformation() userInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<PostsDto[] | HttpException>> {
+		return this.queryBus.execute(
+			new GetPostsArchiveByUserQuery(filter, userInformation.id),
+		);
 	}
 
 	@Get('/:postId')
@@ -77,5 +96,32 @@ export class PostsController {
 		@Param('postId') postId: string,
 	): Promise<HttpResponseBodyDto<PostsDto | HttpException>> {
 		return this.commandBus.execute(new DeletePostCommand(postId, userInformation));
+	}
+
+	@AuthRole(RoleUserEnum.ADMIN)
+	@Patch('/:postId/accept')
+	async acceptPost(
+		@Param('postId') postId: string,
+	): Promise<HttpResponseBodyDto<PostsDto | HttpException>> {
+		return this.commandBus.execute(new AcceptPostCommand(postId));
+	}
+
+	@Get('/user/:userId')
+	async getPostsByUser(
+		@Query() filter: FilterPostDto,
+		@Param('userId') userId: string,
+	): Promise<HttpResponseBodyDto<PostsDto[] | HttpException>> {
+		return this.queryBus.execute(new GetPostsByUserQuery(filter, userId));
+	}
+
+	@Auth()
+	@Post('/:postId/toggle-archive')
+	async togglePostArchive(
+		@MyInformation() userInformation: UserInformationDto,
+		@Param('postId') postId: string,
+	): Promise<HttpResponseBodyDto<PostsDto | HttpException>> {
+		return this.commandBus.execute(
+			new TogglePostArchiveCommand(postId, userInformation),
+		);
 	}
 }

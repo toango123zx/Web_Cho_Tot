@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { AgePostEnum, SizePostEnum } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
 	IsEnum,
@@ -10,8 +11,6 @@ import {
 	ValidateNested,
 	IsArray,
 } from 'class-validator';
-
-import { AgePostEnum, SizePostEnum, PostStatusEnum } from './createPost.dto';
 
 export class NewPostImageDto {
 	@ApiProperty({ example: 'https://example.com/image.jpg' })
@@ -50,16 +49,6 @@ export class UpdatePostDto {
 	@IsOptional()
 	@IsString()
 	address?: string;
-
-	@ApiProperty({
-		enum: PostStatusEnum,
-		enumName: 'PostStatusEnum',
-		required: false,
-		example: PostStatusEnum.PUBLISHED,
-	})
-	@IsOptional()
-	@IsEnum(PostStatusEnum)
-	status?: PostStatusEnum;
 
 	@ApiProperty({
 		example: 'uuid-category-id',

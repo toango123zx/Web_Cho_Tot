@@ -1,35 +1,41 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { HttpResponseBodySuccessDto } from 'src/common';
-import { PostsDto } from 'src/models';
+import { PostArchivesDto } from 'src/models';
 
 import { PostsRepository } from '../../posts.repository';
-import { GetPostsQuery } from '../implements';
+import { GetPostsArchiveByUserQuery } from '../implements';
 
-@QueryHandler(GetPostsQuery)
-export class GetPostsHandler implements IQueryHandler<GetPostsQuery> {
+@QueryHandler(GetPostsArchiveByUserQuery)
+export class GetPostsArchiveByUserHandler
+	implements IQueryHandler<GetPostsArchiveByUserQuery>
+{
 	constructor(private readonly postsRepository: PostsRepository) {}
 
 	public async execute(
-		query: GetPostsQuery,
-	): Promise<HttpResponseBodySuccessDto<PostsDto[]>> {
+		query: GetPostsArchiveByUserQuery,
+	): Promise<HttpResponseBodySuccessDto<PostArchivesDto[]>> {
 		const skip = (query.filter.page - 1) * query.filter.limit;
 
-		const filter = {
+		const pagination = {
 			skip,
 			take: query.filter.limit,
 			...(query.filter.status && { status: query.filter.status }),
 		};
 
-		const [posts, totalRecords] = await this.postsRepository.findPosts(filter);
+		const [postsArchive, totalRecords] =
+			await this.postsRepository.findAllArchivedPostsByUser(
+				pagination,
+				query.userId,
+			);
 
 		const totalPage = Math.ceil(totalRecords / query.filter.limit);
 		return {
 			success: true,
-			data: posts,
+			data: postsArchive,
 			pagination: {
 				totalItems: totalRecords,
-				itemsPerPage: posts.length,
+				itemsPerPage: postsArchive.length,
 				currentPage: query.filter.page,
 				totalPages: totalPage,
 			},

@@ -4,24 +4,27 @@ import { HttpResponseBodySuccessDto } from 'src/common';
 import { PostsDto } from 'src/models';
 
 import { PostsRepository } from '../../posts.repository';
-import { GetPostsQuery } from '../implements';
+import { GetPostsByUserQuery } from '../implements';
 
-@QueryHandler(GetPostsQuery)
-export class GetPostsHandler implements IQueryHandler<GetPostsQuery> {
+@QueryHandler(GetPostsByUserQuery)
+export class GetPostsByUserHandler implements IQueryHandler<GetPostsByUserQuery> {
 	constructor(private readonly postsRepository: PostsRepository) {}
 
 	public async execute(
-		query: GetPostsQuery,
+		query: GetPostsByUserQuery,
 	): Promise<HttpResponseBodySuccessDto<PostsDto[]>> {
 		const skip = (query.filter.page - 1) * query.filter.limit;
 
-		const filter = {
+		const pagination = {
 			skip,
 			take: query.filter.limit,
 			...(query.filter.status && { status: query.filter.status }),
 		};
 
-		const [posts, totalRecords] = await this.postsRepository.findPosts(filter);
+		const [posts, totalRecords] = await this.postsRepository.findPosts(
+			pagination,
+			query.userId,
+		);
 
 		const totalPage = Math.ceil(totalRecords / query.filter.limit);
 		return {

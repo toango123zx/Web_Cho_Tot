@@ -1,7 +1,7 @@
 import { IQuery } from '@nestjs/cqrs';
 
-import { PaginationDto } from 'src/common';
+import { FilterPostDto } from 'src/modules/posts/dtos';
 
 export class GetPostsQuery implements IQuery {
-	constructor(public readonly pagination: PaginationDto) {}
+	constructor(public readonly filter: FilterPostDto) {}
 }

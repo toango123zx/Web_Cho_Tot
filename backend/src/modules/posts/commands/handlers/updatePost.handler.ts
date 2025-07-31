@@ -1,11 +1,7 @@
 import { HttpException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import {
-	HttpResponseBodySuccessDto,
-	NotFoundException,
-	OptionalException,
-} from 'src/common';
+import { HttpResponseBodySuccessDto, OptionalException } from 'src/common';
 import { PostsEntity } from 'src/models';
 
 import { CategoriesRepository } from 'src/modules/categories/categories.repository';
@@ -27,7 +23,7 @@ export class UpdatePostHandler implements ICommandHandler<UpdatePostCommand> {
 
 		const post = await this.postsRepository.findPostById(postId);
 		if (!post) {
-			throw new NotFoundException('postId');
+			throw new OptionalException(404, 'Post not found');
 		}
 
 		if (post.userId !== myInformation.id) {
