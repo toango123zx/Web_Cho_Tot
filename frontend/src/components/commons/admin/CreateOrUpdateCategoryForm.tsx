@@ -11,15 +11,9 @@ interface Props {
 	open: boolean;
 	onClose: () => void;
 	initialData?: Category | null;
-	onSuccess: () => void;
 }
 
-export function CreateOrUpdateCategoryForm({
-	open,
-	onClose,
-	initialData,
-	onSuccess,
-}: Props) {
+export function CreateOrUpdateCategoryForm({ open, onClose, initialData }: Props) {
 	const isEditing = !!initialData;
 	const [name, setName] = useState('');
 	const [errors, setErrors] = useState({ name: '' });
@@ -40,22 +34,21 @@ export function CreateOrUpdateCategoryForm({
 
 	const handleSubmit = async () => {
 		if (!name.trim()) {
-			setErrors({ ...errors, name: 'Tên không được bỏ trống' });
+			setErrors({ name: 'Tên không được bỏ trống' });
 			return;
 		} else {
-			setErrors({ ...errors, name: '' });
+			setErrors({ name: '' });
 		}
 		try {
 			setLoading(true);
 			if (isEditing && initialData) {
-				await updateCategoryAPI(initialData.id, { name });
+				await updateCategoryAPI(initialData.id, { name: name.trim() });
 				toast.success('Cập nhật danh mục thành công');
 			} else {
 				await createCategoryAPI({ name: name.trim() });
 				toast.success('Tạo danh mục mới thành công');
 			}
 			queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAllCategories() });
-			onSuccess();
 			onClose();
 		} catch (err: any) {
 			toast.error('Có lỗi xảy ra: ' + err.message);

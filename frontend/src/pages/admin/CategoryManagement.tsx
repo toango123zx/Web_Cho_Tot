@@ -22,25 +22,6 @@ export default function CategoriesPage() {
 		setDetailOpen(true);
 	};
 
-	// const handleFormSuccess = async (data: CategoryCreation | CategoryUpdate) => {
-	// 	try {
-	// 		if (selectedCategory) {
-	// 			await updateCategory.mutateAsync({
-	// 				id: selectedCategory.id,
-	// 				data: data as CategoryUpdate,
-	// 			});
-	// 			toast.success('Cập nhật danh mục thành công');
-	// 		} else {
-	// 			await createCategory.mutateAsync(data as CategoryCreation);
-	// 			toast.success('Thêm danh mục thành công');
-	// 		}
-	// 		setFormOpen(false);
-	// 		setSelectedCategory(null);
-	// 	} catch (error: any) {
-	// 		toast.error(error?.message || 'Có lỗi xảy ra');
-	// 	}
-	// };
-
 	return (
 		<div className="space-y-6">
 			<div className="flex justify-between items-center">
@@ -60,7 +41,6 @@ export default function CategoriesPage() {
 					setFormOpen(false);
 					setSelectedCategory(null);
 				}}
-				onSuccess={() => {}}
 			/>
 
 			<CategoryDetail

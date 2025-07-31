@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { X } from 'lucide-react';
 
 interface CategoryDetailProps {
 	open: boolean;
