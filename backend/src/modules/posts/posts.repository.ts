@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { PostStatusEnum } from '@prisma/client';
-import { PostsEntity } from 'src/models';
+import { PostsDto, PostsEntity } from 'src/models';
 import { PrismaService } from 'src/modules/database/services';
 import { CreatePostDto, UpdatePostDto } from 'src/modules/posts/dtos';
 import { IFilterPostQuery } from 'src/modules/posts/interfaces';
@@ -13,7 +13,7 @@ export class PostsRepository {
 	async findPosts(
 		filterPost: IFilterPostQuery,
 		userId?: string,
-	): Promise<[PostsEntity[], number]> {
+	): Promise<[PostsDto[], number]> {
 		const filter = {
 			deletedAt: null,
 			...(userId ? { userId } : {}),
@@ -28,7 +28,15 @@ export class PostsRepository {
 				include: {
 					postImages: true,
 					category: true,
-					user: true,
+					user: {
+						select: {
+							id: true,
+							name: true,
+							email: true,
+							phoneNumber: true,
+							avatar: true,
+						},
+					},
 				},
 				orderBy: {
 					createdAt: 'asc',
@@ -49,7 +57,6 @@ export class PostsRepository {
 			include: {
 				postImages: true,
 				category: true,
-				user: true,
 			},
 		});
 	}
@@ -82,7 +89,6 @@ export class PostsRepository {
 			include: {
 				postImages: true,
 				category: true,
-				user: true,
 			},
 		});
 	}
@@ -91,11 +97,6 @@ export class PostsRepository {
 		return this.prismaService.posts.update({
 			where: { id: postId },
 			data: { status: PostStatusEnum.PUBLISHED },
-			include: {
-				postImages: true,
-				category: true,
-				user: true,
-			},
 		});
 	}
 
@@ -132,7 +133,7 @@ export class PostsRepository {
 	async deletePostById(postId: string): Promise<PostsEntity> {
 		return this.prismaService.posts.update({
 			where: { id: postId },
-			data: { deletedAt: new Date() },
+			data: { deletedAt: new Date(), status: PostStatusEnum.DELETED },
 		});
 	}
 
@@ -173,7 +174,7 @@ export class PostsRepository {
 	async findAllArchivedPostsByUser(
 		filterPost: IFilterPostQuery,
 		userId: string,
-	): Promise<[PostsEntity[], number]> {
+	): Promise<[PostsDto[], number]> {
 		const filter = {
 			postArchives: {
 				some: { userId },
@@ -190,7 +191,15 @@ export class PostsRepository {
 				include: {
 					postImages: true,
 					category: true,
-					user: true,
+					user: {
+						select: {
+							id: true,
+							name: true,
+							email: true,
+							phoneNumber: true,
+							avatar: true,
+						},
+					},
 				},
 			}),
 
