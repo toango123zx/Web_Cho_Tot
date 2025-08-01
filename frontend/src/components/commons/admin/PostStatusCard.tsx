@@ -1,14 +1,8 @@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { postStatusToText } from '@/helper';
+import { POST_STATUS_OPTIONS } from './constants';
 
 type IPostStatus = 'ALL' | 'PENDING' | 'PUBLISHED' | 'EXPIRED' | 'DELETED' | string;
-const POST_STATUS_OPTIONS = [
-	'ALL',
-	'PENDING',
-	'PUBLISHED',
-	'EXPIRED',
-	'DELETED',
-] as const;
 
 type Props = {
 	status: IPostStatus;

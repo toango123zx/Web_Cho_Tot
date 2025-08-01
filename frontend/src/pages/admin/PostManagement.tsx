@@ -7,7 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-type IPostStatus = 'ALL' | 'PENDING' | 'PUBLISHED' | 'EXPIRED' | 'DELETED';
+type ITabPostStatus = 'ALL' | IPostStatus;
 const ITEMS_PER_PAGE = 10;
 
 const PostCardSkeleton = () => (
@@ -23,7 +23,7 @@ const PostCardSkeleton = () => (
 
 export default function PostManagement() {
 	const [page, setPage] = useState(1);
-	const [status, setStatus] = useState<IPostStatus>('PENDING');
+	const [status, setStatus] = useState<ITabPostStatus>('PENDING');
 	const [isAcceptingPostId, setIsAcceptingPostId] = useState<string>();
 
 	const queryClient = useQueryClient();
