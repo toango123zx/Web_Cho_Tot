@@ -6,3 +6,4 @@
 /// <reference path="./cloudinary.d.ts" />
 /// <reference path="./api.d.ts" />
 /// <reference path="./category.d.ts" />
+/// <reference path="./post.d.ts" />
