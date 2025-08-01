@@ -98,7 +98,7 @@ export default function PostManagement() {
 			</div>
 
 			{!loading && postResponse?.success && postResponse.data.length > 0 && (
-				<div className="flex justify-center gap-2 pt-6">
+				<div className="flex items-center justify-center gap-2 pt-6">
 					<Button
 						variant="outline"
 						disabled={page <= 1}

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader } from 'lucide-react';
+import { postStatusToText } from '@/helper';
 
 type Props = {
 	post: IPostWithCategoryAndUser;
@@ -21,7 +22,9 @@ export function PostCard({ post, onApprove, isApproving, isApprovingPostId }: Pr
 						className="w-full h-48 object-cover"
 					/>
 				)}
-				<Badge className="absolute top-2 right-2 text-xs">{post.status}</Badge>
+				<Badge className="absolute top-2 right-2 text-xs">
+					{postStatusToText(post.status)}
+				</Badge>
 			</CardHeader>
 
 			<CardContent className="p-4 space-y-2">
