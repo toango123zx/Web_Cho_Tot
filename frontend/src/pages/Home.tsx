@@ -1,9 +1,25 @@
+import { useEffect, useState } from 'react';
 import { Heart, MapPin, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePosts } from '@/services/query/post';
 
+const LIMIT = 9;
+
 export default function HomePage() {
-	const { data: posts, isLoading } = usePosts();
+	const [page, setPage] = useState(1);
+	const [postList, setPostList] = useState<IPost[]>([]);
+
+	const { data, isLoading } = usePosts(page, LIMIT);
+
+	useEffect(() => {
+		if (data?.success && data.data.length > 0) {
+			setPostList((prev) => [...prev, ...data.data]);
+		}
+	}, [data]);
+
+	const handleLoadMore = () => {
+		setPage((prev) => prev + 1);
+	};
 
 	return (
 		<div className="min-h-screen bg-white">
@@ -19,20 +35,20 @@ export default function HomePage() {
 			</div>
 
 			{/* Main Content */}
-			<div className="max-w-6xl mx-auto px-6 py-6">
-				{isLoading ? (
+			<div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+				{isLoading && postList.length === 0 ? (
 					<p>Đang tải sản phẩm...</p>
-				) : !posts || posts.length === 0 ? (
+				) : postList.length === 0 ? (
 					<p>Không có sản phẩm nào</p>
 				) : (
-					<div className="grid grid-cols-5 gap-4">
-						{posts.map((post) => (
+					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+						{postList.map((post) => (
 							<div key={post.id} className="cursor-pointer group">
 								<div className="relative">
 									<img
 										src={post.postImages[0]?.url || '/placeholder.svg'}
 										alt={post.title}
-										className="w-full h-48 object-cover transition-transform duration-200 group-hover:scale-105"
+										className="w-full h-40 sm:h-48 object-cover transition-transform duration-200 group-hover:scale-105 rounded-md"
 									/>
 
 									{/* Heart Icon */}
@@ -70,14 +86,18 @@ export default function HomePage() {
 				)}
 
 				{/* Load More */}
-				<div className="text-center mt-8">
-					<Button
-						variant="outline"
-						className="px-8 bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-					>
-						Xem thêm
-					</Button>
-				</div>
+				{data?.success && data.data.length === LIMIT && (
+					<div className="text-center mt-8">
+						<Button
+							onClick={handleLoadMore}
+							variant="outline"
+							className="px-8 bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+							disabled={isLoading}
+						>
+							{isLoading ? 'Đang tải...' : 'Xem thêm'}
+						</Button>
+					</div>
+				)}
 			</div>
 		</div>
 	);

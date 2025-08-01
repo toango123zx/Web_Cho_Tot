@@ -4,5 +4,6 @@ export const QUERY_KEY = {
 		return ['fetchUser', page];
 	},
 	getAccount: () => ['account'],
-	getPosts: () => ['posts'],
+	getPosts: (params: { page: number; limit: number }) => ['posts', params],
+	getCategories: () => ['categories'],
 };

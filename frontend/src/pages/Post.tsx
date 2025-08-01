@@ -1,10 +1,9 @@
-'use client';
-
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { uploadFileToCloudinary } from '@/services/api/cloudinary';
+import { useCategories, useCreatePost } from '@/services/query/post';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
 	Select,
 	SelectContent,
@@ -12,23 +11,36 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { Camera, AlertTriangle, Info } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Camera, Info } from 'lucide-react';
 import { AddressDialog } from '@/components/dialog/AddressDialog';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProductListingPage() {
 	const [selectedImages, setSelectedImages] = useState<File[]>([]);
+	const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+	const fileInputRef = useRef<HTMLInputElement | null>(null);
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [price, setPrice] = useState('');
 	const [age, setAge] = useState('');
 	const [size, setSize] = useState('');
+	const [category, setCategory] = useState<string>('');
+	const navigate = useNavigate();
+
+	// Lấy categories từ API
+	const { data: categories, isLoading: isCategoriesLoading } = useCategories();
 	const [address, setAddress] = useState<{
 		province: string;
+		provinceLabel: string;
 		ward: string;
+		wardLabel: string;
 		specificAddress: string;
 	} | null>(null);
 	const [showAddressDialog, setShowAddressDialog] = useState(false);
+
+	const createPostMutation = useCreatePost();
 
 	const [errors, setErrors] = useState<{
 		title?: string;
@@ -37,13 +49,53 @@ export default function ProductListingPage() {
 		size?: string;
 		price?: string;
 		address?: string;
+		category?: string;
+		images?: string;
 	}>({});
-
+	const queryClient = useQueryClient();
 	const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const files = event.target.files;
 		if (files) {
-			setSelectedImages(Array.from(files));
+			let fileArr = Array.from(files);
+			if (selectedImages.length > 0) {
+				fileArr = [...selectedImages, ...fileArr].slice(0, 6);
+			} else {
+				fileArr = fileArr.slice(0, 6);
+			}
+			setSelectedImages(fileArr);
+			setPreviewUrls(fileArr.map((file) => URL.createObjectURL(file)));
+			if (fileInputRef.current) fileInputRef.current.value = '';
 		}
+	};
+
+	const handleRemoveImage = (idx: number) => {
+		setSelectedImages((prev) => {
+			const newArr = prev.filter((_, i) => i !== idx);
+			setPreviewUrls(newArr.map((file) => URL.createObjectURL(file)));
+			return newArr;
+		});
+	};
+
+	// Drag & drop reorder
+	const dragItem = useRef<number | null>(null);
+	const dragOverItem = useRef<number | null>(null);
+	const handleDragStart = (idx: number) => {
+		dragItem.current = idx;
+	};
+	const handleDragEnter = (idx: number) => {
+		dragOverItem.current = idx;
+	};
+	const handleDragEnd = () => {
+		const from = dragItem.current;
+		const to = dragOverItem.current;
+		if (from === null || to === null || from === to) return;
+		const newFiles = [...selectedImages];
+		const [file] = newFiles.splice(from, 1);
+		newFiles.splice(to, 0, file);
+		setSelectedImages(newFiles);
+		setPreviewUrls(newFiles.map((file) => URL.createObjectURL(file)));
+		dragItem.current = null;
+		dragOverItem.current = null;
 	};
 
 	const validateForm = () => {
@@ -55,6 +107,9 @@ export default function ProductListingPage() {
 		const wordCount = description.trim().split(/\s+/).length;
 		if (!description.trim() || wordCount < 10) {
 			newErrors.description = 'Vui lòng nhập ít nhất 10 từ';
+		}
+		if (!category) {
+			newErrors.category = 'Vui lòng chọn danh mục';
 		}
 		if (!age) {
 			newErrors.age = 'Vui lòng chọn độ tuổi';
@@ -69,74 +124,208 @@ export default function ProductListingPage() {
 			newErrors.address = 'Vui lòng chọn đầy đủ địa chỉ';
 		}
 
+		if (Object.keys(newErrors).length === 0 && selectedImages.length === 0) {
+			newErrors.images = 'Bạn cần đăng ít nhất 1 ảnh';
+		}
+
 		setErrors(newErrors);
 		return Object.keys(newErrors).length === 0;
 	};
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (validateForm()) {
-			console.log('Submit with:', { title, description, price, age, size, address });
+			let uploadedImageUrls: string[] = [];
+			if (selectedImages.length > 0) {
+				const uploadPromises = selectedImages.map((file) =>
+					uploadFileToCloudinary(file, 'image'),
+				);
+				const results = await Promise.all(uploadPromises);
+				for (const res of results) {
+					if (res.success && res.data && res.data.secure_url) {
+						uploadedImageUrls.push(res.data.secure_url);
+					} else {
+						setErrors((prev) => ({
+							...prev,
+							images: 'Có ảnh không upload được, hãy thử lại.',
+						}));
+						return;
+					}
+				}
+			}
+			const payload = {
+				title,
+				description,
+				price: Number(price),
+				age: age as PetAge,
+				size: size as PetSize,
+				address: address
+					? `${address.specificAddress}, ${address.wardLabel}, ${address.provinceLabel}`
+					: '',
+				categoryId: category,
+				postImages: uploadedImageUrls.map((url) => ({ url })),
+			};
+			createPostMutation.mutate(payload, {
+				onSuccess: (res) => {
+					if (res.success) {
+						queryClient.invalidateQueries({ queryKey: ['posts'] });
+						toast.success('Đăng tin thành công!');
+						navigate('/');
+					} else {
+						toast.error(res.message || 'Đăng tin thất bại');
+					}
+				},
+				onError: (err: any) => {
+					toast.error(err?.response?.data?.message || 'Có lỗi xảy ra');
+				},
+			});
 		}
 	};
 
 	return (
 		<div className="min-h-screen bg-gray-100 py-6">
 			<div className="container mx-auto max-w-4xl px-4">
-				<Alert className="mb-4 border-red-200 bg-red-50">
-					<AlertTriangle className="h-4 w-4 text-red-600" />
-					<AlertDescription className="text-red-800">
-						Vui lòng điền đầy đủ thông tin trước khi chọn XEM TRƯỚC
-					</AlertDescription>
-				</Alert>
-
 				<div className="bg-white p-4 rounded-lg shadow-sm">
 					<div className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-4">
 						<div className="space-y-3">
-							<h3 className="text-lg font-semibold mb-2">Hình ảnh và Video sản phẩm</h3>
-							<div className="border-2 border-dashed border-orange-300 rounded-lg p-4 bg-gray-50 w-[320px]">
-								<div className="flex flex-col items-center space-y-3">
-									<div className="flex items-center space-x-2 text-blue-600 text-sm">
-										<Info className="w-4 h-4" />
-										<span>Hình ảnh hợp lệ</span>
+							<h3 className="text-lg font-semibold mb-10">Hình ảnh và Video sản phẩm</h3>
+							<div>
+								{previewUrls.length === 0 ? (
+									<div
+										className="relative border-2 border-dashed border-orange-300 rounded-lg p-4 bg-gray-50 w-[320px] cursor-pointer"
+										onClick={() => fileInputRef.current?.click()}
+									>
+										<div
+											className="absolute right-2 top-1 flex items-center gap-1 select-none"
+											style={{ zIndex: 2 }}
+										>
+											<Info className="w-3 h-3 text-blue-500" />
+											<span className="text-xs text-blue-500 font-normal leading-none">
+												Hình ảnh hợp lệ
+											</span>
+										</div>
+										<div className="flex flex-col items-center space-y-3 justify-center h-full">
+											<div className="w-20 h-20 border-2 border-dashed border-orange-300 rounded-lg flex items-center justify-center">
+												<Camera className="w-8 h-8 text-orange-400" />
+											</div>
+											<p className="text-gray-600 text-sm text-center">
+												ĐĂNG TỪ 01 ĐẾN 06 HÌNH
+											</p>
+										</div>
 									</div>
-									<div className="w-20 h-20 border-2 border-dashed border-orange-300 rounded-lg flex items-center justify-center">
-										<Camera className="w-8 h-8 text-orange-400" />
+								) : (
+									<div>
+										<div className="flex flex-wrap gap-3">
+											{previewUrls.map((url, idx) => (
+												<div
+													key={idx}
+													className="relative w-32 h-24 rounded overflow-hidden border border-orange-300 bg-white flex items-center justify-center"
+													draggable
+													onDragStart={() => handleDragStart(idx)}
+													onDragEnter={() => handleDragEnter(idx)}
+													onDragEnd={handleDragEnd}
+													onDragOver={(e) => e.preventDefault()}
+												>
+													<img
+														src={url}
+														alt={`preview-${idx}`}
+														className="object-cover w-full h-full"
+													/>
+													<button
+														type="button"
+														className="absolute top-1 right-1 bg-black bg-opacity-60 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+														onClick={() => handleRemoveImage(idx)}
+														tabIndex={-1}
+													>
+														×
+													</button>
+													{idx === 0 && (
+														<span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs text-center py-1">
+															Hình bìa
+														</span>
+													)}
+												</div>
+											))}
+											{previewUrls.length < 6 && (
+												<div
+													className="w-32 h-24 border-2 border-dashed border-orange-300 rounded flex items-center justify-center cursor-pointer bg-gray-50"
+													onClick={() => fileInputRef.current?.click()}
+												>
+													<span className="text-3xl text-orange-400 font-bold">+</span>
+												</div>
+											)}
+										</div>
+										<p className="text-xs text-gray-500 mt-2">
+											Nhấn và giữ để di chuyển hình ảnh
+										</p>
 									</div>
-									<p className="text-gray-600 text-sm text-center">
-										ĐĂNG TỪ 01 ĐẾN 06 HÌNH
-									</p>
-								</div>
+								)}
+								<input
+									ref={fileInputRef}
+									type="file"
+									multiple
+									accept="image/*"
+									onChange={handleImageUpload}
+									className="hidden"
+									id="file-upload"
+								/>
 							</div>
-							<input
-								type="file"
-								multiple
-								accept="image/*"
-								onChange={handleImageUpload}
-								className="hidden"
-								id="file-upload"
-							/>
 						</div>
 
 						<div className="space-y-4 -ml-4">
+							{errors.images && (
+								<div className="mb-2">
+									<div className="flex items-center bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+										<svg
+											className="w-5 h-5 mr-2 text-red-500"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2"
+											viewBox="0 0 24 24"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+											/>
+										</svg>
+										<span>{errors.images}</span>
+									</div>
+								</div>
+							)}
 							<div>
 								<Label htmlFor="category" className="text-sm font-medium">
 									Danh Mục Tin Đăng *
 								</Label>
-								<Select>
-									<SelectTrigger className="mt-2 w-full">
-										<SelectValue placeholder="Thú cưng - Chó" />
+								<Select
+									value={category}
+									onValueChange={setCategory}
+									disabled={isCategoriesLoading || !categories}
+								>
+									<SelectTrigger
+										className="mt-2 w-full border"
+										style={errors.category ? { borderColor: '#dc2626' } : {}}
+									>
+										<SelectValue
+											placeholder={isCategoriesLoading ? 'Đang tải...' : 'Chọn danh mục'}
+										/>
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value="pets-dogs">Thú cưng - Chó</SelectItem>
-										<SelectItem value="pets-cats">Thú cưng - Mèo</SelectItem>
-										<SelectItem value="electronics">Điện tử</SelectItem>
-										<SelectItem value="fashion">Thời trang</SelectItem>
+										{categories &&
+											categories.length > 0 &&
+											categories.map((cat) => (
+												<SelectItem key={cat.id} value={cat.id}>
+													{cat.name}
+												</SelectItem>
+											))}
 									</SelectContent>
 								</Select>
+								{errors.category && (
+									<p className="text-sm text-red-600 mt-1">{errors.category}</p>
+								)}
 							</div>
 
 							<div>
-								<h3 className="text-lg font-semibold mb-4 mt-12">Thông tin chi tiết</h3>
+								<h3 className="text-lg font-semibold mb-4 mt-8">Thông tin chi tiết</h3>
 								<div className="space-y-3">
 									<div>
 										<Label htmlFor="age" className="text-sm">
@@ -250,7 +439,11 @@ export default function ProductListingPage() {
 									>
 										{address ? (
 											<p className="text-sm">
-												{address.specificAddress}, {address.ward}, {address.province}
+												{address.specificAddress}
+												{address.specificAddress ? ', ' : ''}
+												{address.wardLabel}
+												{address.wardLabel ? ', ' : ''}
+												{address.provinceLabel}
 											</p>
 										) : (
 											<p className="text-gray-400 text-sm">Chọn địa chỉ</p>
@@ -286,7 +479,9 @@ export default function ProductListingPage() {
 						onClose={() => setShowAddressDialog(false)}
 						onSave={(value: {
 							province: string;
+							provinceLabel: string;
 							ward: string;
+							wardLabel: string;
 							specificAddress: string;
 						}) => {
 							setAddress(value);

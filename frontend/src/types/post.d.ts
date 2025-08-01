@@ -36,3 +36,21 @@ interface IPost {
 	category: ICategory;
 	user: IUser;
 }
+
+type PetAge = 'PUPPY' | 'YOUNG_DOG' | 'ADULT_DOG';
+type PetSize = 'MINI' | 'SMALL' | 'MEDIUM' | 'LARGE';
+
+interface ICreatePostImage {
+	url: string;
+}
+
+interface ICreatePostPayload {
+	title: string;
+	description: string;
+	age: PetAge;
+	size: PetSize;
+	price: number;
+	address: string;
+	categoryId: string;
+	postImages: ICreatePostImage[];
+}

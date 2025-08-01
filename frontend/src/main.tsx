@@ -52,7 +52,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: '/posts',
+				path: '/user/posts',
 				element: (
 					<ProtectedRoute>
 						<Post />

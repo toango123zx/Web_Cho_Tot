@@ -18,6 +18,7 @@ import { HeaderSearch } from './HeaderSearch';
 import { AccountLayer } from './AccountLayer';
 import { Avatar } from './AccountAvatar';
 import { useCurrentApp } from '@/components/context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 export function HeaderBottom() {
 	const [isAccountLayerShown, setIsAccountLayerShown] = useState(false);
@@ -37,6 +38,7 @@ export function HeaderBottom() {
 		e.stopPropagation();
 		setIsAccountLayerShown((prev) => !prev);
 	};
+	const navigate = useNavigate();
 
 	return (
 		<div className="flex flex-col sm:flex-row items-center px-4 sm:px-6 py-2 gap-4 sm:gap-0">
@@ -125,7 +127,12 @@ export function HeaderBottom() {
 						/>
 					)}
 				</div>
-				<Button variant={'app-secondary'} className="uppercase" size={'lg'}>
+				<Button
+					variant="app-secondary"
+					className="uppercase"
+					size="lg"
+					onClick={() => navigate('/user/posts')}
+				>
 					<SquarePen className="w-4 h-4 sm:w-5 sm:h-5" />
 					<span className="hidden sm:inline">Đăng tin</span>
 				</Button>
