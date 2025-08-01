@@ -11,6 +11,7 @@ export const usePostQueryWithPagination = (params?: {
 	return useQuery({
 		queryKey: QUERY_KEY.list(params),
 		queryFn: () => postApi.getPosts(params),
+		staleTime: 1000 * 60 * 5, // 5 minutes
 	});
 };
 

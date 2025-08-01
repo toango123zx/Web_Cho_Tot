@@ -1,7 +1,7 @@
 import { applyDecorators, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
-import { AuthRefreshTokenGuard } from '../guards/authRefreshToken.guard';
+import { AuthRefreshTokenGuard } from '../guards';
 
 export const AuthRefreshToken = (): MethodDecorator &
 	ClassDecorator &

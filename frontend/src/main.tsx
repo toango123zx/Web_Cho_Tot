@@ -20,6 +20,7 @@ import AdminDashboard from './pages/admin/Dashboard.tsx';
 import UserManagement from './pages/admin/UserManagement.tsx';
 import AuthLayout from './layout/AuthLayout.tsx';
 import PostManagement from './pages/admin/PostManagement.tsx';
+import CategoryManagement from './pages/admin/CategoryManagement.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
 			{
 				path: 'posts-management',
 				element: <PostManagement />,
+			},
+			{
+				path: 'categories-management',
+				element: <CategoryManagement />,
 			},
 		],
 	},

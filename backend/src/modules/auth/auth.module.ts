@@ -9,11 +9,21 @@ import { DatabaseModule } from '../database/database.module';
 import { AuthController } from './auth.controller';
 import { AuthRepository } from './auth.repository';
 import { AuthCommandHandlers } from './commands/handlers';
+import { GoogleOAuthGuard } from './guards';
+import { AuthQueryHandlers } from './queries/handlers';
+import { GoogleOauthStrategy } from './strategies';
 
 @Module({
 	imports: [CqrsModule, DatabaseModule, JwtModule],
 	controllers: [AuthController],
-	providers: [UserRepository, AuthRepository, ...AuthCommandHandlers],
+	providers: [
+		GoogleOauthStrategy,
+		GoogleOAuthGuard,
+		UserRepository,
+		AuthRepository,
+		...AuthQueryHandlers,
+		...AuthCommandHandlers,
+	],
 	exports: [JwtModule],
 })
 export class AuthModule {}

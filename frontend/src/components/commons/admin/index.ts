@@ -3,3 +3,8 @@ export * from './UserTable';
 export * from './PostCard';
 export * from './PostStatusCard';
 export * from './constants';
+export * from './CategoryTable';
+export * from './CreateOrUpdateCategoryForm';
+export * from './CreateOrUpdateUserForm';
+export * from './UserDetail';
+export * from './CategoryDetail';
