@@ -3,7 +3,9 @@ import { Injectable } from '@nestjs/common';
 import {
 	AccountsEntity,
 	CreateAccountsDto,
+	CreateSocialAccountsDto,
 	CreateTokensDto,
+	SocialAccountsEntity,
 	TokensEntity,
 	UpdateTokensDto,
 } from 'src/models';
@@ -48,6 +50,32 @@ export class AuthRepository {
 		});
 	}
 
+	async findSocialAccount({
+		googleId,
+		userId,
+		email,
+		phoneNumber,
+	}: {
+		googleId?: string;
+		userId?: string;
+		email?: string;
+		phoneNumber?: string;
+	}): Promise<SocialAccountsEntity | null> {
+		return this.prismaService.socialAccounts.findFirst({
+			include: {
+				user: true,
+			},
+			where: {
+				googleId: googleId,
+				user: {
+					id: userId,
+					email: email,
+					phoneNumber: phoneNumber,
+				},
+			},
+		});
+	}
+
 	async createAccount({
 		account,
 	}: {
@@ -58,6 +86,33 @@ export class AuthRepository {
 				user: true,
 			},
 			data: account,
+		});
+	}
+
+	async createSocialAccount({
+		socialAccount,
+	}: {
+		socialAccount: CreateSocialAccountsDto;
+	}): Promise<SocialAccountsEntity> {
+		return this.prismaService.socialAccounts.create({
+			include: {
+				user: true,
+			},
+			data: {
+				googleId: socialAccount.googleId,
+				user: {
+					connect: socialAccount.user.connect
+						? {
+								id: socialAccount.user.connect.id,
+							}
+						: undefined,
+					create: socialAccount.user.create
+						? {
+								...socialAccount.user.create,
+							}
+						: undefined,
+				},
+			},
 		});
 	}
 
