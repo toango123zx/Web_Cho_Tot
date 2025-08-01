@@ -5,3 +5,4 @@
 /// <reference path="./auth.d.ts" />
 /// <reference path="./cloudinary.d.ts" />
 /// <reference path="./api.d.ts" />
+/// <reference path="./category.d.ts" />
