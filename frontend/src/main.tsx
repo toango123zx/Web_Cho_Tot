@@ -19,6 +19,7 @@ import AdminLayout from './layout/AdminLayout.tsx';
 import AdminDashboard from './pages/admin/Dashboard.tsx';
 import UserManagement from './pages/admin/UserManagement.tsx';
 import AuthLayout from './layout/AuthLayout.tsx';
+import Post from './pages/Post.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -47,6 +48,14 @@ const router = createBrowserRouter([
 						<ProfileLayout>
 							<AccountSettings />
 						</ProfileLayout>
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/posts',
+				element: (
+					<ProtectedRoute>
+						<Post />
 					</ProtectedRoute>
 				),
 			},
