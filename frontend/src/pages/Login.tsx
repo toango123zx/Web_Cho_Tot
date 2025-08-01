@@ -92,11 +92,8 @@ export default function LoginForm() {
 					{/* Banner */}
 					<div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
 						<div className="flex items-start gap-3">
-							<img
-								src="https://id.chotot.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fstatic-chotot-com%2Fstorage%2Ficons%2Fgif%2Fgift_transparent.gif&w=96&q=75"
-								alt="Gift"
-								className="w-8 h-8 mt-1 flex-shrink-0"
-							/>
+							<span className="text-xl mt-1">🎁</span>
+
 							<div className="flex-1">
 								<p className="text-sm text-gray-800 leading-relaxed">
 									Chưa có tài khoản? Tạo tài khoản để nhận{' '}

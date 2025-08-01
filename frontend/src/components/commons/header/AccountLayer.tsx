@@ -34,7 +34,7 @@ export function AccountLayer({
 	return (
 		<div
 			ref={accountLayerRef}
-			className="absolute top-[calc(100%+30px)] right-0 w-[300px] bg-white py-2 shadow-xl max-h-[800px] overflow-y-auto"
+			className="absolute top-[calc(100%+30px)] right-0 w-[300px] bg-white py-2 shadow-xl max-h-[800px] overflow-y-auto z-10"
 		>
 			<div className="flex gap-3 p-3">
 				{isLoggedIn ? (

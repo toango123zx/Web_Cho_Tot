@@ -11,7 +11,6 @@ function Layout() {
 	const { user, setUser, setIsAuthenticated, isAppLoading, setIsAppLoading } =
 		useCurrentApp();
 	const { data, isLoading, refetch } = useAccount();
-	const queryClient = useQueryClient();
 
 	useEffect(() => {
 		if (data) {

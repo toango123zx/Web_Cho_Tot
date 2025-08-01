@@ -1,6 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { fetchAccountAPI, loginAPI, registerAPI } from '../api/auth';
 import { QUERY_KEY } from '@/config/key';
+// import axios from '@/services/AxiosCustomize';
+import { isAxiosError } from 'axios';
 
 export const useLogin = () => {
 	return useMutation({
@@ -24,13 +26,19 @@ export const useRegister = () => {
 };
 
 export const useAccount = () => {
-	return useQuery({
+	return useQuery<IFetchAccount | null, Error, IFetchAccount | null, string[]>({
 		queryKey: QUERY_KEY.getAccount(),
 		queryFn: async () => {
-			const res = await fetchAccountAPI();
-			return res.success ? res.data : null;
+			try {
+				const res = await fetchAccountAPI();
+				return res.success ? res.data : null;
+			} catch (err: any) {
+				if (isAxiosError(err) && err.response?.status === 401) {
+					return null;
+				}
+				throw err;
+			}
 		},
-		// enabled: !!localStorage.getItem('access_token'),
 		staleTime: 1000 * 60 * 5,
 		retry: 1,
 		refetchOnWindowFocus: false,
