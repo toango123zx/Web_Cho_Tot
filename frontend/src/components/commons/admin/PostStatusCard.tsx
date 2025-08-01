@@ -1,6 +1,14 @@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { postStatusToText } from '@/helper';
 
 type IPostStatus = 'ALL' | 'PENDING' | 'PUBLISHED' | 'EXPIRED' | 'DELETED' | string;
+const POST_STATUS_OPTIONS = [
+	'ALL',
+	'PENDING',
+	'PUBLISHED',
+	'EXPIRED',
+	'DELETED',
+] as const;
 
 type Props = {
 	status: IPostStatus;
@@ -11,13 +19,13 @@ export function PostStatusTabs({ status, onChange }: Props) {
 	return (
 		<Tabs value={status} onValueChange={onChange} className="w-full">
 			<TabsList className="flex flex-wrap gap-2">
-				{['ALL', 'PENDING', 'PUBLISHED', 'EXPIRED', 'DELETED'].map((s) => (
+				{POST_STATUS_OPTIONS.map((s) => (
 					<TabsTrigger
 						key={s}
 						value={s}
 						className="text-xs sm:text-sm px-4 py-2 rounded-full border shadow-sm cursor-pointer"
 					>
-						{s === 'ALL' ? 'Tất cả' : s}
+						{postStatusToText(s)}
 					</TabsTrigger>
 				))}
 			</TabsList>

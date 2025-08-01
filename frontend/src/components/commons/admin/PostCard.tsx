@@ -14,11 +14,13 @@ export function PostCard({ post, onApprove, isApproving, isApprovingPostId }: Pr
 	return (
 		<Card className="flex flex-col overflow-hidden shadow-md hover:shadow-lg transition-shadow">
 			<CardHeader className="p-0 relative">
-				<img
-					src={post.postImages[0]?.url || '/placeholder.png'}
-					alt={post.title}
-					className="w-full h-48 object-cover"
-				/>
+				{post.postImages.length > 0 && (
+					<img
+						src={post.postImages[0]?.url}
+						alt={post.title}
+						className="w-full h-48 object-cover"
+					/>
+				)}
 				<Badge className="absolute top-2 right-2 text-xs">{post.status}</Badge>
 			</CardHeader>
 
@@ -49,7 +51,7 @@ export function PostCard({ post, onApprove, isApproving, isApprovingPostId }: Pr
 						size="sm"
 						onClick={() => onApprove(post.id)}
 					>
-						{isApprovingPostId == post.id && <Loader className="animate-spin" />}
+						{isApprovingPostId === post.id && <Loader className="animate-spin" />}
 						Duyệt
 					</Button>
 				)}

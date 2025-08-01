@@ -18,7 +18,6 @@ interface IPost {
 	address: string;
 	createdAt: string;
 	updatedAt: string;
-	deletedAt: string | null;
 	status: IPostStatus;
 	postImages: IPostImage[];
 }

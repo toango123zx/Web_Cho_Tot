@@ -4,6 +4,7 @@ interface PostQueryParams {
 	page?: number;
 	limit?: number;
 	search?: string;
+	status?: IPostStatus;
 }
 
 export const postApi = {
