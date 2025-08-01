@@ -1,10 +1,11 @@
 import { cn } from '@/lib/utils';
-import { Home, LogOut, Users } from 'lucide-react';
+import { Home, LogOut, Newspaper, Users } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 const links = [
 	{ to: '/admin/dashboard', label: 'Dashboard', icon: Home },
 	{ to: '/admin/users-management', label: 'Người dùng', icon: Users },
+	{ to: '/admin/posts-management', label: 'Bài đăng', icon: Newspaper },
 ];
 
 export function Sidebar() {
