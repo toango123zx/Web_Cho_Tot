@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { uploadFileToCloudinary } from '@/services/api/cloudinary';
-import { useCategories, useCreatePost } from '@/services/query/post';
+import { useCreatePost } from '@/services/query/post';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,6 +16,7 @@ import { AddressDialog } from '@/components/dialog/AddressDialog';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { useCategories } from '@/services/query/category';
 
 export default function ProductListingPage() {
 	const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -29,8 +30,8 @@ export default function ProductListingPage() {
 	const [category, setCategory] = useState<string>('');
 	const navigate = useNavigate();
 
-	// Lấy categories từ API
 	const { data: categories, isLoading: isCategoriesLoading } = useCategories();
+
 	const [address, setAddress] = useState<{
 		province: string;
 		provinceLabel: string;
@@ -169,7 +170,7 @@ export default function ProductListingPage() {
 					if (res.success) {
 						queryClient.invalidateQueries({ queryKey: ['posts'] });
 						toast.success('Đăng tin thành công!');
-						navigate('/');
+						navigate('/manage-post');
 					} else {
 						toast.error(res.message || 'Đăng tin thất bại');
 					}

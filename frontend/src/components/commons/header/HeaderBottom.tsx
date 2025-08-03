@@ -18,7 +18,7 @@ import { HeaderSearch } from './HeaderSearch';
 import { AccountLayer } from './AccountLayer';
 import { Avatar } from './AccountAvatar';
 import { useCurrentApp } from '@/components/context/AppContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export function HeaderBottom() {
 	const [isAccountLayerShown, setIsAccountLayerShown] = useState(false);
@@ -95,7 +95,11 @@ export function HeaderBottom() {
 				<ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 hover:opacity-70 cursor-pointer" />
 				<div className="inline-flex items-center gap-1 sm:gap-2 cursor-pointer group">
 					<Newspaper className="w-4 h-4 sm:w-5 sm:h-5 group-hover:opacity-70" />
-					<span className="group-hover:opacity-70 hidden sm:inline">Quản lí tin</span>
+					<Link to="/manage-post">
+						<span className="group-hover:opacity-70 hidden sm:inline cursor-pointer">
+							Quản lí tin
+						</span>
+					</Link>{' '}
 					<ChevronDown size={14} className="group-hover:opacity-70" />
 				</div>
 				<div
@@ -131,7 +135,7 @@ export function HeaderBottom() {
 					variant="app-secondary"
 					className="uppercase"
 					size="lg"
-					onClick={() => navigate('/user/posts')}
+					onClick={() => navigate('/post')}
 				>
 					<SquarePen className="w-4 h-4 sm:w-5 sm:h-5" />
 					<span className="hidden sm:inline">Đăng tin</span>

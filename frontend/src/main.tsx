@@ -20,6 +20,8 @@ import AdminDashboard from './pages/admin/Dashboard.tsx';
 import UserManagement from './pages/admin/UserManagement.tsx';
 import AuthLayout from './layout/AuthLayout.tsx';
 import Post from './pages/Post.tsx';
+import ProductDetailPage from './pages/ProductDetailPage.tsx';
+import ManagePost from './pages/ManagePost.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -52,10 +54,22 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: '/user/posts',
+				path: '/post',
 				element: (
 					<ProtectedRoute>
 						<Post />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/post/:id',
+				element: <ProductDetailPage />,
+			},
+			{
+				path: '/manage-post',
+				element: (
+					<ProtectedRoute>
+						<ManagePost />
 					</ProtectedRoute>
 				),
 			},

@@ -1,21 +1,9 @@
+type IPostStatus = 'PENDING' | 'PUBLISHED' | 'EXPIRED' | 'DELETED';
+
 interface IPostImage {
 	id: string;
 	postId: string;
 	url: string;
-}
-
-interface ICategory {
-	id: string;
-	name: string;
-	createdAt: string;
-	updatedAt: string;
-	deletedAt: string | null;
-}
-
-interface IUser {
-	id: string;
-	name: string;
-	avatar: string;
 }
 
 interface IPost {
@@ -30,10 +18,12 @@ interface IPost {
 	address: string;
 	createdAt: string;
 	updatedAt: string;
-	deletedAt: string | null;
-	status: string;
+	status: IPostStatus;
 	postImages: IPostImage[];
-	category: ICategory;
+}
+
+interface IPostWithCategoryAndUser extends IPost {
+	category: Category;
 	user: IUser;
 }
 
