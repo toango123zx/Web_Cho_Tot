@@ -1,3 +1,5 @@
+import { updatePostByIdAPI } from '../api/post';
+
 import { deletePostAPI, fetchPostsByUserId } from './../api/post';
 import { QUERY_KEY } from '@/config/key';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -77,5 +79,17 @@ export const usePostsByUserId = (userId: string) => {
 export const useDeletePost = () => {
 	return useMutation({
 		mutationFn: (postId: string) => deletePostAPI(postId),
+	});
+};
+
+export const useUpdatePostById = () => {
+	return useMutation({
+		mutationFn: ({
+			postId,
+			payload,
+		}: {
+			postId: string;
+			payload: Partial<IUpdatePostPayload>;
+		}) => updatePostByIdAPI(postId, payload),
 	});
 };

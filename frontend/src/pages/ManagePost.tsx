@@ -6,6 +6,8 @@ import { Plus, Pencil, Trash } from 'lucide-react';
 import { GoodCoinIcon } from '@/assets/icons';
 import { usePostsByUserId, useDeletePost } from '@/services/query/post';
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+// import {QUERY_KEY} from 'key';
 import {
 	Dialog,
 	DialogContent,
@@ -17,6 +19,9 @@ import {
 } from '@/components/ui/dialog';
 import { useCurrentApp } from '@/components/context/AppContext';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEY } from '@/config/key';
+
 function AdItem({
 	post,
 	onDeleted,
@@ -26,7 +31,9 @@ function AdItem({
 }) {
 	const { mutate: deletePost, isPending: isDeleting } = useDeletePost();
 	const [open, setOpen] = useState(false);
+	const navigate = useNavigate();
 	const handleDelete = () => setOpen(true);
+	const queryClient = useQueryClient();
 	const handleConfirmDelete = () => {
 		deletePost(post.id, {
 			onSuccess: (res: any) => {
@@ -43,6 +50,10 @@ function AdItem({
 				toast.error(err?.response?.data?.message || 'Xóa thất bại');
 			},
 		});
+	};
+	const handleEdit = () => {
+		queryClient.invalidateQueries({ queryKey: QUERY_KEY.getPostById(post.id) });
+		navigate(`/update-post/${post.id}`);
 	};
 	return (
 		<>
@@ -67,7 +78,10 @@ function AdItem({
 					</div>
 					{/* Action buttons */}
 					<div className="flex gap-2 justify-end mt-4">
-						<Button className="flex items-center justify-center gap-1 bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto">
+						<Button
+							className="flex items-center justify-center gap-1 bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
+							onClick={handleEdit}
+						>
 							<Pencil className="h-4 w-4" />
 							Sửa tin
 						</Button>

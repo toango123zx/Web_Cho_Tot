@@ -19,9 +19,10 @@ import AdminLayout from './layout/AdminLayout.tsx';
 import AdminDashboard from './pages/admin/Dashboard.tsx';
 import UserManagement from './pages/admin/UserManagement.tsx';
 import AuthLayout from './layout/AuthLayout.tsx';
-import Post from './pages/Post.tsx';
+import CreatePost from './pages/CreatePost.tsx';
 import ProductDetailPage from './pages/ProductDetailPage.tsx';
 import ManagePost from './pages/ManagePost.tsx';
+import UpdatePost from './pages/UpdatePost.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -57,7 +58,7 @@ const router = createBrowserRouter([
 				path: '/post',
 				element: (
 					<ProtectedRoute>
-						<Post />
+						<CreatePost />
 					</ProtectedRoute>
 				),
 			},
@@ -70,6 +71,14 @@ const router = createBrowserRouter([
 				element: (
 					<ProtectedRoute>
 						<ManagePost />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/update-post/:id',
+				element: (
+					<ProtectedRoute>
+						<UpdatePost />
 					</ProtectedRoute>
 				),
 			},

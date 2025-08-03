@@ -44,3 +44,15 @@ interface ICreatePostPayload {
 	categoryId: string;
 	postImages: ICreatePostImage[];
 }
+
+interface IUpdatePostPayload {
+	title?: string;
+	description?: string;
+	age?: PetAge;
+	size?: PetSize;
+	price?: number;
+	address?: string;
+	categoryId?: string;
+	newPostImages?: ICreatePostImage[];
+	deletePostImageIds?: string[];
+}

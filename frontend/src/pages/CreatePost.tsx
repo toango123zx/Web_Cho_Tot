@@ -18,7 +18,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useCategories } from '@/services/query/category';
 
-export default function ProductListingPage() {
+export default function CreatePost() {
 	const [selectedImages, setSelectedImages] = useState<File[]>([]);
 	const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 	const fileInputRef = useRef<HTMLInputElement | null>(null);

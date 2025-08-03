@@ -1,3 +1,5 @@
+// Update post by id
+
 import axios from '@/services/AxiosCustomize';
 
 interface PostQueryParams {
@@ -45,4 +47,12 @@ export const fetchPostsByUserId = async (userId: string) => {
 export const deletePostAPI = async (postId: string) => {
 	const res = await axios.delete(`/posts/${postId}`);
 	return res.data as IBackendRes<IPost>;
+};
+
+export const updatePostByIdAPI = async (
+	postId: string,
+	payload: Partial<IUpdatePostPayload>,
+) => {
+	const res = await axios.patch(`/posts/${postId}`, payload);
+	return res.data as IBackendRes<IUpdatePostPayload>;
 };
