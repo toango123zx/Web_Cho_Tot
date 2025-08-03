@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { uploadFileToCloudinary } from '@/services/api/cloudinary';
 import { useCreatePost } from '@/services/query/post';
 import { Button } from '@/components/ui/button';
@@ -54,6 +54,13 @@ export default function CreatePost() {
 		images?: string;
 	}>({});
 	const queryClient = useQueryClient();
+
+	useEffect(() => {
+		return () => {
+			previewUrls.forEach((url) => URL.revokeObjectURL(url));
+		};
+	}, [previewUrls]);
+
 	const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const files = event.target.files;
 		if (files) {
@@ -63,6 +70,7 @@ export default function CreatePost() {
 			} else {
 				fileArr = fileArr.slice(0, 6);
 			}
+			previewUrls.forEach((url) => URL.revokeObjectURL(url));
 			setSelectedImages(fileArr);
 			setPreviewUrls(fileArr.map((file) => URL.createObjectURL(file)));
 			if (fileInputRef.current) fileInputRef.current.value = '';
@@ -71,7 +79,11 @@ export default function CreatePost() {
 
 	const handleRemoveImage = (idx: number) => {
 		setSelectedImages((prev) => {
+			URL.revokeObjectURL(previewUrls[idx]);
 			const newArr = prev.filter((_, i) => i !== idx);
+			previewUrls.forEach((url, i) => {
+				if (i !== idx) URL.revokeObjectURL(url);
+			});
 			setPreviewUrls(newArr.map((file) => URL.createObjectURL(file)));
 			return newArr;
 		});
@@ -93,6 +105,7 @@ export default function CreatePost() {
 		const newFiles = [...selectedImages];
 		const [file] = newFiles.splice(from, 1);
 		newFiles.splice(to, 0, file);
+		previewUrls.forEach((url) => URL.revokeObjectURL(url));
 		setSelectedImages(newFiles);
 		setPreviewUrls(newFiles.map((file) => URL.createObjectURL(file)));
 		dragItem.current = null;
@@ -466,8 +479,9 @@ export default function CreatePost() {
 								<Button
 									onClick={handleSubmit}
 									className="bg-orange-500 hover:bg-orange-600 px-6"
+									disabled={createPostMutation.isPending}
 								>
-									Đăng tin
+									{createPostMutation.isPending ? 'Đang xử lý...' : 'Đăng tin'}
 								</Button>
 							</div>
 						</div>

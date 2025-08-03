@@ -1,4 +1,6 @@
 type IPostStatus = 'PENDING' | 'PUBLISHED' | 'EXPIRED' | 'DELETED';
+type PetAge = 'PUPPY' | 'YOUNG_DOG' | 'ADULT_DOG';
+type PetSize = 'MINI' | 'SMALL' | 'MEDIUM' | 'LARGE';
 
 interface IPostImage {
 	id: string;
@@ -12,8 +14,8 @@ interface IPost {
 	title: string;
 	categoryId: string;
 	description: string;
-	age: string;
-	size: string;
+	age: PetAge;
+	size: PetSize;
 	price: number;
 	address: string;
 	createdAt: string;
@@ -26,9 +28,6 @@ interface IPostWithCategoryAndUser extends IPost {
 	category: Category;
 	user: IUser;
 }
-
-type PetAge = 'PUPPY' | 'YOUNG_DOG' | 'ADULT_DOG';
-type PetSize = 'MINI' | 'SMALL' | 'MEDIUM' | 'LARGE';
 
 interface ICreatePostImage {
 	url: string;

@@ -33,6 +33,9 @@ export const postStatusToText = (status: IPostStatus | string) => {
 
 export function getRelativeTime(dateString: string) {
 	const date = new Date(dateString);
+	if (isNaN(date.getTime())) {
+		return 'Ngày không hợp lệ';
+	}
 	const now = new Date();
 	const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
 	if (diff < 60) return 'Vừa xong';

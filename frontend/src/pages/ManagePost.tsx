@@ -77,7 +77,7 @@ function AdItem({
 						<p className="text-sm text-gray-500 truncate">{post.address}</p>
 					</div>
 					{/* Action buttons */}
-					<div className="flex gap-2 justify-end mt-4">
+					<div className="flex flex-col sm:flex-row gap-2 justify-end mt-4">
 						<Button
 							className="flex items-center justify-center gap-1 bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
 							onClick={handleEdit}
@@ -195,28 +195,28 @@ export default function ManagePost() {
 						}
 						className="w-full"
 					>
-						<TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 md:grid-cols-7 h-auto bg-white p-0 rounded-none border-b border-gray-200">
+						<TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 md:grid-cols-7 h-auto bg-white p-0 rounded-none ">
 							<TabsTrigger
 								value="active"
-								className="py-3 px-2 text-sm font-medium text-gray-600 data-[state=active]:text-orange-500 data-[state=active]:border-b-2 data-[state=active]:border-orange-500 data-[state=active]:shadow-none rounded-none whitespace-nowrap"
+								className="py-3 px-2 text-sm font-bold border-b-2 border-transparent data-[state=active]:border-[#FF8800] data-[state=active]:bg-white data-[state=active]:text-[#FF8800] data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500 rounded-none whitespace-nowrap transition-colors"
 							>
 								{`ĐANG HIỂN THỊ (${posts?.filter((p) => p.status === 'PUBLISHED').length || 0})`}
 							</TabsTrigger>
 							<TabsTrigger
 								value="expired"
-								className="py-3 px-2 text-sm font-medium text-gray-600 data-[state=active]:text-orange-500 data-[state=active]:border-b-2 data-[state=active]:border-orange-500 data-[state=active]:shadow-none rounded-none whitespace-nowrap"
+								className="py-3 px-2 text-sm font-bold border-b-2 border-transparent data-[state=active]:border-orange-500 data-[state=active]:bg-white data-[state=active]:text-orange-500 data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500 rounded-none whitespace-nowrap transition-colors"
 							>
 								{`HẾT HẠN (${posts?.filter((p) => p.status === 'EXPIRED').length || 0})`}
 							</TabsTrigger>
 							<TabsTrigger
 								value="rejected"
-								className="py-3 px-2 text-sm font-medium text-gray-600 data-[state=active]:text-orange-500 data-[state=active]:border-b-2 data-[state=active]:border-orange-500 data-[state=active]:shadow-none rounded-none whitespace-nowrap"
+								className="py-3 px-2 text-sm font-bold border-b-2 border-transparent data-[state=active]:border-orange-500 data-[state=active]:bg-white data-[state=active]:text-orange-500 data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500 rounded-none whitespace-nowrap transition-colors"
 							>
 								{`BỊ TỪ CHỐI (${posts?.filter((p) => p.status === 'DELETED').length || 0})`}
 							</TabsTrigger>
 							<TabsTrigger
 								value="pending"
-								className="py-3 px-2 text-sm font-medium text-gray-600 data-[state=active]:text-orange-500 data-[state=active]:border-b-2 data-[state=active]:border-orange-500 data-[state=active]:shadow-none rounded-none whitespace-nowrap"
+								className="py-3 px-2 text-sm font-bold border-b-2 border-transparent data-[state=active]:border-orange-500 data-[state=active]:bg-white data-[state=active]:text-orange-500 data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500 rounded-none whitespace-nowrap transition-colors"
 							>
 								{`CHỜ DUYỆT (${posts?.filter((p) => p.status === 'PENDING').length || 0})`}
 							</TabsTrigger>

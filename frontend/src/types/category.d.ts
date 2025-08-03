@@ -1,4 +1,4 @@
-interface ICategory {
+interface Category {
 	id: string;
 	name: string;
 	createdAt: string;
@@ -6,10 +6,10 @@ interface ICategory {
 	deletedAt: string | null;
 }
 
-interface ICategoryCreation {
+interface CategoryCreation {
 	name: string;
 }
 
-interface ICategoryUpdate {
+interface CategoryUpdate {
 	name: string;
 }

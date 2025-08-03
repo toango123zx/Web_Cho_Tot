@@ -24,7 +24,7 @@ export const useGetCategories = ({ page, limit }: CategoryQueryProps) => {
 	return query;
 };
 export const useCategories = () => {
-	return useQuery<ICategory[] | null, Error>({
+	return useQuery<Category[] | null, Error>({
 		queryKey: QUERY_KEY.getAllCategories(),
 		queryFn: async () => {
 			const res = await getCategoriesAPI({});
@@ -37,11 +37,11 @@ export const useCategories = () => {
 
 export const useCategoryMutations = () => {
 	const createCategory = useMutation({
-		mutationFn: (data: ICategoryCreation) => createCategoryAPI(data),
+		mutationFn: (data: CategoryCreation) => createCategoryAPI(data),
 	});
 
 	const updateCategory = useMutation({
-		mutationFn: ({ id, data }: { id: string; data: ICategoryUpdate }) =>
+		mutationFn: ({ id, data }: { id: string; data: CategoryUpdate }) =>
 			updateCategoryAPI(id, data),
 	});
 

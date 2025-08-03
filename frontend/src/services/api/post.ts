@@ -29,7 +29,7 @@ export const postApi = {
 
 export const createPostAPI = async (payload: ICreatePostPayload) => {
 	const res = await axios.post('/posts', payload);
-	return res.data as IBackendRes<ICreatePostPayload>;
+	return res.data as IBackendRes<IPostWithCategoryAndUser>;
 };
 
 export const fetchPostByIdAPI = async (id: string) => {
@@ -52,5 +52,5 @@ export const updatePostByIdAPI = async (
 	payload: Partial<IUpdatePostPayload>,
 ) => {
 	const res = await axios.patch(`/posts/${postId}`, payload);
-	return res.data as IBackendRes<IUpdatePostPayload>;
+	return res.data as IBackendRes<IPostWithCategoryAndUser>;
 };
