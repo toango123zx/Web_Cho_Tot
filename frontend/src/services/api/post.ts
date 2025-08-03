@@ -1,5 +1,3 @@
-// Update post by id
-
 import axios from '@/services/AxiosCustomize';
 
 interface PostQueryParams {

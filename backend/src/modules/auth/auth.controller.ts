@@ -1,15 +1,19 @@
 import {
 	Body,
 	Controller,
+	Get,
 	HttpException,
 	Post,
 	Put,
+	Req,
+	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
 import { HttpResponseBodyDto, SetCookieInterceptor } from 'src/common';
+import { SocialAccountsEntity } from 'src/models';
 import { MyInformation } from 'src/modules/users/decorators';
 import { UserInformationDto } from 'src/modules/users/dtos';
 
@@ -25,11 +29,19 @@ import {
 	RegisterRequestDto,
 	RegisterResponseDto,
 } from './dtos';
+import { GoogleOAuthGuard } from './guards';
+import {
+	CheckLoginWithGoogleOauthQuery,
+	LoginWithGoogleOauthQuery,
+} from './queries/implements';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-	constructor(private readonly commandBus: CommandBus) {}
+	constructor(
+		private readonly queryBus: QueryBus,
+		private readonly commandBus: CommandBus,
+	) {}
 
 	@Post('login')
 	@UseInterceptors(SetCookieInterceptor)
@@ -54,5 +66,19 @@ export class AuthController {
 		@RefreshToken() token: string,
 	): Promise<HttpResponseBodyDto<LoginResponseDto | HttpException>> {
 		return this.commandBus.execute(new RefreshTokenCommand(myInformation, token));
+	}
+
+	@Get('google/login')
+	@UseGuards(GoogleOAuthGuard)
+	async googleLogin(): Promise<HttpResponseBodyDto<string>> {
+		return this.queryBus.execute(new LoginWithGoogleOauthQuery());
+	}
+
+	@Get('google/check-login')
+	@UseGuards(GoogleOAuthGuard)
+	async checkGoogleLogin(
+		@Req() { user }: { user: SocialAccountsEntity },
+	): Promise<HttpResponseBodyDto<LoginResponseDto | HttpException>> {
+		return this.queryBus.execute(new CheckLoginWithGoogleOauthQuery(user));
 	}
 }

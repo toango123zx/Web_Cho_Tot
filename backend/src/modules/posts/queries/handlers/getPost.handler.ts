@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { HttpResponseBodySuccessDto, NotFoundException } from 'src/common';
+import { HttpResponseBodySuccessDto, OptionalException } from 'src/common';
 import { PostsDto } from 'src/models';
 
 import { PostsRepository } from '../../posts.repository';
@@ -16,7 +16,7 @@ export class GetPostHandler implements IQueryHandler<GetPostQuery> {
 		const post = await this.postsRepository.findPostById(query.postId);
 
 		if (!post) {
-			throw new NotFoundException('postId');
+			throw new OptionalException(404, 'Post not found');
 		}
 
 		return {

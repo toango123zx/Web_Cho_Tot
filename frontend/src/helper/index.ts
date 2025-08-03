@@ -16,6 +16,21 @@ export const trimData = <T>(data: Record<string, unknown>, removeEmpty = true) =
 	return result as T;
 };
 
+export const postStatusToText = (status: IPostStatus | string) => {
+	switch (status) {
+		case 'PENDING':
+			return 'Chờ duyệt';
+		case 'PUBLISHED':
+			return 'Đang hiển thị';
+		case 'EXPIRED':
+			return 'Hết hạn';
+		case 'DELETED':
+			return 'Đã ẩn';
+		default:
+			return 'Tất cả';
+	}
+};
+
 export function getRelativeTime(dateString: string) {
 	const date = new Date(dateString);
 	const now = new Date();

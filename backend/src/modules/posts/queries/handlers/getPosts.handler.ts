@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { HttpResponseBodySuccessDto, IPaginationQuery } from 'src/common';
+import { HttpResponseBodySuccessDto } from 'src/common';
 import { PostsDto } from 'src/models';
 
 import { PostsRepository } from '../../posts.repository';
@@ -13,23 +13,24 @@ export class GetPostsHandler implements IQueryHandler<GetPostsQuery> {
 	public async execute(
 		query: GetPostsQuery,
 	): Promise<HttpResponseBodySuccessDto<PostsDto[]>> {
-		const skip = (query.pagination.page - 1) * query.pagination.limit;
+		const skip = (query.filter.page - 1) * query.filter.limit;
 
-		const pagination: IPaginationQuery = {
+		const filter = {
 			skip,
-			take: query.pagination.limit,
+			take: query.filter.limit,
+			...(query.filter.status && { status: query.filter.status }),
 		};
 
-		const [posts, totalRecords] = await this.postsRepository.findPosts(pagination);
+		const [posts, totalRecords] = await this.postsRepository.findPosts(filter);
 
-		const totalPage = Math.ceil(totalRecords / query.pagination.limit);
+		const totalPage = Math.ceil(totalRecords / query.filter.limit);
 		return {
 			success: true,
 			data: posts,
 			pagination: {
 				totalItems: totalRecords,
 				itemsPerPage: posts.length,
-				currentPage: query.pagination.page,
+				currentPage: query.filter.page,
 				totalPages: totalPage,
 			},
 		};
