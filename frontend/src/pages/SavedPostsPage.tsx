@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getRelativeTime } from '@/helper';
 
 import { useArchivedPosts, useToggleArchivePost } from '@/services/query/post';
@@ -7,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 function SavedPostsPage() {
+	const navigate = useNavigate();
 	const { data, isLoading } = useArchivedPosts({ page: 1, limit: 100 });
 	const toggleArchiveMutation = useToggleArchivePost();
 	const posts = data && data.success && Array.isArray(data.data) ? data.data : [];
@@ -44,7 +46,13 @@ function SavedPostsPage() {
 						posts.map((post: any) => (
 							<div
 								key={post.id}
-								className="flex items-center border-b border-gray-200 pb-4 last:border-b-0"
+								className="flex items-center border-b border-gray-200 pb-4 last:border-b-0 cursor-pointer group"
+								onClick={() => navigate(`/post/${post.id}`)}
+								role="button"
+								tabIndex={0}
+								onKeyDown={(e) => {
+									if (e.key === 'Enter') navigate(`/post/${post.id}`);
+								}}
 							>
 								<div className="relative w-24 h-24 flex-shrink-0 mr-4 rounded-lg overflow-hidden">
 									<img
@@ -86,7 +94,10 @@ function SavedPostsPage() {
 										<span>{post.address || ''}</span>
 									</div>
 								</div>
-								<div className="flex items-center space-x-2 ml-4">
+								<div
+									className="flex items-center space-x-2 ml-4"
+									onClick={(e) => e.stopPropagation()}
+								>
 									<Button
 										variant="outline"
 										className="border-green-500 text-green-500 hover:bg-green-50 hover:text-green-600 bg-transparent"

@@ -32,6 +32,7 @@ export default function ProductDetailPage() {
 	const { id } = useParams<{ id: string }>();
 	const { data, isLoading, isError, refetch } = usePostById(id || '');
 	const [currentImageIdx, setCurrentImageIdx] = useState(0);
+	const [showPhone, setShowPhone] = useState(false);
 
 	const queryClient = useQueryClient();
 	const toggleArchiveMutation = useToggleArchivePost();
@@ -45,12 +46,77 @@ export default function ProductDetailPage() {
 		if (id) refetch();
 	}, [id]);
 
-	if (isLoading) return <div className="p-6">Đang tải...</div>;
+	if (isLoading)
+		return (
+			<main className="pt-6 bg-gray-100 min-h-screen">
+				<div className="mx-auto max-w-[1200px] px-4 md:px-6 lg:px-6">
+					<div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white rounded-lg shadow p-6 animate-pulse">
+						{/* Gallery skeleton */}
+						<div className="lg:col-span-5">
+							<div className="relative h-[420px] flex items-center justify-center rounded overflow-hidden bg-gray-200" />
+							<div className="flex mt-3 gap-2 justify-center">
+								{Array.from({ length: 4 }).map((_, i) => (
+									<div key={i} className="w-14 h-14 rounded bg-gray-200" />
+								))}
+							</div>
+						</div>
+						{/* Info skeleton */}
+						<div className="lg:col-span-7 space-y-4">
+							<div className="flex justify-between items-start">
+								<div className="h-8 bg-gray-200 rounded w-2/3 mb-2" />
+								<div className="h-10 w-10 rounded-full bg-gray-200" />
+							</div>
+							<div className="h-5 bg-gray-100 rounded w-1/3 mb-2" />
+							<div className="h-8 bg-gray-200 rounded w-1/4 mb-2" />
+							<div className="h-4 bg-gray-100 rounded w-1/2 mb-2" />
+							<div className="h-4 bg-gray-100 rounded w-1/4 mb-2" />
+							<div className="grid grid-cols-2 gap-3 mt-4">
+								<div className="h-10 bg-gray-200 rounded w-full" />
+								<div className="h-10 bg-gray-200 rounded w-full" />
+							</div>
+							<div className="flex items-center gap-4 mt-5">
+								<div className="w-10 h-10 rounded-full bg-gray-200" />
+								<div className="h-4 bg-gray-100 rounded w-24" />
+							</div>
+							<div className="pt-4 mt-4 border-t">
+								<div className="h-4 bg-gray-100 rounded w-1/2 mb-2" />
+								<div className="flex gap-2">
+									{Array.from({ length: 3 }).map((_, i) => (
+										<div key={i} className="h-8 w-24 bg-gray-200 rounded-full" />
+									))}
+								</div>
+							</div>
+						</div>
+					</div>
+					{/* Description + Comment skeleton */}
+					<div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+						<div className="lg:col-span-7 bg-white rounded-lg shadow p-6 animate-pulse">
+							<div className="h-6 bg-gray-200 rounded w-1/3 mb-4" />
+							<div className="h-4 bg-gray-100 rounded w-full mb-2" />
+							<div className="h-4 bg-gray-100 rounded w-2/3 mb-2" />
+							<div className="h-4 bg-gray-100 rounded w-1/2 mb-2" />
+							<div className="h-8 bg-gray-200 rounded w-1/3 mt-4" />
+						</div>
+						<div className="lg:col-span-5 bg-white rounded-lg shadow p-6 animate-pulse">
+							<div className="h-6 bg-gray-200 rounded w-1/3 mb-4" />
+							<div className="h-4 bg-gray-100 rounded w-1/2" />
+						</div>
+					</div>
+				</div>
+			</main>
+		);
 	if (isError || !data) return <div className="p-6">Không tìm thấy bài đăng</div>;
 
 	const post = data;
-	const mainImage = post.postImages[currentImageIdx]?.url || '/placeholder.svg';
-	const thumbnails = post.postImages.map((img) => img.url);
+	const mainImage = post.postImages?.[currentImageIdx]?.url || '/placeholder.svg';
+	const thumbnails = post.postImages?.map((img: any) => img.url) || [];
+	const user = post.user || {};
+	const userAvatar = user.avatar || '/placeholder.svg';
+	const userName = user.name || 'Người dùng';
+	const userPhone = user.phoneNumber || '';
+	const phoneMasked = userPhone
+		? userPhone.replace(/(\d{4})\d{3}(\d{3})/, '$1***$2')
+		: '';
 
 	const handlePrev = () => {
 		setCurrentImageIdx((prev) => (prev === 0 ? thumbnails.length - 1 : prev - 1));
@@ -170,8 +236,13 @@ export default function ProductDetailPage() {
 						</div>
 
 						<div className="grid grid-cols-2 gap-3 mt-4">
-							<Button className="bg-gray-200 text-gray-800 text-sm">
-								Hiện số 091519****
+							<Button
+								className="bg-gray-200 text-gray-800 text-sm"
+								onClick={() => {
+									if (!showPhone) setShowPhone(true);
+								}}
+							>
+								{showPhone ? userPhone : `Hiện số ${phoneMasked}`}
 							</Button>
 							<Button className="bg-yellow-400 text-black hover:bg-yellow-500 text-sm">
 								<MessageSquare className="w-4 h-4 mr-2" /> Chat
@@ -181,11 +252,11 @@ export default function ProductDetailPage() {
 						{/* Buyer demo */}
 						<div className="flex items-center gap-4 mt-5">
 							<Avatar className="w-10 h-10">
-								<AvatarImage src="/placeholder.svg" />
-								<AvatarFallback>T</AvatarFallback>
+								<AvatarImage src={userAvatar} />
+								<AvatarFallback>{userName?.[0]?.toUpperCase?.() || 'U'}</AvatarFallback>
 							</Avatar>
 							<div>
-								<p className="font-semibold text-sm">Trang</p>
+								<p className="font-semibold text-sm">{userName}</p>
 							</div>
 						</div>
 
@@ -217,13 +288,16 @@ export default function ProductDetailPage() {
 
 						<div className="inline-flex items-center bg-gray-100 rounded-full px-4 py-2 mt-4">
 							<span className="font-semibold mr-2">SĐT liên hệ:</span>
-							<span className="font-semibold">091267***</span>
-							<button
-								className="ml-3 text-blue-600 font-semibold hover:underline focus:outline-none cursor-pointer"
-								type="button"
-							>
-								Hiện số
-							</button>
+							<span className="font-semibold">{showPhone ? userPhone : phoneMasked}</span>
+							{!showPhone && userPhone && (
+								<button
+									className="ml-3 text-blue-600 font-semibold hover:underline focus:outline-none cursor-pointer"
+									type="button"
+									onClick={() => setShowPhone(true)}
+								>
+									Hiện số
+								</button>
+							)}
 						</div>
 					</div>
 
