@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { HttpResponseBodySuccessDto } from 'src/common';
-import { PostsDto } from 'src/models';
+import { PostsDto } from 'src/modules/posts/dtos';
 
 import { PostsRepository } from '../../posts.repository';
 import { GetPostsQuery } from '../implements';
@@ -23,10 +23,17 @@ export class GetPostsHandler implements IQueryHandler<GetPostsQuery> {
 
 		const [posts, totalRecords] = await this.postsRepository.findPosts(filter);
 
+		const postsTransformed = posts.map((post) => ({
+			...post,
+			isArchived: post.postArchives.some(
+				(archive) => archive.userId === query.userInformation?.id,
+			),
+		}));
+
 		const totalPage = Math.ceil(totalRecords / query.filter.limit);
 		return {
 			success: true,
-			data: posts,
+			data: postsTransformed,
 			pagination: {
 				totalItems: totalRecords,
 				itemsPerPage: posts.length,

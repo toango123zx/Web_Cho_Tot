@@ -14,8 +14,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { RoleUserEnum } from '@prisma/client';
 import { HttpResponseBodyDto } from 'src/common';
-import { PostsDto } from 'src/models';
-import { Auth, AuthRole } from 'src/modules/auth/decorators';
+import { Auth, AuthRole, OptionalAuth } from 'src/modules/auth/decorators';
 import {
 	AcceptPostCommand,
 	CreatePostCommand,
@@ -23,7 +22,12 @@ import {
 	TogglePostArchiveCommand,
 	UpdatePostCommand,
 } from 'src/modules/posts/commands/implements';
-import { CreatePostDto, FilterPostDto, UpdatePostDto } from 'src/modules/posts/dtos';
+import {
+	CreatePostDto,
+	FilterPostDto,
+	PostsDto,
+	UpdatePostDto,
+} from 'src/modules/posts/dtos';
 import {
 	GetPostQuery,
 	GetPostsArchiveByUserQuery,
@@ -41,11 +45,13 @@ export class PostsController {
 		private readonly queryBus: QueryBus,
 	) {}
 
+	@OptionalAuth()
 	@Get()
 	async getPosts(
 		@Query() filter: FilterPostDto,
+		@MyInformation() userInformation?: UserInformationDto,
 	): Promise<HttpResponseBodyDto<PostsDto[] | HttpException>> {
-		return this.queryBus.execute(new GetPostsQuery(filter));
+		return this.queryBus.execute(new GetPostsQuery(filter, userInformation));
 	}
 
 	@Auth()
