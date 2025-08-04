@@ -59,12 +59,22 @@ export default function HomePage() {
 			{/* Main Content */}
 			<div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
 				{isLoading && postList.length === 0 ? (
-					<p>Đang tải sản phẩm...</p>
+					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+						{Array.from({ length: 9 }).map((_, idx) => (
+							<div key={idx} className="animate-pulse bg-white rounded-md shadow p-2">
+								<div className="bg-gray-200 h-40 sm:h-48 w-full rounded-md mb-2" />
+								<div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+								<div className="h-4 bg-gray-200 rounded w-1/2 mb-2" />
+								<div className="h-3 bg-gray-100 rounded w-1/3" />
+							</div>
+						))}
+					</div>
 				) : postList.length === 0 ? (
 					<p>Không có sản phẩm nào</p>
 				) : (
 					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
 						{postList.map((post) => (
+							// ...existing code...
 							<div
 								key={post.id}
 								className="cursor-pointer group"
@@ -75,14 +85,15 @@ export default function HomePage() {
 									if (e.key === 'Enter') navigate(`/post/${post.id}`);
 								}}
 							>
+								{/* ...existing code... */}
 								<div className="relative group overflow-hidden">
+									{/* ...existing code... */}
 									<img
 										src={post.postImages[0]?.url || '/placeholder.svg'}
 										alt={post.title}
 										className="w-full h-40 sm:h-48 object-cover transition-transform duration-200 group-hover:scale-105 rounded-md z-0"
 									/>
-
-									{/* Heart Icon */}
+									{/* ...existing code... */}
 									<Button
 										variant="ghost"
 										size="icon"
@@ -114,7 +125,7 @@ export default function HomePage() {
 											className={`h-4 w-4 ${archivedIds.includes(post.id) ? 'text-white' : 'text-white'}`}
 										/>
 									</Button>
-
+									{/* ...existing code... */}
 									<div className="absolute bottom-0 left-0 right-0 flex justify-between items-end bg-gradient-to-t from-black/70 to-transparent px-2 py-1 rounded-b-md z-10 pointer-events-none transition-transform duration-200 group-hover:scale-105">
 										<span className="text-white text-xs font-semibold">
 											{getRelativeTime(post.createdAt)}
@@ -132,12 +143,11 @@ export default function HomePage() {
 										</span>
 									</div>
 								</div>
-
+								{/* ...existing code... */}
 								<div className="pt-2">
 									<h3 className="font-normal text-sm line-clamp-2 mb-1 text-black leading-tight">
 										{post.title}
 									</h3>
-
 									<div className="flex items-center justify-between mb-1">
 										<span className="font-bold text-red-600 text-sm">
 											{post.price.toLocaleString()} đ
@@ -146,7 +156,6 @@ export default function HomePage() {
 											<MoreHorizontal className="h-4 w-4 text-gray-400" />
 										</Button>
 									</div>
-
 									<div className="flex items-center text-xs text-gray-500">
 										<MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
 										<span className="truncate">{post.address}</span>
