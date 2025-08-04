@@ -19,7 +19,7 @@ export class TogglePostArchiveHandler
 	): Promise<HttpResponseBodySuccessDto<PostsEntity> | HttpException> {
 		const { postId, myInformation } = command;
 
-		const post = await this.postsRepository.findPostById(postId);
+		const post = await this.postsRepository.findPostById(postId, true);
 		if (!post) {
 			throw new OptionalException(404, 'Post not found');
 		}
