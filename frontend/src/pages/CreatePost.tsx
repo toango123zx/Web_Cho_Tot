@@ -28,6 +28,7 @@ export default function CreatePost() {
 	const [age, setAge] = useState('');
 	const [size, setSize] = useState('');
 	const [category, setCategory] = useState<string>('');
+	const [isUploading, setIsUploading] = useState(false);
 	const navigate = useNavigate();
 
 	const { data: categories, isLoading: isCategoriesLoading } = useCategories();
@@ -150,6 +151,7 @@ export default function CreatePost() {
 		if (validateForm()) {
 			let uploadedImageUrls: string[] = [];
 			if (selectedImages.length > 0) {
+				setIsUploading(true);
 				const uploadPromises = selectedImages.map((file) =>
 					uploadFileToCloudinary(file, 'image'),
 				);
@@ -158,6 +160,7 @@ export default function CreatePost() {
 					if (res.success && res.data && res.data.secure_url) {
 						uploadedImageUrls.push(res.data.secure_url);
 					} else {
+						setIsUploading(false);
 						setErrors((prev) => ({
 							...prev,
 							images: 'Có ảnh không upload được, hãy thử lại.',
@@ -165,6 +168,7 @@ export default function CreatePost() {
 						return;
 					}
 				}
+				setIsUploading(false);
 			}
 			const payload = {
 				title,
@@ -189,6 +193,7 @@ export default function CreatePost() {
 					}
 				},
 				onError: (err: any) => {
+					setIsUploading(false);
 					toast.error(err?.response?.data?.message || 'Có lỗi xảy ra');
 				},
 			});
@@ -479,9 +484,11 @@ export default function CreatePost() {
 								<Button
 									onClick={handleSubmit}
 									className="bg-orange-500 hover:bg-orange-600 px-6"
-									disabled={createPostMutation.isPending}
+									disabled={createPostMutation.isPending || isUploading}
 								>
-									{createPostMutation.isPending ? 'Đang xử lý...' : 'Đăng tin'}
+									{createPostMutation.isPending || isUploading
+										? 'Đang xử lý...'
+										: 'Đăng tin'}
 								</Button>
 							</div>
 						</div>

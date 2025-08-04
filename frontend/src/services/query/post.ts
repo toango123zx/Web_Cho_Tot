@@ -1,9 +1,12 @@
+import { fetchArchivedPostsAPI } from '../api/post';
+
 import { updatePostByIdAPI } from '../api/post';
 
 import { deletePostAPI, fetchPostsByUserId } from './../api/post';
 import { QUERY_KEY } from '@/config/key';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createPostAPI, fetchPostByIdAPI, postApi } from '../api/post';
+import { toggleArchivePostAPI } from '../api/post';
 
 export const usePostQueryWithPagination = (params?: {
 	page?: number;
@@ -91,5 +94,19 @@ export const useUpdatePostById = () => {
 			postId: string;
 			payload: Partial<IUpdatePostPayload>;
 		}) => updatePostByIdAPI(postId, payload),
+	});
+};
+
+export const useToggleArchivePost = () => {
+	return useMutation({
+		mutationFn: (postId: string) => toggleArchivePostAPI(postId),
+	});
+};
+
+export const useArchivedPosts = (params?: { page?: number; limit?: number }) => {
+	return useQuery({
+		queryKey: QUERY_KEY.getArchivedPosts(params),
+		queryFn: () => fetchArchivedPostsAPI(params),
+		staleTime: 1000 * 60 * 5,
 	});
 };

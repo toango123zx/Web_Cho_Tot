@@ -14,4 +14,5 @@ export const QUERY_KEY = {
 	getPosts: (params: { page: number; limit: number }) => ['posts', params],
 	getPostById: (id: string) => ['post', id],
 	getPostsByUserId: (userId: string) => ['posts', 'user', userId],
+	getArchivedPosts: (params?: Record<string, any>) => ['archived-posts', params],
 };

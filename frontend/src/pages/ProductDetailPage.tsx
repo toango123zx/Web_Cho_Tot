@@ -12,7 +12,14 @@ import {
 	Clock,
 } from 'lucide-react';
 import { getRelativeTime } from '@/helper';
-import { usePostById } from '@/services/query/post';
+import {
+	usePostById,
+	useArchivedPosts,
+	useToggleArchivePost,
+} from '@/services/query/post';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { QUERY_KEY } from '@/config/key';
 
 const ageMap: Record<string, string> = {
 	PUPPY: 'Chó con',
@@ -25,6 +32,14 @@ export default function ProductDetailPage() {
 	const { id } = useParams<{ id: string }>();
 	const { data, isLoading, isError, refetch } = usePostById(id || '');
 	const [currentImageIdx, setCurrentImageIdx] = useState(0);
+
+	const queryClient = useQueryClient();
+	const toggleArchiveMutation = useToggleArchivePost();
+	const { data: archivedData } = useArchivedPosts({ page: 1, limit: 100 });
+	const archivedIds =
+		archivedData && archivedData.success && Array.isArray(archivedData.data)
+			? (archivedData.data as { id: string }[]).map((p) => p.id)
+			: [];
 
 	useEffect(() => {
 		if (id) refetch();
@@ -106,8 +121,37 @@ export default function ProductDetailPage() {
 					<div className="lg:col-span-7 space-y-4">
 						<div className="flex justify-between items-start">
 							<h1 className="text-2xl font-bold leading-tight">{post.title}</h1>
-							<Button variant="ghost" size="icon">
-								<Heart className="w-5 h-5 text-gray-500" />
+							<Button
+								variant="ghost"
+								size="icon"
+								className={
+									archivedIds.includes(post.id) ? 'bg-red-500 hover:bg-red-600' : ''
+								}
+								onClick={() => {
+									toggleArchiveMutation.mutate(post.id, {
+										onSuccess: (res) => {
+											if (res.success) {
+												queryClient.invalidateQueries({
+													queryKey: QUERY_KEY.getArchivedPosts({
+														page: 1,
+														limit: 100,
+													}),
+												});
+												toast.success('Cập nhật trạng thái lưu trữ thành công!');
+											} else {
+												toast.error(res.message || 'Cập nhật thất bại');
+											}
+										},
+										onError: (err) => {
+											const error: any = err;
+											toast.error(error?.response?.data?.message || 'Có lỗi xảy ra');
+										},
+									});
+								}}
+							>
+								<Heart
+									className={`w-5 h-5 ${archivedIds.includes(post.id) ? 'text-white' : 'text-gray-500'}`}
+								/>
 							</Button>
 						</div>
 						<p className="text-base text-muted-foreground">

@@ -35,6 +35,7 @@ const UpdatePost = () => {
 	const [age, setAge] = useState('');
 	const [size, setSize] = useState('');
 	const [category, setCategory] = useState<string>('');
+	const [isUploading, setIsUploading] = useState(false);
 	const [address, setAddress] = useState<{
 		province: string;
 		provinceLabel: string;
@@ -148,6 +149,7 @@ const UpdatePost = () => {
 				(file) => !keepUrls.includes(URL.createObjectURL(file)),
 			);
 			if (newFiles.length > 0) {
+				setIsUploading(true);
 				const uploadPromises = newFiles.map((file) =>
 					uploadFileToCloudinary(file, 'image'),
 				);
@@ -156,6 +158,7 @@ const UpdatePost = () => {
 					if (res.success && res.data && res.data.secure_url) {
 						uploadedImageUrls.push(res.data.secure_url);
 					} else {
+						setIsUploading(false);
 						setErrors((prev) => ({
 							...prev,
 							images: 'Có ảnh không upload được, hãy thử lại.',
@@ -163,6 +166,7 @@ const UpdatePost = () => {
 						return;
 					}
 				}
+				setIsUploading(false);
 			}
 			const deletePostImageIds = oldImages
 				.filter((img) => !previewUrls.includes(img.url))
@@ -194,6 +198,7 @@ const UpdatePost = () => {
 						}
 					},
 					onError: (err: any) => {
+						setIsUploading(false);
 						toast.error(err?.response?.data?.message || 'Có lỗi xảy ra');
 					},
 				},
@@ -488,9 +493,9 @@ const UpdatePost = () => {
 								<Button
 									onClick={handleSubmit}
 									className="bg-orange-500 hover:bg-orange-600 px-6"
-									disabled={isUpdating}
+									disabled={isUpdating || isUploading}
 								>
-									Cập nhật
+									{isUpdating || isUploading ? 'Đang xử lý...' : 'Cập nhật'}
 								</Button>
 							</div>
 						</div>
