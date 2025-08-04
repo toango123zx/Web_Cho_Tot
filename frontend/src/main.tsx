@@ -25,6 +25,7 @@ import CreatePost from './pages/CreatePost.tsx';
 import ProductDetailPage from './pages/ProductDetailPage.tsx';
 import ManagePost from './pages/ManagePost.tsx';
 import UpdatePost from './pages/UpdatePost.tsx';
+import SavedPostsPage from './pages/SavedPostsPage.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -81,6 +82,14 @@ const router = createBrowserRouter([
 				element: (
 					<ProtectedRoute>
 						<UpdatePost />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/saved-posts',
+				element: (
+					<ProtectedRoute>
+						<SavedPostsPage />
 					</ProtectedRoute>
 				),
 			},
