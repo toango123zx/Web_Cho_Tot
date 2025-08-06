@@ -21,7 +21,7 @@ export class DeletePostHandler implements ICommandHandler<DeletePostCommand> {
 	): Promise<HttpResponseBodySuccessDto<PostsEntity> | HttpException> {
 		const { postId, myInformation } = command;
 
-		const post = await this.postsRepository.findPostById(postId);
+		const post = await this.postsRepository.findPostById(postId, false);
 		if (!post) {
 			throw new NotFoundException('postId');
 		}

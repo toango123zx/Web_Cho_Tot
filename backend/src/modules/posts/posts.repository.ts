@@ -5,11 +5,13 @@ import { PostsDto, PostsEntity } from 'src/models';
 import { PrismaService } from 'src/modules/database/services';
 import { CreatePostDto, UpdatePostDto } from 'src/modules/posts/dtos';
 
-interface PostFilter {
+type PostFilter = {
 	skip: number;
 	take: number;
 	status?: Exclude<PostStatusEnum, 'DELETED'>;
-}
+};
+
+type PostResult<T extends boolean> = T extends true ? PostsDto : PostsEntity;
 
 @Injectable()
 export class PostsRepository {
@@ -54,12 +56,25 @@ export class PostsRepository {
 		return [posts, totalRecords];
 	}
 
-	async findPostById(postId: string): Promise<PostsEntity> {
+	async findPostById<T extends boolean>(
+		postId: string,
+		includeUser: T,
+	): Promise<PostResult<T>> {
 		return this.prismaService.posts.findFirst({
 			where: { id: postId, deletedAt: null },
 			include: {
 				postImages: true,
 				category: true,
+				...(includeUser && {
+					user: {
+						select: {
+							id: true,
+							name: true,
+							avatar: true,
+							phoneNumber: true,
+						},
+					},
+				}),
 			},
 		});
 	}

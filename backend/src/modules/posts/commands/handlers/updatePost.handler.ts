@@ -21,7 +21,7 @@ export class UpdatePostHandler implements ICommandHandler<UpdatePostCommand> {
 	): Promise<HttpResponseBodySuccessDto<PostsEntity> | HttpException> {
 		const { updatePostDto, postId, myInformation } = command;
 
-		const post = await this.postsRepository.findPostById(postId);
+		const post = await this.postsRepository.findPostById(postId, false);
 		if (!post) {
 			throw new OptionalException(404, 'Post not found');
 		}
