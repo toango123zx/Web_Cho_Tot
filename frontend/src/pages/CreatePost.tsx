@@ -16,7 +16,7 @@ import { AddressDialog } from '@/components/dialog/AddressDialog';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { useCategories } from '@/services/query/category';
+import { useGetCategories } from '@/services/query/category';
 
 export default function CreatePost() {
 	const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -31,7 +31,14 @@ export default function CreatePost() {
 	const [isUploading, setIsUploading] = useState(false);
 	const navigate = useNavigate();
 
-	const { data: categories, isLoading: isCategoriesLoading } = useCategories();
+	const { data: categoriesData, isLoading: isCategoriesLoading } = useGetCategories({
+		page: 1,
+		limit: 100,
+	});
+	const categories: Category[] =
+		categoriesData && 'data' in categoriesData && categoriesData.success
+			? categoriesData.data
+			: [];
 
 	const [address, setAddress] = useState<{
 		province: string;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useCurrentApp } from '@/components/context/AppContext';
 import { Button, Avatar, AvatarFallback, AvatarImage } from '@/components/ui';
 import {
 	Heart,
@@ -29,6 +30,7 @@ const ageMap: Record<string, string> = {
 };
 
 export default function ProductDetailPage() {
+	const { isAuthenticated } = useCurrentApp();
 	const { id } = useParams<{ id: string }>();
 	const { data, isLoading, isError, refetch } = usePostById(id || '');
 	const [currentImageIdx, setCurrentImageIdx] = useState(0);
@@ -127,7 +129,7 @@ export default function ProductDetailPage() {
 
 	return (
 		<main className="pt-6 bg-gray-100 min-h-screen">
-			<div className="mx-auto max-w-[1200px] px-4 md:px-6 lg:px-6">
+			<div className="mx-auto max-w-[1200px] px-4 md:px-6 lg:px-6 pb-8">
 				{/* Gallery + Info */}
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white rounded-lg shadow p-6">
 					{/* Gallery */}
@@ -194,6 +196,14 @@ export default function ProductDetailPage() {
 									archivedIds.includes(post.id) ? 'bg-red-500 hover:bg-red-600' : ''
 								}
 								onClick={() => {
+									if (!isAuthenticated) {
+										window.open(
+											'/login?popup=1',
+											'_blank',
+											'noopener,noreferrer,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
+										);
+										return;
+									}
 									toggleArchiveMutation.mutate(post.id, {
 										onSuccess: (res) => {
 											if (res.success) {
@@ -236,20 +246,34 @@ export default function ProductDetailPage() {
 						</div>
 
 						<div className="grid grid-cols-2 gap-3 mt-4">
-							<Button
-								className="bg-gray-200 text-gray-800 text-sm"
-								onClick={() => {
-									if (!showPhone) setShowPhone(true);
-								}}
-							>
-								{showPhone ? userPhone : `Hiện số ${phoneMasked}`}
-							</Button>
+							{userPhone ? (
+								<Button
+									className="bg-gray-200 text-gray-800 text-sm"
+									onClick={() => {
+										if (!isAuthenticated) {
+											window.open(
+												'/login?popup=1',
+												'_blank',
+												'noopener,noreferrer,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
+											);
+											return;
+										}
+										if (!showPhone) setShowPhone(true);
+									}}
+								>
+									{showPhone ? userPhone : `Hiện số ${phoneMasked}`}
+								</Button>
+							) : (
+								<Button className="bg-gray-200 text-gray-800 text-sm" disabled>
+									Không có số điện thoại
+								</Button>
+							)}
 							<Button className="bg-yellow-400 text-black hover:bg-yellow-500 text-sm">
 								<MessageSquare className="w-4 h-4 mr-2" /> Chat
 							</Button>
 						</div>
 
-						{/* Buyer demo */}
+						{/* Buyer info */}
 						<div className="flex items-center gap-4 mt-5">
 							<Avatar className="w-10 h-10">
 								<AvatarImage src={userAvatar} />
@@ -279,29 +303,63 @@ export default function ProductDetailPage() {
 
 				{/* Description + Comment */}
 				<div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-					<div className="lg:col-span-7 bg-white rounded-lg shadow p-6">
-						<h2 className="text-xl font-bold mb-4">Mô tả chi tiết</h2>
+					<div className="lg:col-span-7 flex flex-col gap-6">
+						<div className="bg-white rounded-lg shadow p-6">
+							<h2 className="text-xl font-bold mb-4">Mô tả chi tiết</h2>
+							<p className="text-base text-muted-foreground whitespace-pre-line leading-relaxed">
+								{post.description}
+							</p>
+							<div className="inline-flex items-center bg-gray-100 rounded-full px-4 py-2 mt-4">
+								<span className="font-semibold mr-2">SĐT liên hệ:</span>
+								{userPhone ? (
+									<>
+										<span className="font-semibold">
+											{showPhone ? userPhone : phoneMasked}
+										</span>
+										{!showPhone && (
+											<button
+												className="ml-3 text-blue-600 font-semibold hover:underline focus:outline-none cursor-pointer"
+												type="button"
+												onClick={() => {
+													if (!isAuthenticated) {
+														window.open(
+															'/login?popup=1',
+															'_blank',
+															'noopener,noreferrer,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
+														);
+														return;
+													}
+													setShowPhone(true);
+												}}
+											>
+												Hiện số
+											</button>
+										)}
+									</>
+								) : (
+									<span className="font-semibold text-gray-400">
+										Không có số điện thoại
+									</span>
+								)}
+							</div>
+						</div>
 
-						<p className="text-base text-muted-foreground whitespace-pre-line leading-relaxed">
-							{post.description}
-						</p>
-
-						<div className="inline-flex items-center bg-gray-100 rounded-full px-4 py-2 mt-4">
-							<span className="font-semibold mr-2">SĐT liên hệ:</span>
-							<span className="font-semibold">{showPhone ? userPhone : phoneMasked}</span>
-							{!showPhone && userPhone && (
-								<button
-									className="ml-3 text-blue-600 font-semibold hover:underline focus:outline-none cursor-pointer"
-									type="button"
-									onClick={() => setShowPhone(true)}
-								>
-									Hiện số
-								</button>
-							)}
+						<div className="bg-white rounded-lg shadow p-6">
+							<h2 className="text-xl font-bold mb-4">Thông tin chi tiết</h2>
+							<div className="divide-y divide-gray-200">
+								<div className="flex justify-between py-2 border-b border-gray-200">
+									<span className="text-gray-600">Giống thú cưng:</span>
+									<span className="font-medium">{post.category?.name || 'Không rõ'}</span>
+								</div>
+								<div className="flex justify-between py-2 border-b border-gray-200">
+									<span className="text-gray-600">Độ tuổi:</span>
+									<span className="font-medium">{ageMap[post.age] || 'Không rõ'}</span>
+								</div>
+							</div>
 						</div>
 					</div>
 
-					<div className="lg:col-span-5 bg-white rounded-lg shadow p-6">
+					<div className="lg:col-span-5 bg-white rounded-lg shadow p-3 text-sm flex flex-col justify-start min-h-0 max-h-[120px]">
 						<h2 className="text-xl font-bold mb-4">Bình luận</h2>
 						<p className="text-muted-foreground">Chưa có bình luận nào.</p>
 					</div>

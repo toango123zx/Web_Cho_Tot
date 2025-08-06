@@ -23,17 +23,6 @@ export const useGetCategories = ({ page, limit }: CategoryQueryProps) => {
 
 	return query;
 };
-export const useCategories = () => {
-	return useQuery<Category[] | null, Error>({
-		queryKey: QUERY_KEY.getAllCategories(),
-		queryFn: async () => {
-			const res = await getCategoriesAPI({});
-			return res.success ? res.data : null;
-		},
-		staleTime: 1000 * 60 * 5,
-		refetchOnWindowFocus: false,
-	});
-};
 
 export const useCategoryMutations = () => {
 	const createCategory = useMutation({

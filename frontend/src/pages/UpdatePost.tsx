@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePostById, useUpdatePostById } from '@/services/query/post';
-import { useCategories } from '@/services/query/category';
+import { useGetCategories } from '@/services/query/category';
 import { uploadFileToCloudinary } from '@/services/api/cloudinary';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,7 +24,14 @@ const UpdatePost = () => {
 	const queryClient = useQueryClient();
 	const { data: post, isLoading: isPostLoading } = usePostById(id || '');
 	const { mutate: updatePost, isPending: isUpdating } = useUpdatePostById();
-	const { data: categories, isLoading: isCategoriesLoading } = useCategories();
+	const { data: categoriesData, isLoading: isCategoriesLoading } = useGetCategories({
+		page: 1,
+		limit: 100,
+	});
+	const categories: Category[] =
+		categoriesData && 'data' in categoriesData && categoriesData.success
+			? categoriesData.data
+			: [];
 
 	const [selectedImages, setSelectedImages] = useState<File[]>([]);
 	const [previewUrls, setPreviewUrls] = useState<string[]>([]);

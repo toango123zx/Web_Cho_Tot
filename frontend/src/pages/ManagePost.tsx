@@ -6,6 +6,7 @@ import { Plus, Pencil, Trash } from 'lucide-react';
 import { GoodCoinIcon } from '@/assets/icons';
 import { usePostsByUserId, useDeletePost } from '@/services/query/post';
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 // import {QUERY_KEY} from 'key';
 import {
@@ -58,19 +59,23 @@ function AdItem({
 	return (
 		<>
 			<Card className="flex flex-row items-center gap-5 p-4 shadow-sm">
-				{/* Image */}
-				<img
-					src={post.postImages[0]?.url || '/placeholder.svg'}
-					alt={post.title}
-					width={140}
-					height={140}
-					className="rounded-xl object-cover aspect-square flex-shrink-0 border border-gray-200"
-				/>
+				{/* Image with link */}
+				<Link to={`/post/${post.id}`} className="block">
+					<img
+						src={post.postImages[0]?.url || '/placeholder.svg'}
+						alt={post.title}
+						width={140}
+						height={140}
+						className="rounded-xl object-cover aspect-square flex-shrink-0 border border-gray-200"
+					/>
+				</Link>
 
 				{/* Content */}
 				<div className="flex-1 flex flex-col h-full justify-center min-w-0">
 					<div className="flex flex-col gap-1 min-w-0">
-						<h3 className="font-bold text-lg truncate mb-0.5">{post.title}</h3>
+						<Link to={`/post/${post.id}`} className="font-bold text-lg truncate mb-0.5">
+							{post.title}
+						</Link>
 						<p className="text-rose-600 font-bold text-xl mb-0.5">
 							{post.price.toLocaleString()} đ
 						</p>
@@ -130,7 +135,7 @@ export default function ManagePost() {
 	const userId = user?.id;
 	const { data: posts, isLoading, refetch } = usePostsByUserId(userId ?? '');
 	const [tab, setTab] = useState<'active' | 'expired' | 'rejected' | 'pending'>(
-		'rejected',
+		'pending',
 	);
 
 	const filteredPosts = useMemo(() => {

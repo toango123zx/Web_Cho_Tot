@@ -11,7 +11,10 @@ export const QUERY_KEY = {
 	getCategoryPaginate: (page: number) => {
 		return ['categories', page];
 	},
-	getPosts: (params: { page: number; limit: number }) => ['posts', params],
+	getPosts: (params: { page: number; limit: number; status?: IPostStatus }) => [
+		'posts',
+		params,
+	],
 	getPostById: (id: string) => ['post', id],
 	getPostsByUserId: (userId: string) => ['posts', 'user', userId],
 	getArchivedPosts: (params?: Record<string, any>) => ['archived-posts', params],

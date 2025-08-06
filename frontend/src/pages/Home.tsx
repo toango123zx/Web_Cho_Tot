@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { usePosts, useToggleArchivePost, useArchivedPosts } from '@/services/query/post';
 import { getRelativeTime } from '@/helper';
 import { useNavigate } from 'react-router-dom';
+import { useCurrentApp } from '@/components/context/AppContext';
 
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
@@ -12,6 +13,7 @@ import { QUERY_KEY } from '@/config/key';
 const LIMIT = 9;
 
 export default function HomePage() {
+	const { isAuthenticated } = useCurrentApp();
 	const [page, setPage] = useState(1);
 	const [postList, setPostList] = useState<IPost[]>([]);
 	const navigate = useNavigate();
@@ -26,7 +28,7 @@ export default function HomePage() {
 			? (archivedData.data as { id: string }[]).map((p) => p.id)
 			: [];
 
-	const { data, isLoading } = usePosts(page, LIMIT);
+	const { data, isLoading } = usePosts(page, LIMIT, 'PUBLISHED');
 
 	useEffect(() => {
 		if (data?.success && data.data.length > 0) {
@@ -73,8 +75,7 @@ export default function HomePage() {
 					<p>Không có sản phẩm nào</p>
 				) : (
 					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-						{postList.map((post) => (
-							// ...existing code...
+						{postList.map((post: IPost) => (
 							<div
 								key={post.id}
 								className="cursor-pointer group"
@@ -85,21 +86,22 @@ export default function HomePage() {
 									if (e.key === 'Enter') navigate(`/post/${post.id}`);
 								}}
 							>
-								{/* ...existing code... */}
 								<div className="relative group overflow-hidden">
-									{/* ...existing code... */}
 									<img
 										src={post.postImages[0]?.url || '/placeholder.svg'}
 										alt={post.title}
 										className="w-full h-40 sm:h-48 object-cover transition-transform duration-200 group-hover:scale-105 rounded-md z-0"
 									/>
-									{/* ...existing code... */}
 									<Button
 										variant="ghost"
 										size="icon"
 										className={`absolute top-2 right-2 h-8 w-8 rounded-full border-0 z-10 ${archivedIds.includes(post.id) ? 'bg-red-500 hover:bg-red-600' : 'bg-black/20 hover:bg-black/40'}`}
 										onClick={(e) => {
 											e.stopPropagation();
+											if (!isAuthenticated) {
+												navigate('/login');
+												return;
+											}
 											toggleArchiveMutation.mutate(post.id, {
 												onSuccess: (res) => {
 													if (res.success) {
@@ -125,7 +127,6 @@ export default function HomePage() {
 											className={`h-4 w-4 ${archivedIds.includes(post.id) ? 'text-white' : 'text-white'}`}
 										/>
 									</Button>
-									{/* ...existing code... */}
 									<div className="absolute bottom-0 left-0 right-0 flex justify-between items-end bg-gradient-to-t from-black/70 to-transparent px-2 py-1 rounded-b-md z-10 pointer-events-none transition-transform duration-200 group-hover:scale-105">
 										<span className="text-white text-xs font-semibold">
 											{getRelativeTime(post.createdAt)}
@@ -143,7 +144,6 @@ export default function HomePage() {
 										</span>
 									</div>
 								</div>
-								{/* ...existing code... */}
 								<div className="pt-2">
 									<h3 className="font-normal text-sm line-clamp-2 mb-1 text-black leading-tight">
 										{post.title}
@@ -167,7 +167,7 @@ export default function HomePage() {
 				)}
 
 				{/* Load More */}
-				{data?.success && data.data.length === LIMIT && (
+				{data?.success && postList.length % LIMIT === 0 && postList.length !== 0 && (
 					<div className="text-center mt-8">
 						<Button
 							onClick={handleLoadMore}

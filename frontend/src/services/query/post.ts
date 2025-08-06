@@ -34,11 +34,11 @@ export const usePostMutations = () => {
 	return { updatePostStatus, acceptPost };
 };
 
-export const usePosts = (page: number, limit: number) => {
+export const usePosts = (page: number, limit: number, status?: IPostStatus) => {
 	return useQuery<IModelPaginate<IPostWithCategoryAndUser[]> | null, Error>({
-		queryKey: QUERY_KEY.getPosts({ page, limit }),
+		queryKey: QUERY_KEY.getPosts({ page, limit, status }),
 		queryFn: async () => {
-			const res = await postApi.getPosts({ page, limit });
+			const res = await postApi.getPosts({ page, limit, status });
 			return res.success ? res : null;
 		},
 		staleTime: 1000 * 60 * 5,
