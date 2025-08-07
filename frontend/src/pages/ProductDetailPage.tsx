@@ -246,7 +246,7 @@ export default function ProductDetailPage() {
 						</div>
 
 						<div className="grid grid-cols-2 gap-3 mt-4">
-							{userPhone ? (
+							{userPhone && (
 								<Button
 									className="bg-gray-200 text-gray-800 text-sm"
 									onClick={() => {
@@ -262,10 +262,6 @@ export default function ProductDetailPage() {
 									}}
 								>
 									{showPhone ? userPhone : `Hiện số ${phoneMasked}`}
-								</Button>
-							) : (
-								<Button className="bg-gray-200 text-gray-800 text-sm" disabled>
-									Không có số điện thoại
 								</Button>
 							)}
 							<Button className="bg-yellow-400 text-black hover:bg-yellow-500 text-sm">
@@ -309,39 +305,33 @@ export default function ProductDetailPage() {
 							<p className="text-base text-muted-foreground whitespace-pre-line leading-relaxed">
 								{post.description}
 							</p>
-							<div className="inline-flex items-center bg-gray-100 rounded-full px-4 py-2 mt-4">
-								<span className="font-semibold mr-2">SĐT liên hệ:</span>
-								{userPhone ? (
-									<>
-										<span className="font-semibold">
-											{showPhone ? userPhone : phoneMasked}
-										</span>
-										{!showPhone && (
-											<button
-												className="ml-3 text-blue-600 font-semibold hover:underline focus:outline-none cursor-pointer"
-												type="button"
-												onClick={() => {
-													if (!isAuthenticated) {
-														window.open(
-															'/login?popup=1',
-															'_blank',
-															'noopener,noreferrer,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
-														);
-														return;
-													}
-													setShowPhone(true);
-												}}
-											>
-												Hiện số
-											</button>
-										)}
-									</>
-								) : (
-									<span className="font-semibold text-gray-400">
-										Không có số điện thoại
+							{userPhone && (
+								<div className="inline-flex items-center bg-gray-100 rounded-full px-4 py-2 mt-4">
+									<span className="font-semibold mr-2">SĐT liên hệ:</span>
+									<span className="font-semibold">
+										{showPhone ? userPhone : phoneMasked}
 									</span>
-								)}
-							</div>
+									{!showPhone && (
+										<button
+											className="ml-3 text-blue-600 font-semibold hover:underline focus:outline-none cursor-pointer"
+											type="button"
+											onClick={() => {
+												if (!isAuthenticated) {
+													window.open(
+														'/login?popup=1',
+														'_blank',
+														'noopener,noreferrer,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
+													);
+													return;
+												}
+												setShowPhone(true);
+											}}
+										>
+											Hiện số
+										</button>
+									)}
+								</div>
+							)}
 						</div>
 
 						<div className="bg-white rounded-lg shadow p-6">
