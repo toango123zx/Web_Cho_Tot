@@ -21,6 +21,11 @@ import UserManagement from './pages/admin/UserManagement.tsx';
 import AuthLayout from './layout/AuthLayout.tsx';
 import PostManagement from './pages/admin/PostManagement.tsx';
 import CategoryManagement from './pages/admin/CategoryManagement.tsx';
+import CreatePost from './pages/CreatePost.tsx';
+import ProductDetailPage from './pages/ProductDetailPage.tsx';
+import ManagePost from './pages/ManagePost.tsx';
+import UpdatePost from './pages/UpdatePost.tsx';
+import SavedPostsPage from './pages/SavedPostsPage.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -49,6 +54,42 @@ const router = createBrowserRouter([
 						<ProfileLayout>
 							<AccountSettings />
 						</ProfileLayout>
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/post',
+				element: (
+					<ProtectedRoute>
+						<CreatePost />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/post/:id',
+				element: <ProductDetailPage />,
+			},
+			{
+				path: '/manage-post',
+				element: (
+					<ProtectedRoute>
+						<ManagePost />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/update-post/:id',
+				element: (
+					<ProtectedRoute>
+						<UpdatePost />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/saved-posts',
+				element: (
+					<ProtectedRoute>
+						<SavedPostsPage />
 					</ProtectedRoute>
 				),
 			},

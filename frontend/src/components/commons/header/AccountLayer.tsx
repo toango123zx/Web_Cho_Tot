@@ -1,6 +1,6 @@
 import { GoodCoinIcon } from '@/assets/icons';
 import { ChevronRight, Pencil, Star } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface AccountLayerProps {
 	accountLayerRef: React.RefObject<HTMLDivElement | null>;
@@ -34,7 +34,7 @@ export function AccountLayer({
 	return (
 		<div
 			ref={accountLayerRef}
-			className="absolute top-[calc(100%+30px)] right-0 w-[300px] bg-white py-2 shadow-xl max-h-[800px] overflow-y-auto"
+			className="absolute top-[calc(100%+30px)] right-0 w-[300px] bg-white py-2 shadow-xl max-h-[800px] overflow-y-auto z-99"
 		>
 			<div className="flex gap-3 p-3">
 				{isLoggedIn ? (
@@ -182,14 +182,18 @@ export function AccountLayer({
 					<div className="px-3 py-2 font-semibold text-gray-500 bg-gray-200">
 						Tiện ích
 					</div>
-					<div className="hover:bg-gray-100 px-3 py-2 flex items-center gap-2">
+
+					<Link
+						to="/saved-posts"
+						className="hover:bg-gray-100 px-3 py-2 flex items-center gap-2"
+					>
 						<img
 							src="https://static.chotot.com/storage/chotot-icons/svg/menu-saved-ad.svg"
 							className="size-5"
 							alt="bookmark"
 						/>
 						<span>Tin đăng đã lưu</span>
-					</div>
+					</Link>
 					<div className="hover:bg-gray-100 px-3 py-2 flex items-center gap-2">
 						<img
 							src="https://static.chotot.com/storage/chotot-icons/svg/menu-saved-search.svg"

@@ -1,13 +1,3 @@
-export const calculatePagesCount = (pageSize: number, totalCount: number) => {
-	if (pageSize <= 0) {
-		throw new Error('Page size must be greater than 0');
-	}
-	if (totalCount < 0) {
-		throw new Error('Total count cannot be negative');
-	}
-	return totalCount < pageSize ? 1 : Math.ceil(totalCount / pageSize);
-};
-
 export const trimData = <T>(data: Record<string, unknown>, removeEmpty = true) => {
 	const result: Record<string, unknown> = {};
 
@@ -40,3 +30,18 @@ export const postStatusToText = (status: IPostStatus | string) => {
 			return 'Tất cả';
 	}
 };
+
+export function getRelativeTime(dateString: string) {
+	const date = new Date(dateString);
+	if (isNaN(date.getTime())) {
+		return 'Ngày không hợp lệ';
+	}
+	const now = new Date();
+	const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+	if (diff < 60) return 'Vừa xong';
+	if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+	if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+	if (diff < 604800) return `${Math.floor(diff / 86400)} ngày trước`;
+	if (diff < 2419200) return `${Math.floor(diff / 604800)} tuần trước`;
+	return date.toLocaleDateString('vi-VN');
+}

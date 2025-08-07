@@ -1,6 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import PacmanLoader from 'react-spinners/PacmanLoader';
 
 import { useCurrentApp } from '@/components/context/AppContext';
@@ -11,7 +10,6 @@ function Layout() {
 	const { user, setUser, setIsAuthenticated, isAppLoading, setIsAppLoading } =
 		useCurrentApp();
 	const { data, isLoading, refetch } = useAccount();
-	const queryClient = useQueryClient();
 
 	useEffect(() => {
 		if (data) {
