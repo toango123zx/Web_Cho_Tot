@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 
 import { PostStatusEnum } from '@prisma/client';
-import { PostsDto, PostsEntity } from 'src/models';
+import { PostsEntity } from 'src/models';
 import { PrismaService } from 'src/modules/database/services';
-import { CreatePostDto, UpdatePostDto } from 'src/modules/posts/dtos';
+import { CreatePostDto, PostsDto, UpdatePostDto } from 'src/modules/posts/dtos';
 
 type PostFilter = {
 	skip: number;
@@ -35,6 +35,7 @@ export class PostsRepository {
 				include: {
 					postImages: true,
 					category: true,
+					postArchives: true,
 					user: {
 						select: {
 							id: true,
