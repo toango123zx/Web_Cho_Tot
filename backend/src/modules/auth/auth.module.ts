@@ -5,6 +5,8 @@ import { JwtModule } from '@nestjs/jwt/dist/jwt.module';
 import { UserRepository } from 'src/modules/users/users.repository';
 
 import { DatabaseModule } from '../database/database.module';
+import { MailModule } from '../mail/mail.module';
+import { OtpsModule } from '../otps/otps.module';
 
 import { AuthController } from './auth.controller';
 import { AuthRepository } from './auth.repository';
@@ -14,7 +16,7 @@ import { AuthQueryHandlers } from './queries/handlers';
 import { GoogleOauthStrategy } from './strategies';
 
 @Module({
-	imports: [CqrsModule, DatabaseModule, JwtModule],
+	imports: [CqrsModule, DatabaseModule, JwtModule, OtpsModule, MailModule],
 	controllers: [AuthController],
 	providers: [
 		GoogleOauthStrategy,

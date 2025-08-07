@@ -30,7 +30,7 @@ model users {
     createdAt   DateTime        @default(now()) @map("created_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    deletedAt DateTime? @map("deleted_at")
+    deletedAt   DateTime?       @map("deleted_at")
 
     accounts              accounts?
     socialAccounts        socialAccounts?
@@ -42,6 +42,7 @@ model users {
     messages              messages[]
     notifications         notifications[]
     transaction           transaction[]
+    otps                  otps[]
 
     @@map("Users")
 }
@@ -100,4 +101,16 @@ model notifications {
     createdAt DateTime @default(now()) @map("created_at")
 
     @@map("Notifications")
+}
+
+model otps {
+    id        String   @id @default(uuid())
+    /// @DtoUpdateHidden
+    userId    String   @unique @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    user      users    @relation(fields: [userId], references: [id])
+    otp       String   @db.Char(6)
+    expiresAt DateTime @map("expires_at")
+
+    @@map("Otps")
 }

@@ -150,4 +150,28 @@ export class AuthRepository {
 			},
 		});
 	}
+
+	async updatePasswordByUserId({
+		newPassword,
+		userId,
+		salt,
+	}: {
+		newPassword: string;
+		userId: string;
+		salt: string;
+	}): Promise<AccountsEntity> {
+		return this.prismaService.accounts.update({
+			include: {
+				user: true,
+			},
+			where: {
+				userId: userId,
+			},
+			data: {
+				password: newPassword,
+				salt: salt,
+				verify: true,
+			},
+		});
+	}
 }

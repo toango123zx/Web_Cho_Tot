@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { HttpResponseBodySuccessDto } from 'src/common';
-import { PostsDto } from 'src/models';
+import { PostsDto } from 'src/modules/posts/dtos';
 
 import { PostsRepository } from '../../posts.repository';
 import { GetPostsByUserQuery } from '../implements';
