@@ -10,6 +10,16 @@ interface PostQueryParams {
 	limit?: number;
 	search?: string;
 	status?: IPostStatus;
+	categoryId?: string;
+	minPrice?: number;
+	maxPrice?: number;
+	age?: string;
+	size?: string;
+	address?: string;
+	district?: string;
+	province?: string;
+	sortBy?: 'createdAt' | 'price' | 'title';
+	sortOrder?: 'asc' | 'desc';
 }
 
 export const postApi = {

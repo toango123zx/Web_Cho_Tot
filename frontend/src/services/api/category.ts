@@ -1,6 +1,10 @@
 import axios from '@/services/AxiosCustomize';
 
-export const getCategoriesAPI = async (params: { page?: number; limit?: number }) => {
+export const getCategoriesAPI = async (params: {
+	page?: number;
+	limit?: number;
+	search?: string;
+}) => {
 	const res = await axios.get('/categories', { params });
 
 	return res.data as IModelPaginate<Category[]>;

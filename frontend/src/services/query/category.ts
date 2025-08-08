@@ -1,7 +1,5 @@
-// src/services/query/category.query.ts
-
 import { QUERY_KEY } from '@/config/key';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import {
 	createCategoryAPI,
 	deleteCategoryAPI,
@@ -12,13 +10,46 @@ import {
 interface CategoryQueryProps {
 	page: number;
 	limit: number;
+	search?: string;
 }
 
-export const useGetCategories = ({ page, limit }: CategoryQueryProps) => {
+export const useGetCategories = ({ page, limit, search }: CategoryQueryProps) => {
 	const query = useQuery({
-		queryKey: QUERY_KEY.getCategoryPaginate(page),
-		queryFn: () => getCategoriesAPI({ page, limit }),
+		queryKey: QUERY_KEY.getCategoryPaginate(page, search),
+		queryFn: () => getCategoriesAPI({ page, limit, search }),
 		staleTime: 1000 * 60 * 5, // 5 minutes
+	});
+
+	return query;
+};
+
+export const useInfiniteCategoriesQuery = ({
+	search,
+	limit = 10,
+}: {
+	search?: string;
+	limit?: number;
+}) => {
+	return useInfiniteQuery({
+		queryKey: QUERY_KEY.getCategoryInfinite({ search, limit }),
+		queryFn: ({ pageParam = 1 }) => getCategoriesAPI({ page: pageParam, limit, search }),
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) => {
+			if (!lastPage.success) return undefined;
+			const { pagination } = lastPage;
+
+			return pagination.currentPage < pagination.totalPages
+				? pagination.currentPage + 1
+				: undefined;
+		},
+	});
+};
+
+export const useGetAllCategories = () => {
+	const query = useQuery({
+		queryKey: QUERY_KEY.getAllCategories(),
+		queryFn: () => getCategoriesAPI({ page: 1, limit: 1000 }),
+		staleTime: 1000 * 60 * 10, // 10 minutes
 	});
 
 	return query;

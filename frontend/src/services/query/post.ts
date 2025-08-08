@@ -7,17 +7,31 @@ import { QUERY_KEY } from '@/config/key';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createPostAPI, fetchPostByIdAPI, postApi } from '../api/post';
 import { toggleArchivePostAPI } from '../api/post';
+import { trimData } from '@/helper';
 
 export const usePostQueryWithPagination = (params?: {
 	page?: number;
 	limit?: number;
 	search?: string;
 	status?: IPostStatus;
+	categoryId?: string;
+	minPrice?: number;
+	maxPrice?: number;
+	age?: string;
+	size?: string;
+	address?: string;
+	district?: string;
+	province?: string;
+	sortBy?: 'createdAt' | 'price' | 'title';
+	sortOrder?: 'asc' | 'desc';
 }) => {
+	const trimmedParams = trimData<typeof params>(params as Record<string, unknown>);
+	console.log('Query params:', params?.search, trimmedParams);
 	return useQuery({
 		queryKey: QUERY_KEY.list(params),
-		queryFn: () => postApi.getPosts(params),
-		staleTime: 1000 * 60 * 5, // 5 minutes
+		queryFn: () => postApi.getPosts(trimmedParams),
+		staleTime: 1000 * 60 * 5, // Reduce stale time to prevent caching issues
+		// gcTime: 1000 * 60 * 5, // Keep cache for 5 minutes but always refetch
 	});
 };
 

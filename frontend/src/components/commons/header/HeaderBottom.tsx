@@ -1,5 +1,7 @@
+import { useCurrentApp } from '@/components/context/AppContext';
 import { Button } from '@/components/ui';
 import { useClickOutside } from '@/hooks';
+import { useInfiniteCategoriesQuery } from '@/services/query/category';
 import {
 	Bell,
 	ChevronDown,
@@ -7,26 +9,29 @@ import {
 	CircleUserRound,
 	Dog,
 	List,
+	Loader,
 	MessageSquareText,
 	Newspaper,
-	PawPrint,
 	ShoppingBag,
 	SquarePen,
 } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { HeaderSearch } from './HeaderSearch';
-import { AccountLayer } from './AccountLayer';
-import { Avatar } from './AccountAvatar';
-import { useCurrentApp } from '@/components/context/AppContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { Avatar } from './AccountAvatar';
+import { AccountLayer } from './AccountLayer';
+import { HeaderSearch } from './HeaderSearch';
 
 export function HeaderBottom() {
 	const [isAccountLayerShown, setIsAccountLayerShown] = useState(false);
 	const { isAuthenticated, user } = useCurrentApp();
 	const isLoggedIn = isAuthenticated;
 	const username = user?.name || 'Unknown';
-	// const isLoggedIn = false;
-	// const username = 'Đạt Ngô';
+
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+		useInfiniteCategoriesQuery({
+			limit: 10,
+		});
+	const categories = data?.pages.flatMap((page) => (page.success ? page.data : [])) ?? [];
 
 	const accountLayerRef = useRef<HTMLDivElement>(null);
 
@@ -43,13 +48,13 @@ export function HeaderBottom() {
 	return (
 		<div className="flex flex-col sm:flex-row items-center px-4 sm:px-6 py-2 gap-4 sm:gap-0">
 			<figure className="flex-shrink-0">
-				<a href="https://chotot.com">
+				<Link to="/">
 					<img
 						src="https://static.chotot.com/storage/APP_WRAPPER/logo/chotot-logo-appwrapper.png"
 						alt="Logo Chotot"
 						className="h-8 sm:h-9 w-auto"
 					/>
-				</a>{' '}
+				</Link>
 				{/* avatarURL={user?.avatar} */}
 			</figure>
 
@@ -61,23 +66,55 @@ export function HeaderBottom() {
 				</span>
 				<ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 group-hover:opacity-70" />
 
-				<div className="absolute top-full left-0 sm:left-auto w-full sm:w-[250px] md:w-[300px] sm:pt-2 hidden group-hover:flex rounded-sm z-10">
+				<div className="absolute top-full left-0 min-h-[200px] sm:left-auto w-full sm:w-[250px] md:w-[300px] sm:pt-2 hidden group-hover:flex rounded-sm z-[20]">
 					<div className="flex flex-col bg-white rounded-sm shadow-lg w-full">
 						<div className="relative inline-flex items-center justify-between bg-white rounded-sm hover:bg-gray-300/70 px-3 sm:px-4 py-2 group/menu">
 							<span className="inline-flex items-center gap-2 sm:gap-3">
-								<PawPrint className="w-4 h-4 sm:w-5 sm:h-5" />
-								<span className="text-xs sm:text-sm line-clamp-1">Thú cưng</span>
+								<Dog className="w-4 h-4 sm:w-5 sm:h-5" />
+								<span className="text-xs sm:text-sm line-clamp-1">Chó</span>
 							</span>
 							<ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
 
 							<div className="absolute top-0 sm:left-full w-full sm:w-[250px] md:w-[300px] hidden group-hover/menu:flex rounded-sm z-10">
-								<div className="flex flex-col bg-white rounded-sm shadow-lg w-full">
-									<div className="inline-flex items-center justify-between bg-white rounded-sm hover:bg-gray-300/70 px-3 sm:px-4 py-2">
-										<span className="inline-flex items-center gap-2 sm:gap-3">
-											<Dog className="w-4 h-4 sm:w-5 sm:h-5" />
-											<span className="text-xs sm:text-sm line-clamp-1">Chó</span>
-										</span>
-									</div>
+								<div className="flex flex-col bg-white rounded-sm shadow-lg w-full overflow-y-auto max-h-[300px]">
+									{categories.length === 0 ? (
+										<div className="inline-flex items-center justify-between bg-white rounded-sm hover:bg-gray-300/70 px-3 sm:px-4 py-2">
+											<span className="inline-flex items-center gap-2 sm:gap-3">
+												<span className="text-xs sm:text-sm line-clamp-1">
+													Không có danh mục nào
+												</span>
+											</span>
+										</div>
+									) : (
+										categories.map((category) => (
+											<div
+												key={category.id}
+												className="inline-flex items-center justify-between bg-white rounded-sm hover:bg-gray-300/70 px-3 sm:px-4 py-2"
+											>
+												<span className="inline-flex items-center gap-2 sm:gap-3">
+													<span className="text-xs sm:text-sm line-clamp-1">
+														{category.name}
+													</span>
+												</span>
+											</div>
+										))
+									)}
+									{isLoading ||
+										(isFetchingNextPage && (
+											<div className="inline-flex items-center justify-center bg-white rounded-sm hover:bg-gray-300/70 px-3 sm:px-4 py-2">
+												<Loader className="animate-spin" />
+											</div>
+										))}
+									{hasNextPage && (
+										<Button
+											variant="ghost"
+											className="w-full text-xs sm:text-sm"
+											onClick={() => fetchNextPage()}
+											disabled={isFetchingNextPage}
+										>
+											{isFetchingNextPage ? 'Đang tải...' : 'Tải thêm'}
+										</Button>
+									)}
 								</div>
 							</div>
 						</div>
@@ -99,7 +136,7 @@ export function HeaderBottom() {
 						<span className="group-hover:opacity-70 hidden sm:inline cursor-pointer">
 							Quản lí tin
 						</span>
-					</Link>{' '}
+					</Link>
 					<ChevronDown size={14} className="group-hover:opacity-70" />
 				</div>
 				<div
