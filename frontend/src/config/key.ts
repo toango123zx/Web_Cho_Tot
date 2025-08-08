@@ -18,4 +18,5 @@ export const QUERY_KEY = {
 	getPostById: (id: string) => ['post', id],
 	getPostsByUserId: (userId: string) => ['posts', 'user', userId],
 	getArchivedPosts: (params?: Record<string, any>) => ['archived-posts', params],
+	getNotifications: () => ['notifications'],
 };
