@@ -18,12 +18,16 @@ export class CreateNotificationHandler
 	async execute(command: CreateNotificationCommand): Promise<void> {
 		const { userId, content, url } = command;
 
-		const notification = await this.notificationsRepository.createNotification(
-			userId,
-			content,
-			url,
-		);
+		try {
+			const notification = await this.notificationsRepository.createNotification(
+				userId,
+				content,
+				url,
+			);
 
-		this.gateway.sendNotification(userId, notification);
+			await this.gateway.sendNotification(userId, notification);
+		} catch (error) {
+			throw new Error(`Failed to create notification: ${error.message}`);
+		}
 	}
 }
