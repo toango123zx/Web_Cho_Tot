@@ -11,22 +11,29 @@ export class CategoriesRepository {
 
 	async findCategories(
 		pagination: IPaginationQuery,
+		search?: string,
 	): Promise<[CategoryEntity[], number]> {
+		const whereCondition = {
+			deletedAt: null,
+			...(search && {
+				name: {
+					contains: search,
+					mode: 'insensitive' as const,
+				},
+			}),
+		};
+
 		const [categories, totalRecords] = await Promise.all([
 			this.prismaService.category.findMany({
-				where: {
-					deletedAt: null,
-				},
+				where: whereCondition,
 				skip: pagination.skip,
 				take: pagination.take,
 				orderBy: {
-					createdAt: 'asc',
+					createdAt: 'desc',
 				},
 			}),
 			this.prismaService.category.count({
-				where: {
-					deletedAt: null,
-				},
+				where: whereCondition,
 			}),
 		]);
 		return [categories, totalRecords];

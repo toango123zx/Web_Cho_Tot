@@ -20,8 +20,10 @@ export class GetCategoriesHandler implements IQueryHandler<GetCategoriesQuery> {
 			take: query.pagination.limit,
 		};
 
-		const [categories, totalRecords] =
-			await this.categoriesRepository.findCategories(pagination);
+		const [categories, totalRecords] = await this.categoriesRepository.findCategories(
+			pagination,
+			query.search,
+		);
 
 		const totalPage = Math.ceil(totalRecords / query.pagination.limit);
 		return {
