@@ -27,7 +27,6 @@ export function HeaderSearch() {
 	const ref = useRef<HTMLDivElement>(null);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const recentContainerRef = useRef<HTMLDivElement>(null);
-	const recentSearchesRef = useRef<HTMLDivElement>(null);
 
 	// Extract URL params for effect dependencies
 	const urlSearchText = searchParams.get('q') || '';

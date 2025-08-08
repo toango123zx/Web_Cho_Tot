@@ -32,34 +32,6 @@ export function PostCard({
 		return new Date(date).toLocaleDateString('vi-VN');
 	};
 
-	const getStatusBadgeVariant = (status: string) => {
-		switch (status) {
-			case 'PUBLISHED':
-				return 'default';
-			case 'PENDING':
-				return 'secondary';
-			case 'EXPIRED':
-				return 'destructive';
-			default:
-				return 'outline';
-		}
-	};
-
-	const getStatusText = (status: string) => {
-		switch (status) {
-			case 'PUBLISHED':
-				return 'Đã đăng';
-			case 'PENDING':
-				return 'Chờ duyệt';
-			case 'EXPIRED':
-				return 'Hết hạn';
-			case 'DELETED':
-				return 'Đã xóa';
-			default:
-				return status;
-		}
-	};
-
 	const getAgeText = (status: string) => {
 		switch (status) {
 			case 'PUPPY':
@@ -252,3 +224,50 @@ export function PostCard({
 		</Card>
 	);
 }
+
+interface IPostSkeletonProps {
+	viewMode?: 'grid' | 'list';
+}
+
+function PostCardSkeleton({ viewMode }: IPostSkeletonProps) {
+	return (
+		<Card className={`${viewMode === 'list' ? 'flex flex-row' : ''} animate-pulse`}>
+			{/* Hình */}
+			<div className={viewMode === 'list' ? 'w-48 flex-shrink-0' : ''}>
+				<div
+					className={`bg-gray-200 ${
+						viewMode === 'list'
+							? 'aspect-square rounded-l-lg'
+							: 'aspect-video rounded-t-lg'
+					}`}
+				/>
+			</div>
+
+			{/* Nội dung */}
+			<div className={`${viewMode === 'list' ? 'flex-1 flex flex-col' : ''}`}>
+				<CardContent className={`${viewMode === 'list' ? 'p-4 flex-1' : 'p-4'}`}>
+					<div className="h-5 bg-gray-200 rounded w-3/4 mb-2" />
+					<div className="h-6 bg-gray-200 rounded w-1/2 mb-3" />
+					<div className="h-4 bg-gray-200 rounded w-1/4 mb-3" />
+					<div className="flex gap-2 mb-3">
+						<div className="h-4 bg-gray-200 rounded w-16" />
+						<div className="h-4 bg-gray-200 rounded w-16" />
+					</div>
+					<div className="h-4 bg-gray-200 rounded w-1/2 mb-2" />
+					<div className="h-4 bg-gray-200 rounded w-1/3" />
+				</CardContent>
+				<CardFooter className={`${viewMode === 'list' ? 'p-4 pt-0' : 'p-4 pt-0'}`}>
+					<div className="flex items-center justify-between">
+						<div className="flex items-center">
+							<div className="w-8 h-8 bg-gray-200 rounded-full mr-2" />
+							<div className="h-4 bg-gray-200 rounded w-20" />
+						</div>
+						<div className="h-4 bg-gray-200 rounded w-8" />
+					</div>
+				</CardFooter>
+			</div>
+		</Card>
+	);
+}
+
+PostCard.Skeleton = PostCardSkeleton;

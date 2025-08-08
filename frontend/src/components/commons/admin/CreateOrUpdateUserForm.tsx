@@ -114,7 +114,6 @@ export default function CreateOrUpdateUserForm({
 
 	const handleValidateForm = <T,>(validationSchema: ValidationSchema<T>) => {
 		const { isValid, errors } = validate(formData, validationSchema);
-		console.log(errors);
 
 		setErrors(errors as Record<keyof IUserCreation, string>);
 		return isValid;
