@@ -22,7 +22,7 @@ import {
 	SlidersHorizontal,
 	X,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AGE_OPTIONS, SIZE_OPTIONS, SORT_OPTIONS } from './admin/PostManagement';
 
@@ -31,55 +31,109 @@ const ITEMS_PER_PAGE = 10;
 export default function SearchResults() {
 	const [searchParams, setSearchParams] = useSearchParams();
 
-	// --- Local UI state & filters ---
 	const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 	const [showAdvanced, setShowAdvanced] = useState(false);
 
-	// basic filters
 	const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
-	const [province, setProvince] = useState(searchParams.get('province') || '');
+	const [provinceInput, setProvinceInput] = useState(searchParams.get('province') || '');
 
-	// advanced inputs vs applied
-	const [catInput, setCatInput] = useState('');
-	const [catApplied, setCatApplied] = useState('');
+	const [catInput, setCatInput] = useState(searchParams.get('categoryId') || '');
+	const [minInput, setMinInput] = useState(searchParams.get('minPrice') || '');
+	const [maxInput, setMaxInput] = useState(searchParams.get('maxPrice') || '');
+	const [ageInput, setAgeInput] = useState(searchParams.get('age') || '');
+	const [sizeInput, setSizeInput] = useState(searchParams.get('size') || '');
 
-	const [minInput, setMinInput] = useState('');
-	const [maxInput, setMaxInput] = useState('');
-	const [minApplied, setMinApplied] = useState('');
-	const [maxApplied, setMaxApplied] = useState('');
-
-	const [ageInput, setAgeInput] = useState('');
-	const [ageApplied, setAgeApplied] = useState('');
-
-	const [sizeInput, setSizeInput] = useState('');
-	const [sizeApplied, setSizeApplied] = useState('');
-
-	const [sortBy, setSortBy] = useState<'createdAt' | 'price' | 'title'>('createdAt');
-	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+	const [sortBy, setSortBy] = useState<'createdAt' | 'price' | 'title'>(
+		(searchParams.get('sortBy') as any) || 'createdAt',
+	);
+	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(
+		(searchParams.get('sortOrder') as any) || 'desc',
+	);
 
 	const debouncedSearch = useDebounce(searchTerm, 500);
 
-	// --- Sync URL params → local state on mount/url-change ---
-	useEffect(() => {
-		const q = searchParams.get('q') || '';
-		const p = searchParams.get('province') || '';
-		setSearchTerm(q);
-		setProvince(p);
+	const writeOrDelete = (
+		next: URLSearchParams,
+		key: string,
+		val?: string | null,
+		removeIf: (v: string) => boolean = (v) => !v,
+	) => {
+		const s = (val ?? '').trim();
+		if (removeIf(s)) next.delete(key);
+		else next.set(key, s);
+	};
 
-		// reset applied + inputs
-		setCatInput('');
-		setCatApplied('');
-		setMinInput('');
-		setMaxInput('');
-		setMinApplied('');
-		setMaxApplied('');
-		setAgeInput('');
-		setAgeApplied('');
-		setSizeInput('');
-		setSizeApplied('');
+	useEffect(() => {
+		setSearchTerm(searchParams.get('q') || '');
+		setProvinceInput(searchParams.get('province') || '');
+		setCatInput(searchParams.get('categoryId') || '');
+		setMinInput(searchParams.get('minPrice') || '');
+		setMaxInput(searchParams.get('maxPrice') || '');
+		setAgeInput(searchParams.get('age') || '');
+		setSizeInput(searchParams.get('size') || '');
+		setSortBy((searchParams.get('sortBy') as any) || 'createdAt');
+		setSortOrder((searchParams.get('sortOrder') as any) || 'desc');
 	}, [searchParams]);
 
-	// --- Infinite Query ---
+	useEffect(() => {
+		setSearchParams((prev) => {
+			const next = new URLSearchParams(prev);
+			writeOrDelete(next, 'q', debouncedSearch);
+			return next;
+		});
+	}, [debouncedSearch, setSearchParams]);
+
+	const handleProvinceChange = (v: string) => {
+		setProvinceInput(v);
+		setSearchParams((prev) => {
+			const next = new URLSearchParams(prev);
+			if (v === 'all') next.delete('province');
+			else writeOrDelete(next, 'province', v);
+			return next;
+		});
+	};
+
+	useEffect(() => {
+		setSearchParams((prev) => {
+			const next = new URLSearchParams(prev);
+			writeOrDelete(next, 'sortBy', sortBy);
+			writeOrDelete(next, 'sortOrder', sortOrder);
+			return next;
+		});
+	}, [sortBy, sortOrder, setSearchParams]);
+
+	const handleApply = () => {
+		setSearchParams((prev) => {
+			const next = new URLSearchParams(prev);
+			writeOrDelete(next, 'categoryId', catInput, (v) => !v || v === 'all');
+			writeOrDelete(next, 'minPrice', minInput, (v) => !v);
+			writeOrDelete(next, 'maxPrice', maxInput, (v) => !v);
+			writeOrDelete(next, 'age', ageInput, (v) => !v || v === 'all');
+			writeOrDelete(next, 'size', sizeInput, (v) => !v || v === 'all');
+			return next;
+		});
+	};
+
+	const handleClear = () => {
+		setSearchParams({});
+	};
+
+	const applied = useMemo(() => {
+		return {
+			q: searchParams.get('q') || '',
+			province: searchParams.get('province') || '',
+			categoryId: searchParams.get('categoryId') || '',
+			minPrice: searchParams.get('minPrice') || '',
+			maxPrice: searchParams.get('maxPrice') || '',
+			age: searchParams.get('age') || '',
+			size: searchParams.get('size') || '',
+			sortBy:
+				(searchParams.get('sortBy') as 'createdAt' | 'price' | 'title') || 'createdAt',
+			sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc',
+		};
+	}, [searchParams]);
+
+	// ====== Query data ======
 	const {
 		data,
 		isFetching,
@@ -90,60 +144,41 @@ export default function SearchResults() {
 		error,
 	} = useInfinitePostQuery({
 		limit: ITEMS_PER_PAGE,
-		search: debouncedSearch || undefined,
-		province: province && province !== 'all' ? province : undefined,
-		categoryId: catApplied || undefined,
-		minPrice: minApplied ? parseInt(minApplied) : undefined,
-		maxPrice: maxApplied ? parseInt(maxApplied) : undefined,
-		age: ageApplied === 'all' ? undefined : ageApplied,
-		size: sizeApplied === 'all' ? undefined : sizeApplied,
-		sortBy,
-		sortOrder,
+		search: applied.q || undefined,
+		province: applied.province || undefined,
+		categoryId: applied.categoryId || undefined,
+		minPrice: applied.minPrice ? parseInt(applied.minPrice) : undefined,
+		maxPrice: applied.maxPrice ? parseInt(applied.maxPrice) : undefined,
+		age: applied.age || undefined,
+		size: applied.size || undefined,
+		sortBy: applied.sortBy,
+		sortOrder: applied.sortOrder,
 	});
 
 	const { data: catRes, isLoading: catLoading } = useGetAllCategories();
 
-	// --- apply advanced filters ---
-	const handleApply = () => {
-		setCatApplied(catInput);
-		setMinApplied(minInput);
-		setMaxApplied(maxInput);
-		setAgeApplied(ageInput);
-		setSizeApplied(sizeInput);
-	};
+	const categoryName = useMemo(() => {
+		if (!applied.categoryId || applied.categoryId === 'all') return '';
+		const list = catRes?.success ? catRes.data : [];
+		return list.find((c: any) => String(c.id) === String(applied.categoryId))?.name || '';
+	}, [applied.categoryId, catRes]);
 
-	// --- clear all ---
-	const handleClear = () => {
-		setSearchTerm('');
-		setProvince('');
-		setCatInput('');
-		setCatApplied('');
-		setMinInput('');
-		setMaxInput('');
-		setAgeInput('');
-		setAgeApplied('');
-		setSizeInput('');
-		setSizeApplied('');
-		setSortBy('createdAt');
-		setSortOrder('desc');
-		setSearchParams({});
-	};
-
-	// check if any filter active
 	const hasFilters = !!(
-		debouncedSearch ||
-		province ||
-		catApplied ||
-		minApplied ||
-		maxApplied ||
-		ageApplied ||
-		sizeApplied ||
-		sortBy !== 'createdAt' ||
-		sortOrder !== 'desc'
+		applied.q ||
+		applied.province ||
+		applied.categoryId ||
+		applied.minPrice ||
+		applied.maxPrice ||
+		applied.age ||
+		applied.size ||
+		applied.sortBy !== 'createdAt' ||
+		applied.sortOrder !== 'desc'
 	);
 
-	// flatten all pages
-	const allPosts = data?.pages.flatMap((page) => (page.success ? page.data : [])) || [];
+	const allPosts = data?.pages.flatMap((p: any) => (p?.success ? p.data : [])) || [];
+
+	const formatPrice = (price?: string) =>
+		price ? Number(price).toLocaleString('vi-VN') : '';
 
 	return (
 		<div className="max-w-[990px] mx-auto px-4 py-6 space-y-6">
@@ -151,12 +186,6 @@ export default function SearchResults() {
 			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
 				<div>
 					<h1 className="text-2xl font-bold">Kết quả tìm kiếm</h1>
-					{debouncedSearch && (
-						<p className="text-gray-600 mt-1">
-							Kết quả cho: "<span className="font-semibold">{debouncedSearch}</span>"
-							{province && <span> tại {province}</span>}
-						</p>
-					)}
 				</div>
 				<div className="flex items-center gap-2">
 					<Button
@@ -195,7 +224,7 @@ export default function SearchResults() {
 
 					{/* Province */}
 					<div className="w-full sm:w-64">
-						<Select value={province} onValueChange={(v) => setProvince(v)}>
+						<Select value={provinceInput} onValueChange={handleProvinceChange}>
 							<SelectTrigger>
 								<Filter className="w-4 h-4 mr-2" />
 								<SelectValue placeholder="Chọn tỉnh/thành" />
@@ -221,8 +250,8 @@ export default function SearchResults() {
 							<SelectContent className="max-h-60 overflow-y-auto">
 								<SelectItem value="all">Tất cả</SelectItem>
 								{catRes?.success &&
-									catRes.data.map((c) => (
-										<SelectItem key={c.id} value={c.id}>
+									catRes.data.map((c: any) => (
+										<SelectItem key={c.id} value={String(c.id)}>
 											{c.name}
 										</SelectItem>
 									))}
@@ -254,6 +283,53 @@ export default function SearchResults() {
 						)}
 					</Button>
 				</div>
+
+				{/* Active filter chips */}
+				{hasFilters && (
+					<div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 pt-2">
+						<span>Bộ lọc đang áp dụng:</span>
+						{applied.q && (
+							<span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
+								Tìm kiếm: "{applied.q}"
+							</span>
+						)}
+						{applied.province && (
+							<span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded">
+								Tỉnh: {applied.province}
+							</span>
+						)}
+						{applied.categoryId && (
+							<span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+								Danh mục: {categoryName || 'Đang tải...'}
+							</span>
+						)}
+						{(applied.minPrice || applied.maxPrice) && (
+							<span className="bg-purple-100 text-purple-800 px-2 py-1 rounded">
+								Giá: {formatPrice(applied.minPrice) || '0'} -{' '}
+								{formatPrice(applied.maxPrice) || '∞'} VNĐ
+							</span>
+						)}
+						{applied.age && (
+							<span className="bg-orange-100 text-orange-800 px-2 py-1 rounded">
+								Tuổi:{' '}
+								{AGE_OPTIONS.find((a) => a.value === applied.age)?.label || applied.age}
+							</span>
+						)}
+						{applied.size && (
+							<span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+								Kích thước:{' '}
+								{SIZE_OPTIONS.find((s) => s.value === applied.size)?.label ||
+									applied.size}
+							</span>
+						)}
+						{(applied.sortBy !== 'createdAt' || applied.sortOrder !== 'desc') && (
+							<span className="bg-gray-100 text-gray-800 px-2 py-1 rounded">
+								Sắp xếp: {SORT_OPTIONS.find((o) => o.value === applied.sortBy)?.label} (
+								{applied.sortOrder === 'desc' ? 'Giảm dần' : 'Tăng dần'})
+							</span>
+						)}
+					</div>
+				)}
 
 				{/* Advanced */}
 				{showAdvanced && (
@@ -366,13 +442,22 @@ export default function SearchResults() {
 							: 'space-y-4'
 					}
 				>
-					{allPosts.map((post) => (
+					{allPosts.map((post: any) => (
 						<PostCard key={post.id} post={post} viewMode={viewMode} />
 					))}
+
+					{/* Optional skeleton hàng cuối khi đang fetching */}
 					{isFetching &&
 						Array.from({
-							length: ITEMS_PER_PAGE - (allPosts.length % ITEMS_PER_PAGE),
-						}).map((_, idx) => <PostCard.Skeleton key={idx} viewMode={viewMode} />)}
+							length: Math.max(
+								0,
+								ITEMS_PER_PAGE - (allPosts.length % ITEMS_PER_PAGE || ITEMS_PER_PAGE),
+							),
+						}).map((_, idx) => (
+							// Nếu bạn đã tạo PostCard.Skeleton
+							// @ts-ignore
+							<PostCard.Skeleton key={idx} viewMode={viewMode} />
+						))}
 				</div>
 
 				{/* Load more */}

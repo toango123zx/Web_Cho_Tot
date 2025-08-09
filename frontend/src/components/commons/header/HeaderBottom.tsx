@@ -66,7 +66,7 @@ export function HeaderBottom() {
 				</span>
 				<ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 group-hover:opacity-70" />
 
-				<div className="absolute top-full left-0 min-h-[200px] sm:left-auto w-full sm:w-[250px] md:w-[300px] sm:pt-2 hidden group-hover:flex rounded-sm z-[20]">
+				<div className="absolute top-full left-0 min-h-[300px] sm:left-auto w-full sm:w-[250px] md:w-[300px] sm:pt-2 hidden group-hover:flex rounded-sm z-[20]">
 					<div className="flex flex-col bg-white rounded-sm shadow-lg w-full">
 						<div className="relative inline-flex items-center justify-between bg-white rounded-sm hover:bg-gray-300/70 px-3 sm:px-4 py-2 group/menu">
 							<span className="inline-flex items-center gap-2 sm:gap-3">
@@ -76,7 +76,7 @@ export function HeaderBottom() {
 							<ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
 
 							<div className="absolute top-0 sm:left-full w-full sm:w-[250px] md:w-[300px] hidden group-hover/menu:flex rounded-sm z-10">
-								<div className="flex flex-col bg-white rounded-sm shadow-lg w-full overflow-y-auto max-h-[300px]">
+								<div className="flex flex-col bg-white rounded-sm shadow-lg w-full overflow-y-auto h-[300px]">
 									{categories.length === 0 ? (
 										<div className="inline-flex items-center justify-between bg-white rounded-sm hover:bg-gray-300/70 px-3 sm:px-4 py-2">
 											<span className="inline-flex items-center gap-2 sm:gap-3">
@@ -91,11 +91,14 @@ export function HeaderBottom() {
 												key={category.id}
 												className="inline-flex items-center justify-between bg-white rounded-sm hover:bg-gray-300/70 px-3 sm:px-4 py-2"
 											>
-												<span className="inline-flex items-center gap-2 sm:gap-3">
+												<Link
+													to={`/search?categoryId=${category.id}`}
+													className="inline-flex items-center gap-2 sm:gap-3 w-full"
+												>
 													<span className="text-xs sm:text-sm line-clamp-1">
 														{category.name}
 													</span>
-												</span>
+												</Link>
 											</div>
 										))
 									)}
