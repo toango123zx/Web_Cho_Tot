@@ -127,7 +127,9 @@ export function PostCard({
 				)}
 			</div>
 
-			<div className={`${viewMode === 'list' ? 'flex-1 flex flex-col' : ''}`}>
+			<div
+				className={`${viewMode === 'list' ? 'flex-1 flex flex-col' : 'flex flex-col h-full'}`}
+			>
 				<CardContent className={`${viewMode === 'list' ? 'p-4 flex-1' : 'p-4'}`}>
 					{/* Title */}
 					<h3
@@ -191,7 +193,9 @@ export function PostCard({
 					</div>
 				</CardContent>
 
-				<CardFooter className={`${viewMode === 'list' ? 'p-4 pt-0' : 'p-4 pt-0'}`}>
+				<CardFooter
+					className={`${viewMode === 'list' ? 'p-4 pt-0' : 'p-4 pt-0'} mt-auto`}
+				>
 					{/* User Info */}
 					<div className="flex items-center justify-between w-full">
 						<div className="flex items-center">

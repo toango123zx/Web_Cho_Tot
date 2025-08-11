@@ -1,131 +1,136 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
-import { AgePostEnum, PostStatusEnum, SizePostEnum } from '@prisma/client';
-import { Type, Transform } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsPositive, IsString, Min } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+	IsIn,
+	IsInt,
+	IsOptional,
+	IsPositive,
+	IsString,
+	Min,
+	Validate,
+	ValidationArguments,
+	ValidatorConstraint,
+	ValidatorConstraintInterface,
+} from 'class-validator';
 import { GetApiConfig } from 'src/configs';
 
-enum FilterablePostStatus {
-	PENDING = 'PENDING',
-	PUBLISHED = 'PUBLISHED',
-	EXPIRED = 'EXPIRED',
+// Các giá trị hợp lệ (không có DELETED)
+export const FILTERABLE_STATUS = ['PENDING', 'PUBLISHED', 'EXPIRED'] as const;
+export type FilterablePostStatus = (typeof FILTERABLE_STATUS)[number];
+
+export const AGE_VALUES = ['BABY', 'YOUNG', 'ADULT', 'SENIOR'] as const; // khớp với Prisma enum của bạn
+export const SIZE_VALUES = ['SMALL', 'MEDIUM', 'LARGE'] as const; // khớp với Prisma enum của bạn
+
+export const SORT_BY_VALUES = ['createdAt', 'price', 'title'] as const;
+export const SORT_ORDER_VALUES = ['asc', 'desc'] as const;
+
+@ValidatorConstraint({ name: 'IsPriceRangeValid', async: false })
+class IsPriceRangeValid implements ValidatorConstraintInterface {
+	validate(_: unknown, args: ValidationArguments): boolean {
+		const o = args.object as FilterPostDto;
+		if (o.minPrice != null && o.maxPrice != null) return o.maxPrice >= o.minPrice;
+		return true;
+	}
+	defaultMessage(): string {
+		return 'maxPrice must be greater than or equal to minPrice';
+	}
 }
 
 export class FilterPostDto {
-	@ApiProperty({ type: 'number', required: false })
+	@ApiPropertyOptional({ type: 'number', default: 1 })
 	@IsOptional()
 	@Type(() => Number)
 	@IsInt()
 	@IsPositive()
 	page: number = GetApiConfig.defaultPage;
 
-	@ApiProperty({ type: 'number', required: false })
+	@ApiPropertyOptional({ type: 'number', default: 20 })
 	@IsOptional()
 	@Type(() => Number)
 	@IsInt()
 	@IsPositive()
 	limit: number = GetApiConfig.defaultLimitPage;
 
-	@ApiProperty({
-		type: 'string',
-		enum: FilterablePostStatus,
+	@ApiPropertyOptional({
+		enum: FILTERABLE_STATUS,
 		enumName: 'FilterablePostStatus',
-		required: false,
 		description: 'Filter by post status (excludes DELETED)',
 	})
 	@IsOptional()
-	@IsEnum(PostStatusEnum)
-	status?: Exclude<PostStatusEnum, 'DELETED'>;
+	@IsIn(FILTERABLE_STATUS)
+	status?: FilterablePostStatus;
 
-	@ApiProperty({
-		type: 'string',
-		required: false,
-		description: 'Search term for title and description',
-	})
+	@ApiPropertyOptional({ description: 'Search term for title and description' })
 	@IsOptional()
 	@IsString()
+	@Transform(({ value }) => value?.trim())
 	search?: string;
 
-	@ApiProperty({
-		type: 'string',
-		required: false,
-		description: 'Filter by category ID',
-	})
+	@ApiPropertyOptional({ description: 'Filter by category ID' })
 	@IsOptional()
 	@IsString()
-	categoryId?: string;
+	categoryId?: string; // nếu là UUID: đổi sang @IsUUID()
 
-	@ApiProperty({
-		type: 'string',
-		enum: AgePostEnum,
+	@ApiPropertyOptional({
+		enum: AGE_VALUES,
 		enumName: 'AgePostEnum',
-		required: false,
 		description: 'Filter by pet age',
 	})
 	@IsOptional()
-	@IsEnum(AgePostEnum)
-	age?: AgePostEnum;
+	@IsIn(AGE_VALUES)
+	age?: (typeof AGE_VALUES)[number];
 
-	@ApiProperty({
-		type: 'string',
-		enum: SizePostEnum,
+	@ApiPropertyOptional({
+		enum: SIZE_VALUES,
 		enumName: 'SizePostEnum',
-		required: false,
 		description: 'Filter by pet size',
 	})
 	@IsOptional()
-	@IsEnum(SizePostEnum)
-	size?: SizePostEnum;
+	@IsIn(SIZE_VALUES)
+	size?: (typeof SIZE_VALUES)[number];
 
-	@ApiProperty({ type: 'number', required: false, description: 'Minimum price filter' })
+	@ApiPropertyOptional({ type: 'number', description: 'Minimum price filter' })
 	@IsOptional()
 	@Type(() => Number)
 	@IsInt()
 	@Min(0)
 	minPrice?: number;
 
-	@ApiProperty({ type: 'number', required: false, description: 'Maximum price filter' })
+	@ApiPropertyOptional({ type: 'number', description: 'Maximum price filter' })
 	@IsOptional()
 	@Type(() => Number)
 	@IsInt()
 	@Min(0)
+	@Validate(IsPriceRangeValid)
 	maxPrice?: number;
 
-	@ApiProperty({
-		type: 'string',
-		required: false,
-		description: 'Filter by location/address',
-	})
+	@ApiPropertyOptional({ description: 'Filter by location/address' })
 	@IsOptional()
 	@IsString()
+	@Transform(({ value }) => value?.trim())
 	address?: string;
 
-	@ApiProperty({
-		type: 'string',
-		required: false,
-		description: 'Filter by district',
-	})
+	@ApiPropertyOptional({ description: 'Filter by district' })
 	@IsOptional()
 	@IsString()
+	@Transform(({ value }) => value?.trim())
 	district?: string;
 
-	@ApiProperty({
-		type: 'string',
-		required: false,
-		description: 'Filter by province',
-	})
+	@ApiPropertyOptional({ description: 'Filter by province' })
 	@IsOptional()
 	@IsString()
+	@Transform(({ value }) => value?.trim())
 	province?: string;
 
-	@ApiProperty({ type: 'string', required: false, description: 'Sort field' })
+	@ApiPropertyOptional({ enum: SORT_BY_VALUES, description: 'Sort field' })
 	@IsOptional()
-	@IsString()
-	sortBy?: 'createdAt' | 'price' | 'title';
+	@IsIn(SORT_BY_VALUES)
+	sortBy?: (typeof SORT_BY_VALUES)[number];
 
-	@ApiProperty({ type: 'string', required: false, description: 'Sort order' })
+	@ApiPropertyOptional({ enum: SORT_ORDER_VALUES, description: 'Sort order' })
 	@IsOptional()
-	@IsString()
 	@Transform(({ value }) => value?.toLowerCase())
-	sortOrder?: 'asc' | 'desc';
+	@IsIn(SORT_ORDER_VALUES)
+	sortOrder?: (typeof SORT_ORDER_VALUES)[number];
 }

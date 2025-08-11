@@ -50,6 +50,8 @@ export default function SearchResults() {
 		(searchParams.get('sortOrder') as any) || 'desc',
 	);
 
+	const [priceError, setPriceError] = useState<string | null>(null);
+
 	const debouncedSearch = useDebounce(searchTerm, 500);
 
 	const writeOrDelete = (
@@ -63,18 +65,25 @@ export default function SearchResults() {
 		else next.set(key, s);
 	};
 
+	const onlyDigits = (s: string) => s.replace(/[^\d]/g, '');
+
 	useEffect(() => {
 		setSearchTerm(searchParams.get('q') || '');
 		setProvinceInput(searchParams.get('province') || '');
 		setCatInput(searchParams.get('categoryId') || '');
-		setMinInput(searchParams.get('minPrice') || '');
-		setMaxInput(searchParams.get('maxPrice') || '');
+
+		const rawMin = searchParams.get('minPrice') || '';
+		const rawMax = searchParams.get('maxPrice') || '';
+		setMinInput(/^\d+$/.test(rawMin) ? rawMin : '');
+		setMaxInput(/^\d+$/.test(rawMax) ? rawMax : '');
+
 		setAgeInput(searchParams.get('age') || '');
 		setSizeInput(searchParams.get('size') || '');
 		setSortBy((searchParams.get('sortBy') as any) || 'createdAt');
 		setSortOrder((searchParams.get('sortOrder') as any) || 'desc');
 	}, [searchParams]);
 
+	// ----- Debounce search -> URL -----
 	useEffect(() => {
 		setSearchParams((prev) => {
 			const next = new URLSearchParams(prev);
@@ -102,7 +111,21 @@ export default function SearchResults() {
 		});
 	}, [sortBy, sortOrder, setSearchParams]);
 
+	useEffect(() => {
+		const min = minInput === '' ? null : parseInt(minInput, 10);
+		const max = maxInput === '' ? null : parseInt(maxInput, 10);
+
+		let err: string | null = null;
+		if (min != null && min < 0) err = 'Giá tối thiểu phải ≥ 0';
+		else if (max != null && max < 0) err = 'Giá tối đa phải ≥ 0';
+		else if (min != null && max != null && max < min)
+			err = 'Giá tối đa phải ≥ giá tối thiểu';
+
+		setPriceError(err);
+	}, [minInput, maxInput]);
+
 	const handleApply = () => {
+		if (priceError) return; // chặn cập nhật URL khi đang lỗi
 		setSearchParams((prev) => {
 			const next = new URLSearchParams(prev);
 			writeOrDelete(next, 'categoryId', catInput, (v) => !v || v === 'all');
@@ -340,19 +363,36 @@ export default function SearchResults() {
 							<div className="flex gap-2">
 								<Input
 									type="number"
+									min={0}
+									step={1}
+									inputMode="numeric"
+									pattern="[0-9]*"
 									placeholder="Từ"
 									value={minInput}
-									onChange={(e) => setMinInput(e.target.value)}
+									onChange={(e) => setMinInput(onlyDigits(e.target.value))}
+									onBlur={(e) =>
+										setMinInput(onlyDigits(e.target.value).replace(/^0+(?=\d)/, ''))
+									}
+									aria-invalid={!!priceError}
 									className="text-sm"
 								/>
 								<Input
 									type="number"
+									min={0}
+									step={1}
+									inputMode="numeric"
+									pattern="[0-9]*"
 									placeholder="Đến"
 									value={maxInput}
-									onChange={(e) => setMaxInput(e.target.value)}
+									onChange={(e) => setMaxInput(onlyDigits(e.target.value))}
+									onBlur={(e) =>
+										setMaxInput(onlyDigits(e.target.value).replace(/^0+(?=\d)/, ''))
+									}
+									aria-invalid={!!priceError}
 									className="text-sm"
 								/>
 							</div>
+							{priceError && <p className="mt-1 text-xs text-red-600">{priceError}</p>}
 						</div>
 						{/* Age */}
 						<div>
@@ -417,7 +457,9 @@ export default function SearchResults() {
 						</div>
 						{/* Apply */}
 						<div className="col-span-full flex justify-end">
-							<Button onClick={handleApply}>Áp dụng</Button>
+							<Button onClick={handleApply} disabled={!!priceError}>
+								Áp dụng
+							</Button>
 						</div>
 					</div>
 				)}
@@ -446,18 +488,13 @@ export default function SearchResults() {
 						<PostCard key={post.id} post={post} viewMode={viewMode} />
 					))}
 
-					{/* Optional skeleton hàng cuối khi đang fetching */}
 					{isFetching &&
 						Array.from({
 							length: Math.max(
 								0,
 								ITEMS_PER_PAGE - (allPosts.length % ITEMS_PER_PAGE || ITEMS_PER_PAGE),
 							),
-						}).map((_, idx) => (
-							// Nếu bạn đã tạo PostCard.Skeleton
-							// @ts-ignore
-							<PostCard.Skeleton key={idx} viewMode={viewMode} />
-						))}
+						}).map((_, idx) => <PostCard.Skeleton key={idx} viewMode={viewMode} />)}
 				</div>
 
 				{/* Load more */}
