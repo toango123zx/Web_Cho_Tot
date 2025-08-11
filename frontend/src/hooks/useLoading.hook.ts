@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 export function useLoading(initialLoading = false) {
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(initialLoading);
 
 	const execute = async (fn: () => Promise<void>) => {
 		try {
