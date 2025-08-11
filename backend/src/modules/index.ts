@@ -4,6 +4,7 @@ import { DatabaseModule } from './database/database.module';
 import { HealthCheckModule } from './healthCheck/healthCheck.module';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 export const Modules = [
 	DatabaseModule,
@@ -12,4 +13,5 @@ export const Modules = [
 	UsersModule,
 	CategoriesModule,
 	PostsModule,
+	NotificationsModule,
 ];

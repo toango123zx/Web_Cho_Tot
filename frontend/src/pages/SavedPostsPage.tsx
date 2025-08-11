@@ -47,11 +47,11 @@ function SavedPostsPage() {
 							<div
 								key={post.id}
 								className="flex items-center border-b border-gray-200 pb-4 last:border-b-0 cursor-pointer group"
-								onClick={() => navigate(`/post/${post.id}`)}
+								onClick={() => navigate(`/posts/${post.id}`)}
 								role="button"
 								tabIndex={0}
 								onKeyDown={(e) => {
-									if (e.key === 'Enter') navigate(`/post/${post.id}`);
+									if (e.key === 'Enter') navigate(`/posts/${post.id}`);
 								}}
 							>
 								<div className="relative w-24 h-24 flex-shrink-0 mr-4 rounded-lg overflow-hidden">
