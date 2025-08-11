@@ -25,7 +25,7 @@ export class NotificationsRepository {
 	async createNotification(
 		userId: string,
 		content: string,
-		url: string,
+		url?: string,
 	): Promise<NotificationsEntity> {
 		return this.prismaService.notifications.create({
 			data: {
