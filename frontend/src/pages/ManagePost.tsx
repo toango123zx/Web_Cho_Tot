@@ -60,7 +60,7 @@ function AdItem({
 		<>
 			<Card className="flex flex-row items-center gap-5 p-4 shadow-sm">
 				{/* Image with link */}
-				<Link to={`/post/${post.id}`} className="block">
+				<Link to={`/posts/${post.id}`} className="block">
 					<img
 						src={post.postImages[0]?.url || '/placeholder.svg'}
 						alt={post.title}
@@ -73,7 +73,7 @@ function AdItem({
 				{/* Content */}
 				<div className="flex-1 flex flex-col h-full justify-center min-w-0">
 					<div className="flex flex-col gap-1 min-w-0">
-						<Link to={`/post/${post.id}`} className="font-bold text-lg truncate mb-0.5">
+						<Link to={`/posts/${post.id}`} className="font-bold text-lg truncate mb-0.5">
 							{post.title}
 						</Link>
 						<p className="text-rose-600 font-bold text-xl mb-0.5">

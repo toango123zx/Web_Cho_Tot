@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui';
-import { useClickOutside } from '@/hooks';
+import { useClickOutside, useNotificationListener } from '@/hooks';
 import {
 	Bell,
 	ChevronDown,
@@ -19,6 +19,8 @@ import { AccountLayer } from './AccountLayer';
 import { Avatar } from './AccountAvatar';
 import { useCurrentApp } from '@/components/context/AppContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { NotificationDropdown } from '@/components/commons/header/NotificationDropDown';
+import { useGetNotifications } from '@/services/query/notification';
 
 export function HeaderBottom() {
 	const [isAccountLayerShown, setIsAccountLayerShown] = useState(false);
@@ -28,16 +30,37 @@ export function HeaderBottom() {
 	// const isLoggedIn = false;
 	// const username = 'Đạt Ngô';
 
+	useNotificationListener();
+	const { data } = useGetNotifications(isAuthenticated);
+
+	const notifications = data?.success ? data.data : [];
+	const countNotificationsUnread = notifications.filter(
+		(notification) => !notification.isRead,
+	).length;
+
+	const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
 	const accountLayerRef = useRef<HTMLDivElement>(null);
+	const notificationRef = useRef<HTMLDivElement | null>(null);
 
 	useClickOutside(accountLayerRef, () => {
 		setIsAccountLayerShown(false);
+	});
+
+	useClickOutside(notificationRef, () => {
+		setIsNotificationOpen(false);
 	});
 
 	const handleToggleAccountLayer = (e: React.MouseEvent) => {
 		e.stopPropagation();
 		setIsAccountLayerShown((prev) => !prev);
 	};
+
+	const handleToggleNotification = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		setIsNotificationOpen((prev) => !prev);
+	};
+
 	const navigate = useNavigate();
 
 	return (
@@ -90,10 +113,29 @@ export function HeaderBottom() {
 
 			{/* Right-side actions */}
 			<div className="flex items-center gap-3 sm:gap-6 text-xs sm:text-sm flex-wrap justify-center sm:justify-end">
-				<Bell className="w-4 h-4 sm:w-5 sm:h-5 hover:opacity-70 cursor-pointer" />
-				<MessageSquareText className="w-4 h-4 sm:w-5 sm:h-5 hover:opacity-70 cursor-pointer" />
-				<ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 hover:opacity-70 cursor-pointer" />
-				<div className="inline-flex items-center gap-1 sm:gap-2 cursor-pointer group">
+				<div
+					className="relative order-4 sm:order-none"
+					onClick={handleToggleNotification}
+				>
+					<div className="relative">
+						<Bell className="w-4 h-4 sm:w-5 sm:h-5 hover:opacity-70 cursor-pointer" />
+						{countNotificationsUnread > 0 && (
+							<span className="absolute rounded-full size-5 flex items-center justify-center -top-2.5 -right-2.5 text-xs bg-app-secondary cursor-pointer text-white">
+								{countNotificationsUnread}
+							</span>
+						)}
+					</div>
+					{isNotificationOpen && (
+						<NotificationDropdown
+							notifications={notifications}
+							notificationRef={notificationRef}
+							onClose={() => setIsNotificationOpen(false)}
+						/>
+					)}
+				</div>
+				<MessageSquareText className="order-1 sm:order-none w-4 h-4 sm:w-5 sm:h-5 hover:opacity-70 cursor-pointer" />
+				<ShoppingBag className="order-2 sm:order-none w-4 h-4 sm:w-5 sm:h-5 hover:opacity-70 cursor-pointer" />
+				<div className="order-3 sm:order-none inline-flex items-center gap-1 sm:gap-2 cursor-pointer group">
 					<Newspaper className="w-4 h-4 sm:w-5 sm:h-5 group-hover:opacity-70" />
 					<Link to="/manage-post">
 						<span className="group-hover:opacity-70 hidden sm:inline cursor-pointer">
@@ -104,7 +146,7 @@ export function HeaderBottom() {
 				</div>
 				<div
 					onClick={handleToggleAccountLayer}
-					className="relative inline-flex items-center gap-1 sm:gap-2 cursor-pointer group"
+					className="order-5 sm:order-none relative inline-flex items-center gap-1 sm:gap-2 cursor-pointer group"
 				>
 					{isLoggedIn ? (
 						<Avatar
@@ -133,9 +175,9 @@ export function HeaderBottom() {
 				</div>
 				<Button
 					variant="app-secondary"
-					className="uppercase"
+					className="uppercase order-6 sm:order-none"
 					size="lg"
-					onClick={() => navigate('/post')}
+					onClick={() => navigate('/posts')}
 				>
 					<SquarePen className="w-4 h-4 sm:w-5 sm:h-5" />
 					<span className="hidden sm:inline">Đăng tin</span>

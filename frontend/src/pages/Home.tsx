@@ -79,11 +79,11 @@ export default function HomePage() {
 							<div
 								key={post.id}
 								className="cursor-pointer group"
-								onClick={() => navigate(`/post/${post.id}`)}
+								onClick={() => navigate(`/posts/${post.id}`)}
 								role="button"
 								tabIndex={0}
 								onKeyDown={(e) => {
-									if (e.key === 'Enter') navigate(`/post/${post.id}`);
+									if (e.key === 'Enter') navigate(`/posts/${post.id}`);
 								}}
 							>
 								<div className="relative group overflow-hidden">
