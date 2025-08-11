@@ -31,7 +31,7 @@ export function HeaderBottom() {
 	// const username = 'Đạt Ngô';
 
 	useNotificationListener();
-	const { data } = useGetNotifications();
+	const { data } = useGetNotifications(isAuthenticated);
 
 	const notifications = data?.success ? data.data : [];
 	const countNotificationsUnread = notifications.filter(
