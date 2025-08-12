@@ -1,0 +1,116 @@
+enum RoleUserEnum {
+    ADMIN @map("admin")
+    USER  @map("user")
+
+    @@map("Role_User_Enum")
+}
+
+enum GenderUserEnum {
+    MALE   @map("Nam")
+    FEMALE @map("Nữ")
+    OTHER  @map("Khác")
+
+    @@map("Gender_User_Enum")
+}
+
+model users {
+    id          String          @id @default(uuid())
+    name        String          @unique
+    role        RoleUserEnum    @default(USER)
+    email       String          @unique
+    address     String?
+    phoneNumber String?         @unique @map("phone_number")
+    avatar      String?         @default("https://i.pinimg.com/1200x/cd/4b/d9/cd4bd9b0ea2807611ba3a67c331bff0b.jpg")
+    bio         String?
+    gender      GenderUserEnum?
+    dob         DateTime?       @map("date_of_birth")
+    balance     Int?            @default(0)
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    createdAt   DateTime        @default(now()) @map("created_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt   DateTime?       @map("deleted_at")
+
+    accounts              accounts?
+    socialAccounts        socialAccounts?
+    tokens                tokens[]
+    posts                 posts[]
+    postArchives          postArchives[]
+    chatRoomsAsFirstUser  chatRooms[]     @relation(name: "FirstUser")
+    chatRoomsAsSecondUser chatRooms[]     @relation(name: "SecondUser")
+    messages              messages[]
+    notifications         notifications[]
+    transaction           transaction[]
+    otps                  otps[]
+
+    @@map("Users")
+}
+
+model accounts {
+    id        String   @id @default(uuid())
+    /// @DtoUpdateHidden
+    userId    String   @unique @map("user_id")
+    /// @DtoRelationCanCreateOnCreate
+    user      users    @relation(fields: [userId], references: [id])
+    password  String
+    salt      String
+    verify    Boolean  @default(false)
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    createdAt DateTime @default(now()) @map("created_at")
+
+    @@map("Accounts")
+}
+
+model socialAccounts {
+    id       String @id @default(uuid())
+    /// @DtoUpdateHidden
+    userId   String @unique @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    /// @DtoRelationCanCreateOnCreate
+    user     users  @relation(fields: [userId], references: [id])
+    googleId String @map("google_id")
+
+    @@map("Social_Accounts")
+}
+
+model tokens {
+    id           String @id @default(uuid())
+    /// @DtoUpdateHidden
+    userId       String @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    /// @DtoRelationCanConnectOnUpdate
+    user         users  @relation(fields: [userId], references: [id])
+    refreshToken String @unique @map("refresh_token")
+
+    @@map("Tokens")
+}
+
+model notifications {
+    id        String   @id @default(uuid())
+    /// @DtoUpdateHidden
+    userId    String   @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    user      users    @relation(fields: [userId], references: [id])
+    content   String
+    url       String?
+    isRead    Boolean  @default(false) @map("is_read")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    createdAt DateTime @default(now()) @map("created_at")
+
+    @@map("Notifications")
+}
+
+model otps {
+    id        String   @id @default(uuid())
+    /// @DtoUpdateHidden
+    userId    String   @unique @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    user      users    @relation(fields: [userId], references: [id])
+    otp       String   @db.Char(6)
+    expiresAt DateTime @map("expires_at")
+
+    @@map("Otps")
+}

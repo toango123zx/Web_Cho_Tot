@@ -1,0 +1,4 @@
+export const SWAGGER_API_PATH = 'api';
+export const SWAGGER_API_TITLE = 'API';
+export const SWAGGER_API_DESCRIPTION = 'Cho Tot API description';
+export const SWAGGER_API_VERSION = '1.0';
