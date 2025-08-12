@@ -20,7 +20,7 @@ export const FILTERABLE_STATUS = ['PENDING', 'PUBLISHED', 'EXPIRED'] as const;
 export type FilterablePostStatus = (typeof FILTERABLE_STATUS)[number];
 
 export const AGE_VALUES = ['PUPPY', 'YOUNG_DOG', 'ADULT_DOG', 'OTHER'] as const;
-export const SIZE_VALUES = ['SMALL', 'MEDIUM', 'MEDIUM', 'LARGE'] as const;
+export const SIZE_VALUES = ['MINI', 'SMALL', 'MEDIUM', 'LARGE'] as const;
 
 export const SORT_BY_VALUES = ['createdAt', 'price', 'title'] as const;
 export const SORT_ORDER_VALUES = ['asc', 'desc'] as const;
