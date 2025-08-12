@@ -8,11 +8,17 @@ import { UserRepository } from './../users/users.repository';
 import { ChatRoomsController } from './chatRooms.controller';
 import { ChatRoomsRepository } from './chatRooms.repository';
 import { ChatRoomCommandHandlers } from './commands/handlers';
+import { ChatRoomQueryHandlers } from './queries/handlers';
 
 @Module({
 	imports: [CqrsModule, DatabaseModule, AuthModule],
 	controllers: [ChatRoomsController],
-	providers: [...ChatRoomCommandHandlers, UserRepository, ChatRoomsRepository],
+	providers: [
+		...ChatRoomQueryHandlers,
+		...ChatRoomCommandHandlers,
+		UserRepository,
+		ChatRoomsRepository,
+	],
 	exports: [],
 })
 export class ChatRoomsModule {}

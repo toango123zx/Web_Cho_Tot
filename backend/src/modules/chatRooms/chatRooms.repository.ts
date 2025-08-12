@@ -13,11 +13,13 @@ export class ChatRoomsRepository {
 	async findChatRooms({
 		chatRoomId,
 		chatRoomMember = [],
+		userName,
 		pagination = {} as IPaginationQuery,
 		filter,
 	}: {
 		chatRoomId?: string[];
 		chatRoomMember?: string[];
+		userName?: string;
 		pagination?: IPaginationQuery;
 		filter?: ChatRoomOrderByDto;
 	}): Promise<[ChatRoomsEntity[], number]> {
@@ -27,16 +29,42 @@ export class ChatRoomsRepository {
 
 		const [chatRooms, totalRecords] = await Promise.all([
 			this.prismaService.chatRooms.findMany({
+				include: {
+					firstUser: true,
+					secondUser: true,
+				},
 				where: {
 					id: {
 						in: chatRoomId,
 					},
-					firstUserId: {
-						in: chatRoomMember,
-					},
-					secondUserId: {
-						in: chatRoomMember,
-					},
+					OR: [
+						{
+							firstUserId: {
+								in: chatRoomMember,
+							},
+							secondUserId: {
+								in: chatRoomMember,
+							},
+						},
+						chatRoomMember[0] === chatRoomMember[1]
+							? {
+									OR: [
+										{
+											firstUserId: chatRoomMember[0],
+											secondUser: {
+												name: userName,
+											},
+										},
+										{
+											secondUserId: chatRoomMember[0],
+											firstUser: {
+												name: userName,
+											},
+										},
+									],
+								}
+							: undefined,
+					],
 				},
 				skip: pagination.skip,
 				take: pagination.take,

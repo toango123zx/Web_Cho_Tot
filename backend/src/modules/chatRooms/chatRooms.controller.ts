@@ -1,8 +1,8 @@
-import { Body, Controller, HttpException, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Query } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
-import { HttpResponseBodyDto } from 'src/common';
+import { HttpResponseBodyDto, PaginationDto } from 'src/common';
 import { ChatRoomsEntity } from 'src/models';
 
 import { Auth } from '../auth/decorators';
@@ -10,7 +10,12 @@ import { MyInformation } from '../users/decorators';
 import { UserInformationDto } from '../users/dtos';
 
 import { CreateChatRoomCommand } from './commands/implements';
-import { CreateChatRoomRequestDto } from './dtos';
+import {
+	ChatRoomsFilterDto,
+	CreateChatRoomRequestDto,
+	GetChatRoomsResponseDto,
+} from './dtos';
+import { GetChatRoomsByUserIdQuery } from './queries/implements';
 
 @ApiTags('ChatRoom')
 @Controller('chat-rooms')
@@ -19,6 +24,18 @@ export class ChatRoomsController {
 		private readonly commandBus: CommandBus,
 		private readonly queryBus: QueryBus,
 	) {}
+
+	@Auth()
+	@Get()
+	async getChatRoomsByUserId(
+		@MyInformation() userInformation: UserInformationDto,
+		@Query() pagination: PaginationDto,
+		@Query() filter?: ChatRoomsFilterDto,
+	): Promise<HttpResponseBodyDto<GetChatRoomsResponseDto | HttpException>> {
+		return this.queryBus.execute(
+			new GetChatRoomsByUserIdQuery(userInformation, pagination, filter),
+		);
+	}
 
 	@Auth()
 	@Post()
