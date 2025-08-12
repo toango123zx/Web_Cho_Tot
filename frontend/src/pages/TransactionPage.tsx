@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { GoodCoinIcon, OderHistoryIcon, TransactionIcon } from '@/assets/icons';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { DepositModal } from '@/components/modals/DepositModal';
 
 const services = [
 	{
@@ -8,6 +10,7 @@ const services = [
 		title: 'Nạp Đồng Tốt',
 		color: 'text-yellow-600 bg-yellow-100',
 		isSvg: true,
+		action: 'deposit',
 	},
 	{
 		icon: OderHistoryIcon,
@@ -18,6 +21,14 @@ const services = [
 ];
 
 export default function TransactionsPage() {
+	const [openDeposit, setOpenDeposit] = useState(false);
+
+	const handleServiceClick = (service: any) => {
+		if (service.action === 'deposit') {
+			setOpenDeposit(true);
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-gray-50">
 			{/* Dashboard Header */}
@@ -44,6 +55,7 @@ export default function TransactionsPage() {
 									<button
 										key={index}
 										className="flex flex-col items-center p-2 rounded-lg transition-colors cursor-pointer"
+										onClick={() => handleServiceClick(service)}
 									>
 										<div className={`p-3 rounded-full ${service.color} mb-2`}>
 											{service.isSvg ? (
@@ -60,6 +72,7 @@ export default function TransactionsPage() {
 							</div>
 						</Card>
 
+						{/* Account Detail */}
 						<Card className="p-6">
 							<h2 className="text-lg font-semibold mb-4">Chi tiết tài khoản</h2>
 							<div className="flex items-center justify-between mb-4">
@@ -111,6 +124,9 @@ export default function TransactionsPage() {
 					</div>
 				</div>
 			</div>
+
+			{/* Deposit Modal */}
+			<DepositModal isOpen={openDeposit} onClose={() => setOpenDeposit(false)} />
 		</div>
 	);
 }
