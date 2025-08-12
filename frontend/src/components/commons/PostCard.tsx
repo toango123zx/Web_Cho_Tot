@@ -236,7 +236,6 @@ interface IPostSkeletonProps {
 function PostCardSkeleton({ viewMode }: IPostSkeletonProps) {
 	return (
 		<Card className={`${viewMode === 'list' ? 'flex flex-row' : ''} animate-pulse`}>
-			{/* Hình */}
 			<div className={viewMode === 'list' ? 'w-48 flex-shrink-0' : ''}>
 				<div
 					className={`bg-gray-200 ${
@@ -247,7 +246,6 @@ function PostCardSkeleton({ viewMode }: IPostSkeletonProps) {
 				/>
 			</div>
 
-			{/* Nội dung */}
 			<div className={`${viewMode === 'list' ? 'flex-1 flex flex-col' : ''}`}>
 				<CardContent className={`${viewMode === 'list' ? 'p-4 flex-1' : 'p-4'}`}>
 					<div className="h-5 bg-gray-200 rounded w-3/4 mb-2" />

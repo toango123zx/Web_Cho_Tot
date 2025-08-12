@@ -7,6 +7,7 @@ import {
 	IsOptional,
 	IsPositive,
 	IsString,
+	IsUUID,
 	Min,
 	Validate,
 	ValidationArguments,
@@ -15,12 +16,11 @@ import {
 } from 'class-validator';
 import { GetApiConfig } from 'src/configs';
 
-// Các giá trị hợp lệ (không có DELETED)
 export const FILTERABLE_STATUS = ['PENDING', 'PUBLISHED', 'EXPIRED'] as const;
 export type FilterablePostStatus = (typeof FILTERABLE_STATUS)[number];
 
-export const AGE_VALUES = ['BABY', 'YOUNG', 'ADULT', 'SENIOR'] as const; // khớp với Prisma enum của bạn
-export const SIZE_VALUES = ['SMALL', 'MEDIUM', 'LARGE'] as const; // khớp với Prisma enum của bạn
+export const AGE_VALUES = ['PUPPY', 'YOUNG_DOG', 'ADULT_DOG', 'OTHER'] as const;
+export const SIZE_VALUES = ['SMALL', 'MEDIUM', 'MEDIUM', 'LARGE'] as const;
 
 export const SORT_BY_VALUES = ['createdAt', 'price', 'title'] as const;
 export const SORT_ORDER_VALUES = ['asc', 'desc'] as const;
@@ -38,14 +38,14 @@ class IsPriceRangeValid implements ValidatorConstraintInterface {
 }
 
 export class FilterPostDto {
-	@ApiPropertyOptional({ type: 'number', default: 1 })
+	@ApiPropertyOptional({ type: 'number', default: GetApiConfig.defaultPage })
 	@IsOptional()
 	@Type(() => Number)
 	@IsInt()
 	@IsPositive()
 	page: number = GetApiConfig.defaultPage;
 
-	@ApiPropertyOptional({ type: 'number', default: 20 })
+	@ApiPropertyOptional({ type: 'number', default: GetApiConfig.defaultLimitPage })
 	@IsOptional()
 	@Type(() => Number)
 	@IsInt()
@@ -64,13 +64,18 @@ export class FilterPostDto {
 	@ApiPropertyOptional({ description: 'Search term for title and description' })
 	@IsOptional()
 	@IsString()
-	@Transform(({ value }) => value?.trim())
+	@Transform(({ value }) =>
+		typeof value === 'string' ? value.trim() || undefined : value,
+	)
 	search?: string;
 
 	@ApiPropertyOptional({ description: 'Filter by category ID' })
 	@IsOptional()
-	@IsString()
-	categoryId?: string; // nếu là UUID: đổi sang @IsUUID()
+	@IsUUID()
+	@Transform(({ value }) =>
+		typeof value === 'string' ? value.trim() || undefined : value,
+	)
+	categoryId?: string;
 
 	@ApiPropertyOptional({
 		enum: AGE_VALUES,
@@ -108,19 +113,25 @@ export class FilterPostDto {
 	@ApiPropertyOptional({ description: 'Filter by location/address' })
 	@IsOptional()
 	@IsString()
-	@Transform(({ value }) => value?.trim())
+	@Transform(({ value }) =>
+		typeof value === 'string' ? value.trim() || undefined : value,
+	)
 	address?: string;
 
 	@ApiPropertyOptional({ description: 'Filter by district' })
 	@IsOptional()
 	@IsString()
-	@Transform(({ value }) => value?.trim())
+	@Transform(({ value }) =>
+		typeof value === 'string' ? value.trim() || undefined : value,
+	)
 	district?: string;
 
 	@ApiPropertyOptional({ description: 'Filter by province' })
 	@IsOptional()
 	@IsString()
-	@Transform(({ value }) => value?.trim())
+	@Transform(({ value }) =>
+		typeof value === 'string' ? value.trim() || undefined : value,
+	)
 	province?: string;
 
 	@ApiPropertyOptional({ enum: SORT_BY_VALUES, description: 'Sort field' })

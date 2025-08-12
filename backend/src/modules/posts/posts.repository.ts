@@ -120,7 +120,7 @@ export class PostsRepository {
 
 		// Determine sort order
 		const sortBy = filterPost.sortBy || 'createdAt';
-		const sortOrder = filterPost.sortOrder || 'asc';
+		const sortOrder = filterPost.sortOrder || 'desc';
 		const orderBy = {
 			[sortBy]: sortOrder,
 		};
@@ -334,7 +334,7 @@ export class PostsRepository {
 
 		// Determine sort order
 		const sortBy = filterPost.sortBy || 'createdAt';
-		const sortOrder = filterPost.sortOrder || 'asc';
+		const sortOrder = filterPost.sortOrder || 'desc';
 		const orderBy = {
 			[sortBy]: sortOrder,
 		};

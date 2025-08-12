@@ -40,7 +40,6 @@ export default function UserManagement() {
 				<UserTable onView={handleViewUser} onEdit={openEditForm} />
 			</div>
 
-			{/* Form thêm / cập nhật */}
 			<CreateOrUpdateUserForm
 				open={formOpen}
 				isEditing={isEditing}
@@ -52,7 +51,6 @@ export default function UserManagement() {
 				onSuccess={() => {}}
 			/>
 
-			{/* Dialog chi tiết người dùng */}
 			<UserDetail
 				user={selectedUser}
 				open={detailOpen}

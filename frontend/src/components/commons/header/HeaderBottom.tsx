@@ -106,7 +106,7 @@ export function HeaderBottom() {
 
 							<div className="absolute top-0 sm:left-full w-full sm:w-[250px] md:w-[300px] hidden group-hover/menu:flex rounded-sm z-10">
 								<div className="flex flex-col bg-white rounded-sm shadow-lg w-full overflow-y-auto h-[300px]">
-									{categories.length === 0 ? (
+									{!isLoading && categories.length === 0 ? (
 										<div className="inline-flex items-center justify-between bg-white rounded-sm hover:bg-gray-300/70 px-3 sm:px-4 py-2">
 											<span className="inline-flex items-center gap-2 sm:gap-3">
 												<span className="text-xs sm:text-sm line-clamp-1">

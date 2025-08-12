@@ -52,7 +52,7 @@ export const usePostQueryWithPagination = (params?: {
 
 export const useInfinitePostQuery = (params: UseInfinitePostParams = {}) => {
 	const {
-		limit = 20, // default nếu bạn muốn
+		limit = 20,
 		search,
 		status,
 		categoryId,
@@ -67,7 +67,6 @@ export const useInfinitePostQuery = (params: UseInfinitePostParams = {}) => {
 		sortOrder,
 	} = params;
 
-	// Trimming bỏ undefined/null
 	const filters = trimData<typeof params>({
 		search,
 		status,

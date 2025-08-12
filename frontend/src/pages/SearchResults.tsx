@@ -125,7 +125,7 @@ export default function SearchResults() {
 	}, [minInput, maxInput]);
 
 	const handleApply = () => {
-		if (priceError) return; // chặn cập nhật URL khi đang lỗi
+		if (priceError) return;
 		setSearchParams((prev) => {
 			const next = new URLSearchParams(prev);
 			writeOrDelete(next, 'categoryId', catInput, (v) => !v || v === 'all');
