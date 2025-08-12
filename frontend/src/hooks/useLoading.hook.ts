@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export function useLoading(initialLoading = false) {
+export function useLoading() {
 	const [loading, setLoading] = useState(false);
 
 	const execute = async (fn: () => Promise<void>) => {
