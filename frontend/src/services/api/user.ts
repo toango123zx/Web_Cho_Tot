@@ -8,9 +8,13 @@ export const getUsersAPI = async () => {
 	return res.data as IModelPaginate<IUser[]>;
 };
 
-export const getUsersPaginateAPI = async (page: number, limit: number) => {
+export const getUsersPaginateAPI = async (
+	page: number,
+	limit: number,
+	search?: string,
+) => {
 	const res = await axios.get('/users', {
-		params: { page, limit },
+		params: { page, limit, search },
 		withCredentials: true,
 	});
 

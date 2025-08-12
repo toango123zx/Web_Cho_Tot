@@ -119,34 +119,33 @@ export default function CreateOrUpdateUserForm({
 		return isValid;
 	};
 
+	const handleUploadImage = async () => {
+		if (file) {
+			const res = await uploadFileToCloudinary(file);
+			if (res.success) {
+				return res.data.secure_url;
+			} else {
+				toast.error(res.message);
+				return '';
+			}
+		}
+	};
+
 	const handleSubmit = async () => {
 		await uploadImage(async () => {
-			let avatar = formData.avatar;
-			if (file) {
-				const res = await uploadFileToCloudinary(file);
-				if (res.success) {
-					avatar = res.data.secure_url;
-				} else {
-					toast.error(res.message);
-				}
-			}
-
 			if (isEditing) {
-				handleUpdateUser(avatar);
+				await handleUpdateUser();
 			} else {
 				handleCreateUser();
 			}
-
-			resetFormData();
-			resetErrors();
-			setFile(undefined);
 		});
 	};
 
-	const handleUpdateUser = (avatar: string) => {
+	const handleUpdateUser = async () => {
 		const isValid = handleValidateForm(updateUserValidationSchema);
 		if (!initialData?.id || !isValid) return;
 
+		const avatar = (await handleUploadImage()) || formData.avatar;
 		const { email, password, role, ...trimmedFormData } =
 			trimData<typeof formData>(formData);
 		updateUser.mutate(
@@ -163,7 +162,13 @@ export default function CreateOrUpdateUserForm({
 				},
 			},
 			{
-				onSuccess: onClose,
+				onSuccess: (res) => {
+					if (res.data.success) {
+						onClose();
+						resetErrors();
+						setFile(undefined);
+					}
+				},
 			},
 		);
 	};
@@ -182,7 +187,12 @@ export default function CreateOrUpdateUserForm({
 				...trimmedFormData,
 			},
 			{
-				onSuccess: onClose,
+				onSuccess: (res) => {
+					if (!res.data.success) return;
+
+					onClose();
+					resetFormData();
+				},
 			},
 		);
 	};

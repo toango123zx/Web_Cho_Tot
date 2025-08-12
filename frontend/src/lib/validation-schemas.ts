@@ -71,9 +71,11 @@ export const updateUserValidationSchema: ValidationSchema<IUserUpdatePayload> = 
 	},
 	phoneNumber: {
 		fieldName: 'Số điện thoại',
-		errorMessage: 'Vui lòng nhập số điện thoại hợp lệ',
+		errorMessage: 'Vui lòng nhập số điện thoại hợp lệ (chỉ toàn số và 10 kí tự)',
 		customValidate: ({ phoneNumber }) => {
-			return !!Number(phoneNumber);
+			if (!phoneNumber) return true;
+
+			return !!Number(phoneNumber) && phoneNumber.length === 10;
 		},
 	},
 };

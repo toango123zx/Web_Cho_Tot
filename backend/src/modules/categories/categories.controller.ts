@@ -38,7 +38,9 @@ export class CategoriesController {
 	async getCategories(
 		@Query() pagination: PaginationDto,
 	): Promise<HttpResponseBodyDto<CategoryDto[] | HttpException>> {
-		return this.queryBus.execute(new GetCategoriesQuery(pagination));
+		return this.queryBus.execute(
+			new GetCategoriesQuery(pagination, pagination.search),
+		);
 	}
 
 	@Get('/:categoryId')

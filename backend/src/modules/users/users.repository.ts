@@ -9,22 +9,53 @@ import { UpdateUserDto } from 'src/modules/users/dtos';
 export class UserRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async findUsers(pagination: IPaginationQuery): Promise<[UsersEntity[], number]> {
+	async findUsers(
+		pagination: IPaginationQuery,
+		search?: string,
+	): Promise<[UsersEntity[], number]> {
+		const whereCondition = {
+			deletedAt: null,
+			...(search && {
+				OR: [
+					{
+						name: {
+							contains: search,
+							mode: 'insensitive' as const,
+						},
+					},
+					{
+						email: {
+							contains: search,
+							mode: 'insensitive' as const,
+						},
+					},
+					{
+						phoneNumber: {
+							contains: search,
+							mode: 'insensitive' as const,
+						},
+					},
+					{
+						address: {
+							contains: search,
+							mode: 'insensitive' as const,
+						},
+					},
+				],
+			}),
+		};
+
 		const [users, totalRecords] = await Promise.all([
 			this.prismaService.users.findMany({
-				where: {
-					deletedAt: null,
-				},
+				where: whereCondition,
 				skip: pagination.skip,
 				take: pagination.take,
 				orderBy: {
-					createdAt: 'asc',
+					createdAt: 'desc',
 				},
 			}),
 			this.prismaService.users.count({
-				where: {
-					deletedAt: null,
-				},
+				where: whereCondition,
 			}),
 		]);
 		return [users, totalRecords];

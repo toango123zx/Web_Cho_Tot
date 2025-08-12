@@ -4,20 +4,98 @@ import { updatePostByIdAPI } from '../api/post';
 
 import { deletePostAPI, fetchPostsByUserId } from './../api/post';
 import { QUERY_KEY } from '@/config/key';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import { createPostAPI, fetchPostByIdAPI, postApi } from '../api/post';
 import { toggleArchivePostAPI } from '../api/post';
+import { trimData } from '@/helper';
+
+interface UseInfinitePostParams {
+	limit?: number;
+	search?: string;
+	status?: IPostStatus;
+	categoryId?: string;
+	minPrice?: number;
+	maxPrice?: number;
+	age?: string;
+	size?: string;
+	address?: string;
+	district?: string;
+	province?: string;
+	sortBy?: 'createdAt' | 'price' | 'title';
+	sortOrder?: 'asc' | 'desc';
+}
 
 export const usePostQueryWithPagination = (params?: {
 	page?: number;
 	limit?: number;
 	search?: string;
 	status?: IPostStatus;
+	categoryId?: string;
+	minPrice?: number;
+	maxPrice?: number;
+	age?: string;
+	size?: string;
+	address?: string;
+	district?: string;
+	province?: string;
+	sortBy?: 'createdAt' | 'price' | 'title';
+	sortOrder?: 'asc' | 'desc';
 }) => {
-	return useQuery({
+	const trimmedParams = trimData<typeof params>(params as Record<string, unknown>);
+	const query = useQuery({
 		queryKey: QUERY_KEY.list(params),
-		queryFn: () => postApi.getPosts(params),
-		staleTime: 1000 * 60 * 5, // 5 minutes
+		queryFn: () => postApi.getPosts(trimmedParams),
+		staleTime: 1000 * 60 * 5, // Reduce stale time to prevent caching issues
+	});
+	return query;
+};
+
+export const useInfinitePostQuery = (params: UseInfinitePostParams = {}) => {
+	const {
+		limit = 20,
+		search,
+		status,
+		categoryId,
+		minPrice,
+		maxPrice,
+		age,
+		size,
+		address,
+		district,
+		province,
+		sortBy,
+		sortOrder,
+	} = params;
+
+	const filters = trimData<typeof params>({
+		search,
+		status,
+		categoryId,
+		minPrice,
+		maxPrice,
+		age,
+		size,
+		address,
+		district,
+		province,
+		sortBy,
+		sortOrder,
+	});
+
+	return useInfiniteQuery({
+		queryKey: [QUERY_KEY.list(), filters],
+		staleTime: 1000 * 60 * 5,
+		queryFn: ({ pageParam = 1 }) =>
+			postApi.getPosts({ ...filters, page: pageParam, limit }),
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) => {
+			if (!lastPage.success) return undefined;
+			const { pagination } = lastPage;
+
+			return pagination.currentPage < pagination.totalPages
+				? pagination.currentPage + 1
+				: undefined;
+		},
 	});
 };
 

@@ -1,5 +1,5 @@
 import { Eye, Loader, Pencil, Trash } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
@@ -12,9 +12,10 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { useUserQueryWithPagination, useUserMutations } from '@/services/query';
-import { GlobalPopup, useGlobalPopup } from '../popup';
+import { useDebounce } from '@/hooks';
+import { useUserMutations, useUserQueryWithPagination } from '@/services/query';
 import { toast } from 'sonner';
+import { GlobalPopup, useGlobalPopup } from '../popup';
 
 type Props = {
 	onView: (user: IUser) => void;
@@ -29,23 +30,15 @@ export function UserTable({ onView, onEdit }: Props) {
 	const { deleteUser } = useUserMutations();
 
 	const search = searchParams.get('search') || '';
+	const searchDebounced = useDebounce(search, 300);
 	const page = parseInt(searchParams.get('page') || '1', 10);
 	const { popupState, confirm, hidePopup } = useGlobalPopup();
 
 	const { data: users, isFetching } = useUserQueryWithPagination({
 		page,
 		limit: ITEMS_PER_PAGE,
+		search: searchDebounced,
 	});
-
-	const filtered = useMemo(() => {
-		if (!users?.success) return [];
-
-		return users.data.filter(
-			(user) =>
-				user.name.toLowerCase().includes(search.toLowerCase()) ||
-				user.email.toLowerCase().includes(search.toLowerCase()),
-		);
-	}, [users, search]);
 
 	const setSearch = (value: string) => {
 		setSearchParams((prev) => {
@@ -84,7 +77,7 @@ export function UserTable({ onView, onEdit }: Props) {
 				onClose={hidePopup}
 			/>
 			<Input
-				placeholder="Tìm kiếm tên hoặc email..."
+				placeholder="Tìm kiếm tên, email hoặc số điện thoại..."
 				value={search}
 				onChange={(e) => setSearch(e.target.value)}
 				className="mb-4"
@@ -112,60 +105,70 @@ export function UserTable({ onView, onEdit }: Props) {
 										</div>
 									</TableCell>
 								</TableRow>
-							) : filtered.length === 0 ? (
-								<TableRow>
-									<TableCell colSpan={6}>
-										<div className="text-center h-24 flex items-center justify-center">
-											Không tìm thấy người dùng
-										</div>
-									</TableCell>
-								</TableRow>
-							) : (
-								filtered.map((user) => (
-									<TableRow key={user.id}>
-										<TableCell>
-											<img
-												src={user.avatar}
-												alt="avatar"
-												className="w-8 h-8 rounded-full object-cover"
-											/>
-										</TableCell>
-										<TableCell>{user.name}</TableCell>
-										<TableCell>{user.email}</TableCell>
-										<TableCell className="capitalize">{user.role}</TableCell>
-										<TableCell>{user.balance.toLocaleString()}₫</TableCell>
-										<TableCell className="text-right space-x-1">
-											<Button
-												disabled={deleteUser.isPending}
-												size="icon"
-												variant="outline"
-												onClick={() => onView(user)}
-											>
-												<Eye className="w-4 h-4" />
-											</Button>
-											<Button
-												disabled={deleteUser.isPending}
-												size="icon"
-												variant="outline"
-												onClick={() => onEdit(user)}
-											>
-												<Pencil className="w-4 h-4" />
-											</Button>
-											<Button
-												disabled={deleteUser.isPending}
-												size="icon"
-												variant="destructive"
-												onClick={() => handleDeleteUser(user)}
-											>
-												{deletingUserId === user.id ? (
-													<Loader className="animate-spin" />
-												) : (
-													<Trash className="w-4 h-4" />
-												)}
-											</Button>
+							) : users?.success ? (
+								users.data.length === 0 ? (
+									<TableRow>
+										<TableCell colSpan={6}>
+											<div className="text-center h-24 flex items-center justify-center">
+												Không tìm thấy người dùng
+											</div>
 										</TableCell>
 									</TableRow>
-								))
+								) : (
+									users.data.map((user) => (
+										<TableRow key={user.id}>
+											<TableCell>
+												<img
+													src={user.avatar}
+													alt="avatar"
+													className="w-8 h-8 rounded-full object-cover"
+												/>
+											</TableCell>
+											<TableCell>{user.name}</TableCell>
+											<TableCell>{user.email}</TableCell>
+											<TableCell className="capitalize">{user.role}</TableCell>
+											<TableCell>{user.balance.toLocaleString()}₫</TableCell>
+											<TableCell className="text-right space-x-1">
+												<Button
+													disabled={deleteUser.isPending}
+													size="icon"
+													variant="outline"
+													onClick={() => onView(user)}
+												>
+													<Eye className="w-4 h-4" />
+												</Button>
+												<Button
+													disabled={deleteUser.isPending}
+													size="icon"
+													variant="outline"
+													onClick={() => onEdit(user)}
+												>
+													<Pencil className="w-4 h-4" />
+												</Button>
+												<Button
+													disabled={deleteUser.isPending}
+													size="icon"
+													variant="destructive"
+													onClick={() => handleDeleteUser(user)}
+												>
+													{deletingUserId === user.id ? (
+														<Loader className="animate-spin" />
+													) : (
+														<Trash className="w-4 h-4" />
+													)}
+												</Button>
+											</TableCell>
+										</TableRow>
+									))
+								)
+							) : (
+								<div>
+									<TableRow>
+										<TableCell colSpan={6} className="text-center">
+											{users?.message || 'Lỗi khi tải người dùng'}
+										</TableCell>
+									</TableRow>
+								</div>
 							)}
 						</TableBody>
 					</Table>

@@ -20,7 +20,10 @@ export class GetUsersHandler implements IQueryHandler<GetUsersQuery> {
 			take: query.pagination.limit,
 		};
 
-		const [users, totalRecords] = await this.userRepository.findUsers(pagination);
+		const [users, totalRecords] = await this.userRepository.findUsers(
+			pagination,
+			query.search,
+		);
 
 		const totalPage = Math.ceil(totalRecords / query.pagination.limit);
 		return {

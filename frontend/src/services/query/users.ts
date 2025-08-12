@@ -13,12 +13,13 @@ import {
 interface UserQueryProps {
 	page: number;
 	limit: number;
+	search?: string;
 }
 
-export function useUserQueryWithPagination({ page, limit }: UserQueryProps) {
+export function useUserQueryWithPagination({ page, limit, search }: UserQueryProps) {
 	const query = useQuery({
-		queryKey: QUERY_KEY.getUserPaginate(page),
-		queryFn: () => getUsersPaginateAPI(page, limit),
+		queryKey: QUERY_KEY.getUserPaginate(page, search || ''),
+		queryFn: () => getUsersPaginateAPI(page, limit, search),
 		staleTime: 1000 * 60 * 5, // 5 minutes
 	});
 
@@ -30,7 +31,7 @@ export function useUserMutations() {
 
 	const createUser = useMutation({
 		mutationFn: createUserAPI,
-		onSuccess: (res: any) => {
+		onSuccess: ({ data: res }: any) => {
 			if (res.success) {
 				toast.success(res.message || 'Tạo người dùng thành công');
 				queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAllUser() });
@@ -66,7 +67,7 @@ export function useUserMutations() {
 	const deleteUser = useMutation({
 		mutationFn: deleteUserAPI,
 		onSuccess: (res: any) => {
-			if (res.success) {
+			if (res.data.success) {
 				toast.success(res.message || 'Xoá người dùng thành công');
 				queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAllUser() });
 			} else {

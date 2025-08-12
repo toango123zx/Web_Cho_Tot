@@ -46,7 +46,7 @@ export class UsersController {
 	async getUsers(
 		@Query() pagination: PaginationDto,
 	): Promise<HttpResponseBodyDto<UsersDto[] | HttpException>> {
-		return this.queryBus.execute(new GetUsersQuery(pagination));
+		return this.queryBus.execute(new GetUsersQuery(pagination, pagination.search));
 	}
 
 	@Auth()

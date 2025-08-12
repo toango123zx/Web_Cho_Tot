@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { PostStatusEnum } from '@prisma/client';
+import { AgePostEnum, PostStatusEnum, SizePostEnum } from '@prisma/client';
 import { PostsEntity } from 'src/models';
 import { PrismaService } from 'src/modules/database/services';
 import { CreatePostDto, PostsDto, UpdatePostDto } from 'src/modules/posts/dtos';
@@ -9,6 +9,17 @@ type PostFilter = {
 	skip: number;
 	take: number;
 	status?: Exclude<PostStatusEnum, 'DELETED'>;
+	search?: string;
+	categoryId?: string;
+	age?: string;
+	size?: string;
+	minPrice?: number;
+	maxPrice?: number;
+	address?: string;
+	district?: string;
+	province?: string;
+	sortBy?: string;
+	sortOrder?: string;
 };
 
 type PostResult<T extends boolean> = T extends true ? PostsDto : PostsEntity;
@@ -16,6 +27,52 @@ type PostResult<T extends boolean> = T extends true ? PostsDto : PostsEntity;
 @Injectable()
 export class PostsRepository {
 	constructor(private readonly prismaService: PrismaService) {}
+
+	private buildAddressFilter(filterPost: PostFilter): object {
+		const addressConditions = [];
+
+		// If specific address search is provided
+		if (filterPost.address) {
+			addressConditions.push({
+				address: {
+					contains: filterPost.address,
+					mode: 'insensitive' as const,
+				},
+			});
+		}
+
+		// If district is specified, search for it in the address
+		if (filterPost.district) {
+			addressConditions.push({
+				address: {
+					contains: filterPost.district,
+					mode: 'insensitive' as const,
+				},
+			});
+		}
+
+		// If province is specified, search for it in the address
+		if (filterPost.province) {
+			addressConditions.push({
+				address: {
+					contains: filterPost.province,
+					mode: 'insensitive' as const,
+				},
+			});
+		}
+
+		// Return the appropriate filter condition
+		if (addressConditions.length === 0) {
+			return {};
+		} else if (addressConditions.length === 1) {
+			return addressConditions[0];
+		} else {
+			// Multiple address conditions - all must match (AND logic)
+			return {
+				AND: addressConditions,
+			};
+		}
+	}
 
 	async findPosts(
 		filterPost: PostFilter,
@@ -25,6 +82,47 @@ export class PostsRepository {
 			deletedAt: null,
 			...(userId ? { userId } : {}),
 			...(filterPost.status ? { status: filterPost.status } : {}),
+			...(filterPost.categoryId ? { categoryId: filterPost.categoryId } : {}),
+			...(filterPost.age ? { age: filterPost.age as AgePostEnum } : {}),
+			...(filterPost.size ? { size: filterPost.size as SizePostEnum } : {}),
+			...this.buildAddressFilter(filterPost),
+			...(filterPost.minPrice !== undefined || filterPost.maxPrice !== undefined
+				? {
+						price: {
+							...(filterPost.minPrice !== undefined
+								? { gte: filterPost.minPrice }
+								: {}),
+							...(filterPost.maxPrice !== undefined
+								? { lte: filterPost.maxPrice }
+								: {}),
+						},
+					}
+				: {}),
+			...(filterPost.search
+				? {
+						OR: [
+							{
+								title: {
+									contains: filterPost.search,
+									mode: 'insensitive' as const,
+								},
+							},
+							{
+								description: {
+									contains: filterPost.search,
+									mode: 'insensitive' as const,
+								},
+							},
+						],
+					}
+				: {}),
+		};
+
+		// Determine sort order
+		const sortBy = filterPost.sortBy || 'createdAt';
+		const sortOrder = filterPost.sortOrder || 'desc';
+		const orderBy = {
+			[sortBy]: sortOrder,
 		};
 
 		const [posts, totalRecords] = await Promise.all([
@@ -44,9 +142,7 @@ export class PostsRepository {
 						},
 					},
 				},
-				orderBy: {
-					createdAt: 'asc',
-				},
+				orderBy,
 			}),
 
 			this.prismaService.posts.count({
@@ -200,6 +296,47 @@ export class PostsRepository {
 			},
 			deletedAt: null,
 			...(filterPost.status ? { status: filterPost.status } : {}),
+			...(filterPost.categoryId ? { categoryId: filterPost.categoryId } : {}),
+			...(filterPost.age ? { age: filterPost.age as AgePostEnum } : {}),
+			...(filterPost.size ? { size: filterPost.size as SizePostEnum } : {}),
+			...this.buildAddressFilter(filterPost),
+			...(filterPost.minPrice !== undefined || filterPost.maxPrice !== undefined
+				? {
+						price: {
+							...(filterPost.minPrice !== undefined
+								? { gte: filterPost.minPrice }
+								: {}),
+							...(filterPost.maxPrice !== undefined
+								? { lte: filterPost.maxPrice }
+								: {}),
+						},
+					}
+				: {}),
+			...(filterPost.search
+				? {
+						OR: [
+							{
+								title: {
+									contains: filterPost.search,
+									mode: 'insensitive' as const,
+								},
+							},
+							{
+								description: {
+									contains: filterPost.search,
+									mode: 'insensitive' as const,
+								},
+							},
+						],
+					}
+				: {}),
+		};
+
+		// Determine sort order
+		const sortBy = filterPost.sortBy || 'createdAt';
+		const sortOrder = filterPost.sortOrder || 'desc';
+		const orderBy = {
+			[sortBy]: sortOrder,
 		};
 
 		const [postsArchive, totalRecords] = await Promise.all([
@@ -218,6 +355,7 @@ export class PostsRepository {
 						},
 					},
 				},
+				orderBy,
 			}),
 
 			this.prismaService.posts.count({

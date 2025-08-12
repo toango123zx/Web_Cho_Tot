@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsPositive } from 'class-validator';
+import { IsInt, IsOptional, IsPositive, IsString } from 'class-validator';
 import { GetApiConfig } from 'src/configs';
 
 export class PaginationDto {
@@ -18,4 +18,9 @@ export class PaginationDto {
 	@IsInt()
 	@IsPositive()
 	limit: number = GetApiConfig.defaultLimitPage;
+
+	@ApiProperty({ type: 'string', required: false, description: 'Search term' })
+	@IsOptional()
+	@IsString()
+	search?: string;
 }

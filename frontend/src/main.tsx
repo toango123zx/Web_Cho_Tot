@@ -25,6 +25,7 @@ import ProductDetailPage from './pages/ProductDetailPage.tsx';
 import ManagePost from './pages/ManagePost.tsx';
 import UpdatePost from './pages/UpdatePost.tsx';
 import SavedPostsPage from './pages/SavedPostsPage.tsx';
+import SearchResults from './pages/SearchResults.tsx';
 import { SocketProvider } from '@/components/context/SocketContext.tsx';
 
 const router = createBrowserRouter([
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
 			{
 				path: '/',
 				element: <HomePage />,
+			},
+			{
+				path: '/search',
+				element: <SearchResults />,
 			},
 
 			{

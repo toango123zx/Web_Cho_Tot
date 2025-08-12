@@ -1,5 +1,5 @@
 import { Eye, Loader, Pencil, Trash } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
@@ -12,11 +12,12 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { GlobalPopup, useGlobalPopup } from '../popup';
-import { toast } from 'sonner';
+import { QUERY_KEY } from '@/config/key';
+import { useDebounce } from '@/hooks/useDebounce.hook';
 import { useCategoryMutations, useGetCategories } from '@/services/query/category';
 import { useQueryClient } from '@tanstack/react-query';
-import { QUERY_KEY } from '@/config/key';
+import { toast } from 'sonner';
+import { GlobalPopup, useGlobalPopup } from '../popup';
 
 interface Props {
 	onView: (category: Category) => void;
@@ -33,18 +34,13 @@ export function CategoryTable({ onView, onEdit }: Props) {
 
 	const queryClient = useQueryClient();
 	const search = searchParams.get('search') || '';
+	const searchDebounced = useDebounce(search, 300);
 	const page = parseInt(searchParams.get('page') || '1', 10);
 	const { data: categories, isFetching } = useGetCategories({
 		page,
 		limit: ITEMS_PER_PAGE,
+		search: searchDebounced,
 	});
-	const filtered = useMemo(() => {
-		if (!categories?.success) return [];
-
-		return categories.data.filter((category) =>
-			category.name.toLowerCase().includes(search.toLowerCase()),
-		);
-	}, [categories, search]);
 
 	const setSearch = (value: string) => {
 		setSearchParams(
@@ -70,10 +66,16 @@ export function CategoryTable({ onView, onEdit }: Props) {
 		confirm('Xóa danh mục', `Bạn chắc chắn muốn xóa "${category.name}"?`, async () => {
 			setDeletingCategoryId(category.id);
 			deleteCategory.mutate(category.id, {
-				onSuccess: () => {
+				onSuccess: (res) => {
+					if (!categories?.success) return;
+					if (!res.success) {
+						toast.error(res.message || 'Xóa danh mục thất bại');
+						return;
+					}
+
 					toast.success('Xóa danh mục thành công');
 					// If this is the last item on the page (except page 1), go to previous page
-					if (filtered.length === 1 && page > 1) {
+					if (categories.data.length === 1 && page > 1) {
 						goToPage(page - 1);
 					}
 					queryClient.invalidateQueries({ queryKey: QUERY_KEY.getAllCategories() });
@@ -115,53 +117,63 @@ export function CategoryTable({ onView, onEdit }: Props) {
 										</div>
 									</TableCell>
 								</TableRow>
-							) : filtered.length === 0 ? (
+							) : categories?.success ? (
+								categories.data.length === 0 ? (
+									<TableRow>
+										<TableCell colSpan={3}>
+											<div className="text-center h-24 flex items-center justify-center">
+												Không tìm thấy danh mục nào
+											</div>
+										</TableCell>
+									</TableRow>
+								) : (
+									categories.data.map((category) => (
+										<TableRow key={category.id}>
+											<TableCell>{category.name}</TableCell>
+											<TableCell>
+												{new Date(category.createdAt).toLocaleDateString()}
+											</TableCell>
+											<TableCell className="text-right space-x-1">
+												<Button
+													disabled={deleteCategory.isPending}
+													size="icon"
+													variant="outline"
+													onClick={() => onView(category)}
+												>
+													<Eye className="w-4 h-4" />
+												</Button>
+												<Button
+													disabled={deleteCategory.isPending}
+													size="icon"
+													variant="outline"
+													onClick={() => onEdit(category)}
+												>
+													<Pencil className="w-4 h-4" />
+												</Button>
+												<Button
+													disabled={deleteCategory.isPending}
+													size="icon"
+													variant="destructive"
+													onClick={() => handleDelete(category)}
+												>
+													{deletingCategoryId === category.id ? (
+														<Loader className="animate-spin w-4 h-4" />
+													) : (
+														<Trash className="w-4 h-4" />
+													)}
+												</Button>
+											</TableCell>
+										</TableRow>
+									))
+								)
+							) : (
 								<TableRow>
 									<TableCell colSpan={3}>
 										<div className="text-center h-24 flex items-center justify-center">
-											Không tìm thấy danh mục nào
+											{categories?.message || 'Lỗi khi tải danh mục'}
 										</div>
 									</TableCell>
 								</TableRow>
-							) : (
-								filtered.map((category) => (
-									<TableRow key={category.id}>
-										<TableCell>{category.name}</TableCell>
-										<TableCell>
-											{new Date(category.createdAt).toLocaleDateString()}
-										</TableCell>
-										<TableCell className="text-right space-x-1">
-											<Button
-												disabled={deleteCategory.isPending}
-												size="icon"
-												variant="outline"
-												onClick={() => onView(category)}
-											>
-												<Eye className="w-4 h-4" />
-											</Button>
-											<Button
-												disabled={deleteCategory.isPending}
-												size="icon"
-												variant="outline"
-												onClick={() => onEdit(category)}
-											>
-												<Pencil className="w-4 h-4" />
-											</Button>
-											<Button
-												disabled={deleteCategory.isPending}
-												size="icon"
-												variant="destructive"
-												onClick={() => handleDelete(category)}
-											>
-												{deletingCategoryId === category.id ? (
-													<Loader className="animate-spin w-4 h-4" />
-												) : (
-													<Trash className="w-4 h-4" />
-												)}
-											</Button>
-										</TableCell>
-									</TableRow>
-								))
 							)}
 						</TableBody>
 					</Table>

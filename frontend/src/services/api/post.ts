@@ -1,4 +1,3 @@
-// Lấy danh sách bài viết đã lưu trữ
 export const fetchArchivedPostsAPI = async (params?: PostQueryParams) => {
 	const res = await axios.get('/posts/archive', { params });
 	return res.data as IModelPaginate<IPostWithCategoryAndUser[]>;
@@ -10,6 +9,16 @@ interface PostQueryParams {
 	limit?: number;
 	search?: string;
 	status?: IPostStatus;
+	categoryId?: string;
+	minPrice?: number;
+	maxPrice?: number;
+	age?: string;
+	size?: string;
+	address?: string;
+	district?: string;
+	province?: string;
+	sortBy?: 'createdAt' | 'price' | 'title';
+	sortOrder?: 'asc' | 'desc';
 }
 
 export const postApi = {

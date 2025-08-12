@@ -3,5 +3,8 @@ import { IQuery } from '@nestjs/cqrs';
 import { PaginationDto } from 'src/common';
 
 export class GetUsersQuery implements IQuery {
-	constructor(public readonly pagination: PaginationDto) {}
+	constructor(
+		public readonly pagination: PaginationDto,
+		public readonly search?: string,
+	) {}
 }
