@@ -26,6 +26,7 @@ import ManagePost from './pages/ManagePost.tsx';
 import UpdatePost from './pages/UpdatePost.tsx';
 import SavedPostsPage from './pages/SavedPostsPage.tsx';
 import { SocketProvider } from '@/components/context/SocketContext.tsx';
+import TransactionsPage from './pages/TransactionPage.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -90,6 +91,14 @@ const router = createBrowserRouter([
 				element: (
 					<ProtectedRoute>
 						<SavedPostsPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/transactions',
+				element: (
+					<ProtectedRoute>
+						<TransactionsPage />
 					</ProtectedRoute>
 				),
 			},

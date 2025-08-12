@@ -147,8 +147,6 @@ export default function ManagePost() {
 		return posts;
 	}, [posts, tab]);
 
-	const postUser = posts?.[0]?.user;
-
 	return (
 		<div className="min-h-screen bg-gray-100">
 			<div className="container mx-auto max-w-6xl px-4 py-6 md:px-6 lg:px-8">
@@ -157,18 +155,18 @@ export default function ManagePost() {
 					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-gray-200 pt-6">
 						<div className="flex items-center gap-3">
 							<Avatar className="h-12 w-12 bg-blue-500 text-white font-bold text-xl">
-								{postUser?.avatar ? (
+								{user?.avatar ? (
 									<img
-										src={postUser.avatar}
-										alt={postUser.name}
+										src={user.avatar}
+										alt={user.name}
 										className="w-full h-full rounded-full object-cover"
 									/>
 								) : (
-									<AvatarFallback>{postUser?.name?.[0] || 'U'}</AvatarFallback>
+									<AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
 								)}
 							</Avatar>
 							<div>
-								<p className="font-semibold text-lg">{postUser?.name || 'User'}</p>
+								<p className="font-semibold text-lg">{user?.name || 'User'}</p>
 							</div>
 						</div>
 						<div className="flex items-center gap-2 bg-gray-50 p-3 rounded-md border border-gray-200 flex-shrink-0">
