@@ -14,7 +14,7 @@ export class TransactionsRepository {
 		status: TransactionStatusEnum;
 		description: string;
 	}) {
-		return this.prisma.transaction.create({
+		const transaction = await this.prisma.transaction.create({
 			data: {
 				signature: data.signature,
 				amount: data.amount,
@@ -26,6 +26,19 @@ export class TransactionsRepository {
 				},
 			},
 		});
+
+		if (data.target === 'deposit' && data.status === 'completed') {
+			await this.prisma.users.update({
+				where: { id: data.userId },
+				data: {
+					balance: {
+						increment: data.amount,
+					},
+				},
+			});
+		}
+
+		return transaction;
 	}
 
 	async getTransactionsByUser(userId: string) {

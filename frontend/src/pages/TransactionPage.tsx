@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useUserTotalBalance } from '@/services/query/transaction';
 import { GoodCoinIcon, OderHistoryIcon, TransactionIcon } from '@/assets/icons';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DepositModal } from '@/components/modals/DepositModal';
+import { useCurrentApp } from '@/components/context/AppContext';
 
 const services = [
 	{
@@ -22,7 +24,8 @@ const services = [
 
 export default function TransactionsPage() {
 	const [openDeposit, setOpenDeposit] = useState(false);
-
+	const { user } = useCurrentApp();
+	const { data: totalBalance, isLoading: isLoadingBalance } = useUserTotalBalance();
 	const handleServiceClick = (service: any) => {
 		if (service.action === 'deposit') {
 			setOpenDeposit(true);
@@ -37,7 +40,7 @@ export default function TransactionsPage() {
 					<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 						<div>
 							<p className="text-gray-300 mb-1">Xin chào,</p>
-							<h1 className="text-2xl font-bold">Van Minh Vo</h1>
+							<h1 className="text-2xl font-bold">{user?.name}</h1>
 						</div>
 					</div>
 				</div>
@@ -83,7 +86,9 @@ export default function TransactionsPage() {
 									<h2 className="text-lg font-semibold">Tài khoản chính</h2>
 								</div>
 								<div className="flex items-center gap-2">
-									<span className="text-xl font-bold">0</span>
+									<span className="text-xl font-bold">
+										{isLoadingBalance ? '...' : (totalBalance?.balance ?? 0)}
+									</span>
 									<div className="bg-yellow-100 rounded-full p-1">
 										<img src={GoodCoinIcon} alt="Đồng Tốt" className="h-4 w-4" />
 									</div>

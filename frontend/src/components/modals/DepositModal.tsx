@@ -16,6 +16,7 @@ import {
 	DialogContent as PhantomDialogContent,
 } from '@/components/ui/dialog';
 import { PublicKey, LAMPORTS_PER_SOL, Transaction, SystemProgram } from '@solana/web3.js';
+import { QUERY_KEY } from '@/config/key';
 
 interface DepositModalProps {
 	isOpen: boolean;
@@ -215,7 +216,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 			const res = await depositMutation.mutateAsync({ signature, solPriceUsd: solPrice });
 
 			if (res?.success) {
-				queryClient.invalidateQueries({ queryKey: ['account'] });
+				queryClient.invalidateQueries({ queryKey: QUERY_KEY.getUserTotalBalance() });
 				toast.success('Nạp Đồng Tốt thành công!');
 				onClose();
 			} else {

@@ -10,6 +10,12 @@ import { UserInformationDto } from '../users/dtos';
 export class TransactionController {
 	constructor(private readonly commandBus: CommandBus) {}
 
+	@Get('total')
+	@Auth()
+	async getTotal(@MyInformation() user: UserInformationDto) {
+		return { balance: user.balance ?? 0 };
+	}
+
 	@Post('deposit')
 	@Auth()
 	async deposit(

@@ -20,7 +20,7 @@ model transaction {
     /// @DtoRelationCanConnectOnCreate
     user        users                 @relation(fields: [userId], references: [id])
     /// @DtoUpdateHidden
-    amount Float @map("amount")
+    amount Int @map("amount")
     description String
     target      TransactionTargetEnum
     /// @DtoCreateHidden
