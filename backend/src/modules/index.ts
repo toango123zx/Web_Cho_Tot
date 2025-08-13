@@ -1,4 +1,5 @@
 import { AuthModule } from './auth/auth.module';
+import { TransactionsModule } from './transactions/transactions.module';
 import { CategoriesModule } from './categories/categories.module';
 import { DatabaseModule } from './database/database.module';
 import { HealthCheckModule } from './healthCheck/healthCheck.module';
@@ -14,4 +15,5 @@ export const Modules = [
 	CategoriesModule,
 	PostsModule,
 	NotificationsModule,
+	TransactionsModule,
 ];

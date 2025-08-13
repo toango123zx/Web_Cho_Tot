@@ -27,6 +27,7 @@ import UpdatePost from './pages/UpdatePost.tsx';
 import SavedPostsPage from './pages/SavedPostsPage.tsx';
 import { SocketProvider } from '@/components/context/SocketContext.tsx';
 import TransactionsPage from './pages/TransactionPage.tsx';
+import { SolanaWalletContext } from './components/context/SolanaWalletProvider.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -146,14 +147,16 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<AppProvider>
-				<SocketProvider>
-					<RouterProvider router={router} />
-					<Toaster />
-					<ReactQueryDevtools initialIsOpen={false} />
-				</SocketProvider>
-			</AppProvider>
-		</QueryClientProvider>
+		<SolanaWalletContext>
+			<QueryClientProvider client={queryClient}>
+				<AppProvider>
+					<SocketProvider>
+						<RouterProvider router={router} />
+						<Toaster />
+						<ReactQueryDevtools initialIsOpen={false} />
+					</SocketProvider>
+				</AppProvider>
+			</QueryClientProvider>
+		</SolanaWalletContext>
 	</StrictMode>,
 );
