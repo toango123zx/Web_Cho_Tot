@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Heart, MapPin, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { usePosts, useToggleArchivePost, useArchivedPosts } from '@/services/query/post';
+import { usePosts, useToggleArchivePost } from '@/services/query/post';
 import { getRelativeTime } from '@/helper';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentApp } from '@/components/context/AppContext';
 
 import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query';
-import { QUERY_KEY } from '@/config/key';
 
 const LIMIT = 9;
 
@@ -19,23 +17,18 @@ export default function HomePage() {
 	const navigate = useNavigate();
 	const [isLoadMore, setIsLoadMore] = useState(false);
 
-	const queryClient = useQueryClient();
 	const toggleArchiveMutation = useToggleArchivePost();
-
-	const { data: archivedData } = useArchivedPosts({ page: 1, limit: 100 });
-	const archivedIds =
-		archivedData && archivedData.success && Array.isArray(archivedData.data)
-			? (archivedData.data as { id: string }[]).map((p) => p.id)
-			: [];
 
 	const { data, isLoading } = usePosts(page, LIMIT, 'PUBLISHED');
 
 	useEffect(() => {
-		if (data?.success && data.data.length > 0) {
+		if (page === 1) {
+			setPostList(data?.success ? data.data : []);
+		} else if (data?.success && data.data.length > 0) {
 			setPostList((prev) => [...prev, ...data.data]);
 		}
 		if (isLoadMore) setIsLoadMore(false);
-	}, [data]);
+	}, [data, page]);
 
 	const handleLoadMore = () => {
 		setIsLoadMore(true);
@@ -79,11 +72,14 @@ export default function HomePage() {
 							<div
 								key={post.id}
 								className="cursor-pointer group"
-								onClick={() => navigate(`/posts/${post.id}`)}
+								onClick={() =>
+									window.open(`/posts/${post.id}`, '_blank', 'noopener,noreferrer')
+								}
 								role="button"
 								tabIndex={0}
 								onKeyDown={(e) => {
-									if (e.key === 'Enter') navigate(`/posts/${post.id}`);
+									if (e.key === 'Enter')
+										window.open(`/posts/${post.id}`, '_blank', 'noopener,noreferrer');
 								}}
 							>
 								<div className="relative group overflow-hidden">
@@ -95,7 +91,7 @@ export default function HomePage() {
 									<Button
 										variant="ghost"
 										size="icon"
-										className={`absolute top-2 right-2 h-8 w-8 rounded-full border-0 z-10 ${archivedIds.includes(post.id) ? 'bg-red-500 hover:bg-red-600' : 'bg-black/20 hover:bg-black/40'}`}
+										className={`absolute top-2 right-2 h-8 w-8 rounded-full border-0 z-10 ${post.isArchived ? 'bg-red-500 hover:bg-red-600' : 'bg-black/20 hover:bg-black/40'}`}
 										onClick={(e) => {
 											e.stopPropagation();
 											if (!isAuthenticated) {
@@ -105,12 +101,13 @@ export default function HomePage() {
 											toggleArchiveMutation.mutate(post.id, {
 												onSuccess: (res) => {
 													if (res.success) {
-														queryClient.invalidateQueries({
-															queryKey: QUERY_KEY.getArchivedPosts({
-																page: 1,
-																limit: 100,
-															}),
-														});
+														setPostList((prev) =>
+															prev.map((p) =>
+																p.id === post.id
+																	? { ...p, isArchived: !p.isArchived }
+																	: p,
+															),
+														);
 														toast.success('Cập nhật trạng thái lưu trữ thành công!');
 													} else {
 														toast.error(res.message || 'Cập nhật thất bại');
@@ -123,9 +120,7 @@ export default function HomePage() {
 											});
 										}}
 									>
-										<Heart
-											className={`h-4 w-4 ${archivedIds.includes(post.id) ? 'text-white' : 'text-white'}`}
-										/>
+										<Heart className={`h-4 w-4 text-white`} />
 									</Button>
 									<div className="absolute bottom-0 left-0 right-0 flex justify-between items-end bg-gradient-to-t from-black/70 to-transparent px-2 py-1 rounded-b-md z-10 pointer-events-none transition-transform duration-200 group-hover:scale-105">
 										<span className="text-white text-xs font-semibold">

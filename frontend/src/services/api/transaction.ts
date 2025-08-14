@@ -8,8 +8,8 @@ export const fetchSolPrice = async () => {
 	return response.data;
 };
 
-export const depositTransactionAPI = async (signature: string, solPriceUsd: number) => {
-	const res = await axios.post('/transactions/deposit', { signature, solPriceUsd });
+export const depositTransactionAPI = async (signature: string) => {
+	const res = await axios.post('/transactions/deposit', { signature });
 	return res.data as IBackendRes<ITransaction>;
 };
 
@@ -17,3 +17,8 @@ export async function fetchUserTotalBalance() {
 	const res = await axios.get('/transactions/total');
 	return res.data;
 }
+
+export const getTransactionHistory = async (params: { page: number; limit: number }) => {
+	const res = await axios.get('/transactions/history', { params });
+	return res.data as IModelPaginate<ITransactionHistory[]>;
+};

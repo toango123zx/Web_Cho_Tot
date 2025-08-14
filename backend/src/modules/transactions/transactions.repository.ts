@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/services';
 import { TransactionTargetEnum, TransactionStatusEnum } from '@prisma/client';
+import { IPaginationQuery } from 'src/common';
 
 @Injectable()
 export class TransactionsRepository {
@@ -46,6 +47,22 @@ export class TransactionsRepository {
 			where: { userId },
 			orderBy: { createdAt: 'desc' },
 		});
+	}
+
+	async getTransactionsByUserPaginate(
+		userId: string,
+		pagination: IPaginationQuery,
+	): Promise<[any[], number]> {
+		const [transactions, totalRecords] = await Promise.all([
+			this.prisma.transaction.findMany({
+				where: { userId },
+				orderBy: { createdAt: 'desc' },
+				skip: pagination.skip,
+				take: pagination.take,
+			}),
+			this.prisma.transaction.count({ where: { userId } }),
+		]);
+		return [transactions, totalRecords];
 	}
 
 	async findBySignature(signature: string) {

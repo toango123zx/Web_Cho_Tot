@@ -22,6 +22,7 @@ import { useCurrentApp } from '@/components/context/AppContext';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEY } from '@/config/key';
+import { useUserTotalBalance } from '@/services/query/transaction';
 
 function AdItem({
 	post,
@@ -137,6 +138,8 @@ export default function ManagePost() {
 	const [tab, setTab] = useState<'active' | 'expired' | 'rejected' | 'pending'>(
 		'pending',
 	);
+	// Get user balance
+	const { data: totalBalance, isLoading: isLoadingBalance } = useUserTotalBalance();
 
 	const filteredPosts = useMemo(() => {
 		if (!posts) return [];
@@ -146,6 +149,8 @@ export default function ManagePost() {
 		if (tab === 'rejected') return posts.filter((p) => p.status === 'DELETED');
 		return posts;
 	}, [posts, tab]);
+
+	const navigate = useNavigate();
 
 	return (
 		<div className="min-h-screen bg-gray-100">
@@ -178,12 +183,16 @@ export default function ManagePost() {
 								className="inline-block mr-1"
 							/>
 							<span className="text-sm text-gray-700">
-								{'Số dư:'} <span className="font-bold">{'20.000'}</span>
+								{'Số dư:'}{' '}
+								<span className="font-bold">
+									{isLoadingBalance ? '...' : (totalBalance?.balance ?? 0)}
+								</span>
 							</span>
 							<Button
 								variant="ghost"
 								size="icon"
 								className="h-6 w-6 text-green-600 hover:bg-green-50"
+								onClick={() => navigate('/transactions')}
 							>
 								<Plus className="h-4 w-4" />
 							</Button>

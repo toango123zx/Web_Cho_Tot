@@ -4,6 +4,7 @@ import { Connection, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { TransactionsRepository } from '../../transactions.repository';
 import { TransactionStatusEnum, TransactionTargetEnum } from '@prisma/client';
 import { DepositTransactionCommand } from '../implements';
+import axios from 'axios';
 
 const SOL_RECEIVE_ADDRESS = process.env.SOL_RECEIVE_ADDRESS;
 const RPC_ENDPOINT = process.env.SOL_RPC_ENDPOINT || 'https://api.devnet.solana.com';
@@ -19,7 +20,14 @@ export class DepositTransactionHandler
 	constructor(private readonly repo: TransactionsRepository) {
 		this.connection = new Connection(RPC_ENDPOINT, 'confirmed');
 	}
-
+	private async getSolPriceUsd(): Promise<number> {
+		const url =
+			'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd';
+		const { data } = await axios.get(url);
+		const price = data?.solana?.usd;
+		if (!price) throw new Error('Không lấy được giá SOL từ API');
+		return price;
+	}
 	async execute(command: DepositTransactionCommand) {
 		const existingTx = await this.repo.findBySignature(command.signature);
 		if (existingTx) {
@@ -58,7 +66,7 @@ export class DepositTransactionHandler
 		const lamports = tx.meta.postBalances[toIndex] - tx.meta.preBalances[toIndex];
 		const solAmount = lamports / LAMPORTS_PER_SOL;
 
-		const solPriceUsd = command.solPriceUsd;
+		const solPriceUsd = await this.getSolPriceUsd();
 		const dongTotAmount = Math.floor(
 			Number(((solAmount * solPriceUsd) / DONGTOT_USD_RATE).toFixed(8)),
 		);

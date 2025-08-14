@@ -1,5 +1,6 @@
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useUserTotalBalance } from '@/services/query/transaction';
+import { useUserTotalBalance, useTransactionHistory } from '@/services/query/transaction';
 import { GoodCoinIcon, OderHistoryIcon, TransactionIcon } from '@/assets/icons';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -23,12 +24,21 @@ const services = [
 ];
 
 export default function TransactionsPage() {
+	const navigate = useNavigate();
 	const [openDeposit, setOpenDeposit] = useState(false);
 	const { user } = useCurrentApp();
 	const { data: totalBalance, isLoading: isLoadingBalance } = useUserTotalBalance();
+	const { data: transactionHistory, isLoading: isLoadingHistory } = useTransactionHistory(
+		1,
+		1,
+	);
+	const latestTransaction =
+		transactionHistory?.success === true ? transactionHistory.data?.[0] : undefined;
 	const handleServiceClick = (service: any) => {
 		if (service.action === 'deposit') {
 			setOpenDeposit(true);
+		} else if (service.title === 'Lịch sử giao dịch') {
+			navigate('/transactions-history');
 		}
 	};
 
@@ -101,29 +111,51 @@ export default function TransactionsPage() {
 					<div className="lg:col-span-1">
 						<Card className="p-6">
 							<div className="flex items-center justify-between mb-4">
-								<h2 className="text-lg font-semibold">Lịch sử giao dịch</h2>
-								<Button variant="link" className="text-[#306bd9] underline font-normal">
+								<h2 className="text-lg font-semibold cursor-pointer">
+									Lịch sử giao dịch
+								</h2>
+								<Button
+									variant="link"
+									className="text-[#306bd9] underline font-normal cursor-pointer"
+									onClick={() => navigate('/transactions-history')}
+								>
 									Xem tất cả
 								</Button>
 							</div>
 
 							<div className="space-y-0">
-								<div className="flex items-center justify-between p-0 bg-transparent rounded-none">
-									<div className="flex items-center gap-2">
-										<div className="w-7 h-7 bg-[#F3F4F6] rounded-lg flex items-center justify-center">
-											<img src={TransactionIcon} alt="Giao dịch" className="h-5 w-5" />
+								{isLoadingHistory ? (
+									<div>Đang tải...</div>
+								) : latestTransaction ? (
+									<div className="flex items-center justify-between p-0 bg-transparent rounded-none">
+										<div className="flex items-center gap-2">
+											<div className="w-7 h-7 bg-[#F3F4F6] rounded-lg flex items-center justify-center">
+												<img src={TransactionIcon} alt="Giao dịch" className="h-5 w-5" />
+											</div>
+											<div>
+												<p className="font-semibold text-sm text-[#222] leading-tight">
+													<span className="underline">
+														Nạp: {latestTransaction.amount}ĐT
+													</span>
+												</p>
+												<p className="text-xs text-[#6B7280] mt-0.5">
+													{latestTransaction.createdAt
+														? new Date(latestTransaction.createdAt).toLocaleDateString(
+																'vi-VN',
+															)
+														: ''}
+												</p>
+											</div>
 										</div>
-										<div>
-											<p className="font-semibold text-sm text-[#222] leading-tight">
-												<span className="underline">Nạp : 20.000ĐT</span>
-											</p>
-											<p className="text-xs text-[#6B7280] mt-0.5">09/07/2025</p>
-										</div>
+										<span className="text-[#00B46E] font-semibold text-base">
+											{latestTransaction.amount > 0
+												? `+ ${latestTransaction.amount} ĐT`
+												: `${latestTransaction.amount} ĐT`}
+										</span>
 									</div>
-									<span className="text-[#00B46E] font-semibold text-base">
-										+ 20.000 ĐT
-									</span>
-								</div>
+								) : (
+									<div>Không có giao dịch nào.</div>
+								)}
 							</div>
 						</Card>
 					</div>

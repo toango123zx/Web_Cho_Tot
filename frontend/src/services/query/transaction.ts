@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { depositTransactionAPI } from '../api/transaction';
+import { depositTransactionAPI, getTransactionHistory } from '../api/transaction';
 
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserTotalBalance } from '../api/transaction';
@@ -7,13 +7,8 @@ import { QUERY_KEY } from '@/config/key';
 
 export const useDepositTransaction = () => {
 	return useMutation({
-		mutationFn: ({
-			signature,
-			solPriceUsd,
-		}: {
-			signature: string;
-			solPriceUsd: number;
-		}) => depositTransactionAPI(signature, solPriceUsd),
+		mutationFn: ({ signature }: { signature: string }) =>
+			depositTransactionAPI(signature),
 	});
 };
 
@@ -23,3 +18,9 @@ export function useUserTotalBalance() {
 		queryFn: fetchUserTotalBalance,
 	});
 }
+export const useTransactionHistory = (page: number, limit: number) => {
+	return useQuery({
+		queryKey: QUERY_KEY.getTransactionHistory(page, limit),
+		queryFn: () => getTransactionHistory({ page, limit }),
+	});
+};

@@ -213,10 +213,14 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
 			toast.success('Giao dịch xác nhận thành công!');
 
-			const res = await depositMutation.mutateAsync({ signature, solPriceUsd: solPrice });
+			const res = await depositMutation.mutateAsync({ signature });
 
 			if (res?.success) {
 				queryClient.invalidateQueries({ queryKey: QUERY_KEY.getUserTotalBalance() });
+				queryClient.invalidateQueries({
+					queryKey: QUERY_KEY.getTransactionHistory(1, 1),
+				});
+
 				toast.success('Nạp Đồng Tốt thành công!');
 				onClose();
 			} else {

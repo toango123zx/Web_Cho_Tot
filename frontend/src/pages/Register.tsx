@@ -38,7 +38,7 @@ export default function RegisterPage() {
 					if (res.success) {
 						setSuccessMessage('Đăng ký thành công!');
 						setErrorMessage('');
-						setTimeout(() => navigate('/login'), 2000);
+						setTimeout(() => navigate('/login?popup=1'), 1000);
 					} else {
 						setErrorMessage(res.message || 'Đăng ký thất bại');
 						setSuccessMessage('');

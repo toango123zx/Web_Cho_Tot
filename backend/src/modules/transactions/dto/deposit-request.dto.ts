@@ -1,12 +1,14 @@
-import { IsString, Length, IsNumber } from 'class-validator';
+import { IsNumber, IsString, Length } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class DepositRequestDto {
-	// Solana transaction signature (usually base58 ~87 chars)
+	@ApiProperty({
+		description: 'Solana transaction signature (base58 string)',
+		minLength: 40,
+		maxLength: 120,
+		example: '5KaVNauTkvP8E9xqXr3Ree2WZMH36c5ZhM37F6RJ3kWzF',
+	})
 	@IsString()
 	@Length(40, 120)
 	signature: string;
-
-	// SOL price at the time FE posted
-	@IsNumber()
-	solPriceUsd: number;
 }

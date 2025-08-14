@@ -71,13 +71,28 @@ const UpdatePost = () => {
 			setSize(post.size || '');
 			setCategory(post.categoryId || '');
 			setPreviewUrls(post.postImages?.map((img) => img.url) || []);
-			// Parse address nếu có
 			if (post.address) {
-				const parts = post.address.split(',').map((s) => s.trim());
+				const parts = post.address
+					.split(',')
+					.map((s) => s.trim())
+					.filter(Boolean);
+				let specificAddress = '';
+				let wardLabel = '';
+				let provinceLabel = '';
+				if (parts.length === 3) {
+					specificAddress = parts[0];
+					wardLabel = parts[1];
+					provinceLabel = parts[2];
+				} else if (parts.length === 2) {
+					wardLabel = parts[0];
+					provinceLabel = parts[1];
+				} else if (parts.length === 1) {
+					provinceLabel = parts[0];
+				}
 				setAddress({
-					specificAddress: parts[0] || '',
-					wardLabel: parts[1] || '',
-					provinceLabel: parts[2] || '',
+					specificAddress,
+					wardLabel,
+					provinceLabel,
 					province: '',
 					ward: '',
 				});
@@ -179,15 +194,21 @@ const UpdatePost = () => {
 				.filter((img) => !previewUrls.includes(img.url))
 				.map((img) => img.id);
 			const newPostImages = uploadedImageUrls.map((url) => ({ url }));
+			let addressStr = '';
+			if (address) {
+				const parts = [];
+				if (address.specificAddress) parts.push(address.specificAddress);
+				if (address.wardLabel) parts.push(address.wardLabel);
+				if (address.provinceLabel) parts.push(address.provinceLabel);
+				addressStr = parts.join(', ');
+			}
 			const payload = {
 				title,
 				description,
 				price: Number(price),
 				age: age as PetAge,
 				size: size as PetSize,
-				address: address
-					? `${address.specificAddress}, ${address.wardLabel}, ${address.provinceLabel}`
-					: '',
+				address: addressStr,
 				categoryId: category,
 				newPostImages,
 				deletePostImageIds,

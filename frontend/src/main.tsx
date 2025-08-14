@@ -28,6 +28,7 @@ import SavedPostsPage from './pages/SavedPostsPage.tsx';
 import { SocketProvider } from '@/components/context/SocketContext.tsx';
 import TransactionsPage from './pages/TransactionPage.tsx';
 import { SolanaWalletContext } from './components/context/SolanaWalletProvider.tsx';
+import TransactionHistory from './pages/TransactionHistory.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -100,6 +101,14 @@ const router = createBrowserRouter([
 				element: (
 					<ProtectedRoute>
 						<TransactionsPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/transactions-history',
+				element: (
+					<ProtectedRoute>
+						<TransactionHistory />
 					</ProtectedRoute>
 				),
 			},
