@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { keepPreviousData, useMutation } from '@tanstack/react-query';
 import { depositTransactionAPI, getTransactionHistory } from '../api/transaction';
 
 import { useQuery } from '@tanstack/react-query';
@@ -22,5 +22,6 @@ export const useTransactionHistory = (page: number, limit: number) => {
 	return useQuery({
 		queryKey: QUERY_KEY.getTransactionHistory(page, limit),
 		queryFn: () => getTransactionHistory({ page, limit }),
+		placeholderData: keepPreviousData,
 	});
 };

@@ -1,3 +1,6 @@
+type TransactionTargetEnum = 'deposit' | 'usage';
+
+type TransactionStatusEnum = 'pending' | 'completed' | 'cancelled';
 interface ITransaction {
 	transactionId: string;
 	from: string;
@@ -5,12 +8,8 @@ interface ITransaction {
 	solAmount: number;
 	solPriceUsd: number;
 	dongTotAmount: number;
-	status: string;
+	status: TransactionStatusEnum;
 }
-type TransactionTargetEnum = 'deposit' | 'usage';
-
-type TransactionStatusEnum = 'pending' | 'completed' | 'cancelled';
-
 interface ITransactionHistory {
 	id: string;
 	userId: string;

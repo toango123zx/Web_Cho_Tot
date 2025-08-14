@@ -7,6 +7,9 @@ import { DepositTransactionCommand } from '../implements';
 import axios from 'axios';
 
 const SOL_RECEIVE_ADDRESS = process.env.SOL_RECEIVE_ADDRESS;
+if (!SOL_RECEIVE_ADDRESS) {
+	throw new Error('SOL_RECEIVE_ADDRESS environment variable is not configured');
+}
 const RPC_ENDPOINT = process.env.SOL_RPC_ENDPOINT || 'https://api.devnet.solana.com';
 const DONGTOT_USD_RATE = 0.1;
 
@@ -15,7 +18,7 @@ export class DepositTransactionHandler
 	implements ICommandHandler<DepositTransactionCommand>
 {
 	private connection: Connection;
-	private readonly logger = new Logger(DepositTransactionHandler.name);
+	// private readonly logger = new Logger(DepositTransactionHandler.name);
 
 	constructor(private readonly repo: TransactionsRepository) {
 		this.connection = new Connection(RPC_ENDPOINT, 'confirmed');
@@ -25,7 +28,7 @@ export class DepositTransactionHandler
 			'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd';
 		const { data } = await axios.get(url);
 		const price = data?.solana?.usd;
-		if (!price) throw new Error('Không lấy được giá SOL từ API');
+		if (!price) throw new Error('Unable to retrieve the SOL price from the API');
 		return price;
 	}
 	async execute(command: DepositTransactionCommand) {

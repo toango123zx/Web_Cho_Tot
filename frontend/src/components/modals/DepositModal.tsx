@@ -76,7 +76,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
 	if (selectedCurrency === 'dongTot') {
 		// User inputs ĐT amount, calculate SOL needed
-		const dongTotAmountNum = Number.parseFloat(dongTotAmount) || 0;
+		const dongTotAmountNum = Number.parseInt(dongTotAmount) || 0;
 		dongTotReceived = dongTotAmountNum;
 		usdValue = dongTotAmountNum * 0.1;
 		solNeeded = usdValue / solPrice;
@@ -91,7 +91,9 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 			const solAmountNum = Number.parseFloat(solAmount) || 0;
 			solNeeded = solAmountNum;
 			usdValue = solAmountNum * solPrice;
-			dongTotReceived = Math.floor(Number((usdValue / 0.1).toFixed(8)));
+			dongTotReceived = Math.floor(
+				Number((Number(usdValue.toFixed(2)) / 0.1).toFixed(8)),
+			);
 		}
 	}
 
@@ -167,6 +169,17 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 			return;
 		}
 		if (isPaying) return;
+
+		const MIN_USD = 1;
+		const MIN_DONG_TOT = 10;
+		const isBelowMin =
+			(selectedCurrency === 'dongTot' && dongTotReceived < MIN_DONG_TOT) ||
+			(selectedCurrency === 'sol' && usdValue < MIN_USD);
+
+		if (isBelowMin) {
+			toast.error('Giao dịch tối thiểu là 1 USD hoặc 10 Đồng Tốt.');
+			return;
+		}
 
 		try {
 			setIsPaying(true);
@@ -312,18 +325,19 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 								<Input
 									type="number"
 									min={0}
+									step={selectedCurrency === 'dongTot' ? 1 : 'any'}
 									value={getCurrentInputValue()}
 									onChange={(e) => {
 										let raw = e.target.value;
-										// Allow empty string for editing, block negative values
 										if (raw.startsWith('-')) return; // ignore negative input
-										// Normalize leading zeros (optional) but keep decimals
-										if (raw && !/^\d*(\.|$)/.test(raw)) return; // basic guard
 										if (selectedCurrency === 'dongTot') {
+											if (raw && !/^\d*$/.test(raw)) return; // only allow integers
 											setDongTotAmount(raw);
 										} else if (inputMode === 'usd') {
+											if (raw && !/^\d*(\.|$)/.test(raw)) return; // allow decimals for USD
 											setUsdAmount(raw);
 										} else {
+											if (raw && !/^\d*(\.|$)/.test(raw)) return; // allow decimals for SOL
 											setSolAmount(raw);
 										}
 									}}
