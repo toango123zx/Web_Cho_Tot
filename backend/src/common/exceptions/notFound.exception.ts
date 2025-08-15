@@ -8,7 +8,7 @@ export class NotFoundException extends HttpException {
 		super(
 			{
 				success: false,
-				message: `Resource not found ${location}`,
+				message: `Không tìm thấy ${location}`,
 			},
 			HttpStatus.NOT_FOUND,
 		);

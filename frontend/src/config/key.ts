@@ -20,4 +20,11 @@ export const QUERY_KEY = {
 	getPostsByUserId: (userId: string) => ['posts', 'user', userId],
 	getArchivedPosts: (params?: Record<string, any>) => ['archived-posts', params],
 	getNotifications: () => ['notifications'],
+	getChatRooms: (page: number, limit: number, search: string) => {
+		return ['fetchRoomChats', page, limit, search] as const;
+	},
+	getChatRoomByChatRoomId: (
+		chatRoomId: string,
+		params: { page: number; limit: number },
+	) => ['fetchRoomChatByChatRoomId', chatRoomId, params],
 };

@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { AppGateway } from 'src/gateway/app.gateway';
+import { AppGateway } from 'src/modules/gateway/app.gateway';
 
 import { NotificationsRepository } from 'src/modules/notifications/notifications.repository';
 

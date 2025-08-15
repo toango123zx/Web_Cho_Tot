@@ -47,8 +47,10 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
 
 		delete account.password;
 		delete account.salt;
-		account.name = account.user.name;
-		delete account.user;
+		if (account.user) {
+			account.name = account.user.name;
+			delete account.user;
+		}
 		return { success: true, data: account };
 	}
 }

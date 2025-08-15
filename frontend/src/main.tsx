@@ -27,6 +27,7 @@ import UpdatePost from './pages/UpdatePost.tsx';
 import SavedPostsPage from './pages/SavedPostsPage.tsx';
 import SearchResults from './pages/SearchResults.tsx';
 import { SocketProvider } from '@/components/context/SocketContext.tsx';
+import Chat from './pages/Chat.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -97,6 +98,10 @@ const router = createBrowserRouter([
 						<SavedPostsPage />
 					</ProtectedRoute>
 				),
+			},
+			{
+				path: '/chats',
+				element: <Chat />,
 			},
 		],
 	},

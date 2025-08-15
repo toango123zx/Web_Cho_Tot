@@ -26,6 +26,8 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private readonly userRepository: UserRepository,
 	) {}
 
+	afterInit(): void {}
+
 	async handleConnection(client: Socket): Promise<void> {
 		const cookies = cookie.parse(client.handshake.headers.cookie || '');
 		const accessToken = cookies['accessToken'];
@@ -52,7 +54,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.connectedUsers.get(user.id).add(client.id);
 
 			this.socketToUser.set(client.id, user.id);
-		} catch (err) {
+		} catch {
 			client.disconnect();
 		}
 	}
@@ -78,5 +80,23 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.server.to(socketId).emit('notification', notification);
 			});
 		}
+	}
+
+	public getUserIdBySocketId(socketId: string): string | undefined {
+		return this.socketToUser.get(socketId);
+	}
+
+	public emitToUser({
+		userId,
+		event,
+		data,
+	}: {
+		userId: string;
+		event: string;
+		data: unknown;
+	}): void {
+		const sockets = this.connectedUsers.get(userId);
+		if (!sockets) return;
+		sockets.forEach((id) => this.server.to(id).emit(event, data));
 	}
 }

@@ -10,14 +10,47 @@ import { ChatRoomOrderByDto } from './dtos';
 export class ChatRoomsRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async findChatRooms({
+	async findChatRoom({
 		chatRoomId,
+		userId,
+	}: {
+		chatRoomId: string;
+		userId?: string;
+	}): Promise<ChatRoomsEntity | null> {
+		return await this.prismaService.chatRooms.findFirst({
+			include: {
+				firstUser: true,
+				secondUser: true,
+				messages: {
+					take: 1,
+					skip: 0,
+					orderBy: {
+						createdAt: 'desc',
+					},
+				},
+			},
+			where: {
+				id: chatRoomId,
+				OR: [
+					{
+						firstUserId: userId,
+					},
+					{
+						secondUserId: userId,
+					},
+				],
+			},
+		});
+	}
+
+	async findChatRooms({
+		chatRoomIds,
 		chatRoomMember = [],
 		userName,
 		pagination = {} as IPaginationQuery,
 		filter,
 	}: {
-		chatRoomId?: string[];
+		chatRoomIds?: string[];
 		chatRoomMember?: string[];
 		userName?: string;
 		pagination?: IPaginationQuery;
@@ -32,10 +65,17 @@ export class ChatRoomsRepository {
 				include: {
 					firstUser: true,
 					secondUser: true,
+					messages: {
+						take: 1,
+						skip: 0,
+						orderBy: {
+							createdAt: 'desc',
+						},
+					},
 				},
 				where: {
 					id: {
-						in: chatRoomId,
+						in: chatRoomIds,
 					},
 					OR: [
 						{
@@ -46,24 +86,25 @@ export class ChatRoomsRepository {
 								in: chatRoomMember,
 							},
 						},
-						chatRoomMember[0] === chatRoomMember[1]
-							? {
-									OR: [
-										{
-											firstUserId: chatRoomMember[0],
-											secondUser: {
-												name: userName,
+						{
+							OR:
+								chatRoomMember[0] === chatRoomMember[1]
+									? [
+											{
+												firstUserId: chatRoomMember[0],
+												secondUser: {
+													name: userName,
+												},
 											},
-										},
-										{
-											secondUserId: chatRoomMember[0],
-											firstUser: {
-												name: userName,
+											{
+												secondUserId: chatRoomMember[0],
+												firstUser: {
+													name: userName,
+												},
 											},
-										},
-									],
-								}
-							: undefined,
+										]
+									: undefined,
+						},
 					],
 				},
 				skip: pagination.skip,
@@ -73,7 +114,7 @@ export class ChatRoomsRepository {
 			this.prismaService.chatRooms.count({
 				where: {
 					id: {
-						in: chatRoomId,
+						in: chatRoomIds,
 					},
 					OR: [
 						{
@@ -84,18 +125,25 @@ export class ChatRoomsRepository {
 								in: chatRoomMember,
 							},
 						},
-						chatRoomMember[0] === chatRoomMember[1]
-							? {
-									OR: [
-										{
-											firstUserId: chatRoomMember[0],
-										},
-										{
-											secondUserId: chatRoomMember[0],
-										},
-									],
-								}
-							: undefined,
+						{
+							OR:
+								chatRoomMember[0] === chatRoomMember[1]
+									? [
+											{
+												firstUserId: chatRoomMember[0],
+												secondUser: {
+													name: userName,
+												},
+											},
+											{
+												secondUserId: chatRoomMember[0],
+												firstUser: {
+													name: userName,
+												},
+											},
+										]
+									: undefined,
+						},
 					],
 				},
 			}),

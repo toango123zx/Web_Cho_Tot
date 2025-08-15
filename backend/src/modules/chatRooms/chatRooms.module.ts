@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { AuthModule } from '../auth/auth.module';
+import { ChatsRepository } from '../chats/chats.repository';
 import { DatabaseModule } from '../database/database.module';
 
 import { UserRepository } from './../users/users.repository';
@@ -17,6 +18,7 @@ import { ChatRoomQueryHandlers } from './queries/handlers';
 		...ChatRoomQueryHandlers,
 		...ChatRoomCommandHandlers,
 		UserRepository,
+		ChatsRepository,
 		ChatRoomsRepository,
 	],
 	exports: [],

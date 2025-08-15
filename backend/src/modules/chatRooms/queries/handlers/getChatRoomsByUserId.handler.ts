@@ -15,24 +15,34 @@ export class GetChatRoomsByUserIdHandler
 
 	async execute(
 		command: GetChatRoomsByUserIdQuery,
-	): Promise<HttpResponseBodySuccessDto<GetChatRoomsResponseDto> | HttpException> {
-		const { myInformation, pagination, filter } = command;
+	): Promise<HttpResponseBodySuccessDto<GetChatRoomsResponseDto[]> | HttpException> {
+		const { myInformation, pagination } = command;
 
 		const page = new PaginationUtils().extractSkipTakeFromPagination(pagination);
 
 		const [chatRooms, totalRecordchatRoomsExists] =
 			await this.chatRoomsRepository.findChatRooms({
-				chatRoomMember: [myInformation.id, myInformation.id],
+				chatRoomMember: [
+					myInformation.id,
+					pagination.search ? pagination.search : myInformation.id,
+				],
 				pagination: page,
-				userName: filter.keyword,
 				filter: {
 					updatedAt: OrderByEnum.DESC,
 				},
 			});
 
+		const chatRoomsResponse = chatRooms.map(
+			(chatRoom) =>
+				new GetChatRoomsResponseDto({
+					chatRoom: chatRoom,
+					myInformation: myInformation,
+				}),
+		);
+
 		return {
 			success: true,
-			data: new GetChatRoomsResponseDto(chatRooms),
+			data: chatRoomsResponse,
 			pagination: page.convertPaginationResponseDtoFromTotalRecords(
 				totalRecordchatRoomsExists,
 			),

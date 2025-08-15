@@ -1,7 +1,9 @@
 import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ChatRoomsModule } from './chatRooms/chatRooms.module';
+import { ChatsModule } from './chats/chats.module';
 import { DatabaseModule } from './database/database.module';
+import { GatewayModule } from './gateway/gateway.module';
 import { HealthCheckModule } from './healthCheck/healthCheck.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PostsModule } from './posts/posts.module';
@@ -16,4 +18,6 @@ export const Modules = [
 	PostsModule,
 	NotificationsModule,
 	ChatRoomsModule,
+	GatewayModule,
+	ChatsModule,
 ];

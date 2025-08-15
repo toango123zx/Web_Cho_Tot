@@ -1,7 +1,8 @@
-import { ChatRoomsEntity } from 'src/models';
+import { TypeMessageEnum } from '@prisma/client';
+import { ChatRoomsEntity, MessagesEntity } from 'src/models';
 import { UserInformationDto } from 'src/modules/users/dtos';
 
-export class GetChatRoomsResponseDto {
+export class GetChatRoomResponseDto {
 	id: string;
 	firstUser: {
 		id: string;
@@ -13,22 +14,25 @@ export class GetChatRoomsResponseDto {
 		name: string;
 		avatar: string;
 	};
-	latestMessage?:
-		| {
-				content: string;
-				type: string;
-				userId: string;
-				isRead: boolean;
-				createdAt: Date;
-		  }
-		| undefined;
+	messages: {
+		id: string;
+		content: string;
+		userId: string;
+		name: string;
+		avatar: string;
+		type: TypeMessageEnum;
+		createdAt: Date;
+		isRead: boolean;
+	}[];
 	updatedAt: Date;
 
 	constructor({
 		chatRoom,
+		messages,
 		myInformation,
 	}: {
 		chatRoom: ChatRoomsEntity;
+		messages: MessagesEntity[];
 		myInformation: UserInformationDto;
 	}) {
 		const user =
@@ -47,16 +51,19 @@ export class GetChatRoomsResponseDto {
 			name: user.name,
 			avatar: user.avatar,
 		};
-		this.latestMessage =
-			chatRoom.messages && chatRoom.messages.length > 0
-				? {
-						content: chatRoom.messages?.[0]?.content,
-						userId: chatRoom.messages?.[0]?.userId,
-						type: chatRoom.messages?.[0]?.type,
-						isRead: chatRoom.messages?.[0]?.isRead,
-						createdAt: chatRoom.messages?.[0]?.createdAt,
-					}
-				: undefined;
+		this.messages =
+			messages && messages.length > 0
+				? messages.map((message) => ({
+						id: message.id,
+						content: message.content,
+						userId: message.user.id,
+						name: message.user.name,
+						avatar: message.user.avatar,
+						type: message.type,
+						createdAt: message.createdAt,
+						isRead: message.isRead,
+					}))
+				: [];
 		this.updatedAt = chatRoom.updatedAt;
 	}
 }

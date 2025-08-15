@@ -54,9 +54,11 @@ function Layout() {
 	}
 
 	return (
-		<div>
+		<div className="h-screen overflow-hidden flex flex-col">
 			<Header />
-			<Outlet />
+			<div className="flex-1 min-h-0 overflow-hidden">
+				<Outlet />
+			</div>
 		</div>
 	);
 }
