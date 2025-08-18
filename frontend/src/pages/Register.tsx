@@ -17,6 +17,7 @@ export default function RegisterPage() {
 	const [successMessage, setSuccessMessage] = useState('');
 
 	const { mutate: register, isPending } = useRegister();
+	const isPopup = new URLSearchParams(location.search).get('popup') === '1';
 
 	const handleRegister = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -38,7 +39,11 @@ export default function RegisterPage() {
 					if (res.success) {
 						setSuccessMessage('Đăng ký thành công!');
 						setErrorMessage('');
-						setTimeout(() => navigate('/login?popup=1'), 1000);
+						if (isPopup) {
+							setTimeout(() => navigate('/login?popup=1'), 1000);
+						} else {
+							setTimeout(() => navigate('/login'), 1000);
+						}
 					} else {
 						setErrorMessage(res.message || 'Đăng ký thất bại');
 						setSuccessMessage('');
@@ -141,7 +146,10 @@ export default function RegisterPage() {
 						<Button
 							variant="link"
 							className="text-blue-600 font-medium p-0 h-auto"
-							onClick={() => navigate('/login')}
+							onClick={() => {
+								if (isPopup) navigate('/login?popup=1');
+								else navigate('/login');
+							}}
 						>
 							Đăng nhập ngay
 						</Button>

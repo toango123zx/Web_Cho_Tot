@@ -26,7 +26,7 @@ export function AccountLayer({
 
 	const handleRegisterClick = () =>
 		window.open(
-			'/register',
+			'/register?popup=1',
 			'_blank',
 			'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
 		);
