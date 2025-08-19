@@ -22,6 +22,7 @@ import { useCurrentApp } from '@/components/context/AppContext';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEY } from '@/config/key';
+import { useUserTotalBalance } from '@/services/query/transaction';
 
 function AdItem({
 	post,
@@ -137,6 +138,8 @@ export default function ManagePost() {
 	const [tab, setTab] = useState<'active' | 'expired' | 'rejected' | 'pending'>(
 		'pending',
 	);
+	// Get user balance
+	const { data: totalBalance, isLoading: isLoadingBalance } = useUserTotalBalance();
 
 	const filteredPosts = useMemo(() => {
 		if (!posts) return [];
@@ -147,7 +150,7 @@ export default function ManagePost() {
 		return posts;
 	}, [posts, tab]);
 
-	const postUser = posts?.[0]?.user;
+	const navigate = useNavigate();
 
 	return (
 		<div className="min-h-screen bg-gray-100">
@@ -157,18 +160,18 @@ export default function ManagePost() {
 					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-gray-200 pt-6">
 						<div className="flex items-center gap-3">
 							<Avatar className="h-12 w-12 bg-blue-500 text-white font-bold text-xl">
-								{postUser?.avatar ? (
+								{user?.avatar ? (
 									<img
-										src={postUser.avatar}
-										alt={postUser.name}
+										src={user.avatar}
+										alt={user.name}
 										className="w-full h-full rounded-full object-cover"
 									/>
 								) : (
-									<AvatarFallback>{postUser?.name?.[0] || 'U'}</AvatarFallback>
+									<AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
 								)}
 							</Avatar>
 							<div>
-								<p className="font-semibold text-lg">{postUser?.name || 'User'}</p>
+								<p className="font-semibold text-lg">{user?.name || 'User'}</p>
 							</div>
 						</div>
 						<div className="flex items-center gap-2 bg-gray-50 p-3 rounded-md border border-gray-200 flex-shrink-0">
@@ -180,12 +183,16 @@ export default function ManagePost() {
 								className="inline-block mr-1"
 							/>
 							<span className="text-sm text-gray-700">
-								{'Số dư:'} <span className="font-bold">{'20.000'}</span>
+								{'Số dư:'}{' '}
+								<span className="font-bold">
+									{isLoadingBalance ? '...' : (totalBalance?.balance ?? 0)}
+								</span>
 							</span>
 							<Button
 								variant="ghost"
 								size="icon"
 								className="h-6 w-6 text-green-600 hover:bg-green-50"
+								onClick={() => navigate('/transactions')}
 							>
 								<Plus className="h-4 w-4" />
 							</Button>

@@ -8,3 +8,4 @@
 /// <reference path="./category.d.ts" />
 /// <reference path="./post.d.ts" />
 /// <reference path="./notification.d.ts" />
+/// <reference path="./transaction.d.ts" />

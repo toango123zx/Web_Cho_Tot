@@ -20,13 +20,13 @@ model transaction {
     /// @DtoRelationCanConnectOnCreate
     user        users                 @relation(fields: [userId], references: [id])
     /// @DtoUpdateHidden
-    amount      Int                   @map("amount")
+    amount Int @map("amount")
     description String
     target      TransactionTargetEnum
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
     createdAt   DateTime              @default(now()) @map("created_at")
     status      TransactionStatusEnum
-
+    signature String?  @unique     
     @@map("Transaction")
 }

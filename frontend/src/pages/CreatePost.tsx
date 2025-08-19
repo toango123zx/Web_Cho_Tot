@@ -177,15 +177,21 @@ export default function CreatePost() {
 				}
 				setIsUploading(false);
 			}
+			let addressStr = '';
+			if (address) {
+				const parts = [];
+				if (address.specificAddress) parts.push(address.specificAddress);
+				if (address.wardLabel) parts.push(address.wardLabel);
+				if (address.provinceLabel) parts.push(address.provinceLabel);
+				addressStr = parts.join(', ');
+			}
 			const payload = {
 				title,
 				description,
 				price: Number(price),
 				age: age as PetAge,
 				size: size as PetSize,
-				address: address
-					? `${address.specificAddress}, ${address.wardLabel}, ${address.provinceLabel}`
-					: '',
+				address: addressStr,
 				categoryId: category,
 				postImages: uploadedImageUrls.map((url) => ({ url })),
 			};
