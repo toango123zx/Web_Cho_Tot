@@ -2,6 +2,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetTransactionsQuery } from '../implements/get-transactions.query';
 import { TransactionsRepository } from '../../transactions.repository';
 import { HttpResponseBodySuccessDto, IPaginationQuery } from 'src/common';
+import { TransactionDto } from 'src/models';
 
 @QueryHandler(GetTransactionsQuery)
 export class GetTransactionsHandler implements IQueryHandler<GetTransactionsQuery> {
@@ -9,7 +10,7 @@ export class GetTransactionsHandler implements IQueryHandler<GetTransactionsQuer
 
 	public async execute(
 		query: GetTransactionsQuery,
-	): Promise<HttpResponseBodySuccessDto<any[]>> {
+	): Promise<HttpResponseBodySuccessDto<TransactionDto[]>> {
 		const skip = (query.pagination.page - 1) * query.pagination.limit;
 		const pagination: IPaginationQuery = {
 			skip,

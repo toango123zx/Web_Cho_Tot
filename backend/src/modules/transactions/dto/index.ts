@@ -1,1 +1,1 @@
-export * from './deposit-request.dto';
+export * from './request/deposit-request.dto';

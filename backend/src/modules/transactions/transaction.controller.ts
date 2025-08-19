@@ -3,7 +3,7 @@ import { DepositTransactionCommand } from './commands/implements/deposit-transac
 import { Body, Controller, Post, Get, Query, HttpException } from '@nestjs/common';
 import { Auth } from '../auth/decorators';
 import { MyInformation } from '../users/decorators';
-import { DepositRequestDto } from './dto/deposit-request.dto';
+import { DepositRequestDto } from './dto/request/deposit-request.dto';
 import { UserInformationDto } from '../users/dtos';
 import { HttpResponseBodyDto, PaginationDto } from 'src/common';
 import { TransactionDto } from 'src/models';
@@ -36,7 +36,7 @@ export class TransactionController {
 	async deposit(
 		@Body() body: DepositRequestDto,
 		@MyInformation() user: UserInformationDto,
-	) {
+	): Promise<HttpResponseBodyDto<TransactionDto[] | HttpException>> {
 		return await this.commandBus.execute(
 			new DepositTransactionCommand(body.signature, user.id),
 		);

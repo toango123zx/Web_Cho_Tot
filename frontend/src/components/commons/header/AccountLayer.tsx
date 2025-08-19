@@ -233,7 +233,9 @@ export function AccountLayer({
 							className="size-5"
 							alt="Good coin Icon"
 						/>
-						<span>Lịch sử giao dịch</span>
+						<span onClick={() => navigate('/transactions-history')}>
+							Lịch sử giao dịch
+						</span>
 					</div>
 
 					<div className="px-3 py-2 font-semibold text-gray-500 bg-gray-200">Khác</div>

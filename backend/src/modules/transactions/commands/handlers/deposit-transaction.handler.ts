@@ -1,10 +1,13 @@
-import { BadRequestException, Logger } from '@nestjs/common';
+import { BadRequestException, HttpException, Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Connection, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { TransactionsRepository } from '../../transactions.repository';
 import { TransactionStatusEnum, TransactionTargetEnum } from '@prisma/client';
 import { DepositTransactionCommand } from '../implements';
 import axios from 'axios';
+import { HttpResponseBodySuccessDto } from 'src/common';
+import { TransactionEntity } from 'src/models';
+import { DepositResponseDto } from '../../dto/response/deposit-response.dto';
 
 const SOL_RECEIVE_ADDRESS = process.env.SOL_RECEIVE_ADDRESS;
 if (!SOL_RECEIVE_ADDRESS) {
@@ -31,7 +34,9 @@ export class DepositTransactionHandler
 		if (!price) throw new Error('Unable to retrieve the SOL price from the API');
 		return price;
 	}
-	async execute(command: DepositTransactionCommand) {
+	async execute(
+		command: DepositTransactionCommand,
+	): Promise<HttpResponseBodySuccessDto<DepositResponseDto> | HttpException> {
 		const existingTx = await this.repo.findBySignature(command.signature);
 		if (existingTx) {
 			throw new BadRequestException('Transaction already processed.');
