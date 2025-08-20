@@ -3,3 +3,4 @@ export * from './useLoading.hook';
 export * from './useDebounce.hook';
 export * from './useRecentSearches.hook';
 export * from './useNotificationListener.hook';
+export * from './useChatRoomRead.hook';

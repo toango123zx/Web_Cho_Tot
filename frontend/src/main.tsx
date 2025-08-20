@@ -27,6 +27,7 @@ import UpdatePost from './pages/UpdatePost.tsx';
 import SavedPostsPage from './pages/SavedPostsPage.tsx';
 import SearchResults from './pages/SearchResults.tsx';
 import { SocketProvider } from '@/components/context/SocketContext.tsx';
+import { MessageListenerProvider } from '@/components/context/MessageListenerContext.tsx';
 import Chat from './pages/Chat.tsx';
 
 const router = createBrowserRouter([
@@ -150,9 +151,11 @@ createRoot(document.getElementById('root')!).render(
 		<QueryClientProvider client={queryClient}>
 			<AppProvider>
 				<SocketProvider>
-					<RouterProvider router={router} />
-					<Toaster />
-					<ReactQueryDevtools initialIsOpen={false} />
+					<MessageListenerProvider>
+						<RouterProvider router={router} />
+						<Toaster />
+						<ReactQueryDevtools initialIsOpen={false} />
+					</MessageListenerProvider>
 				</SocketProvider>
 			</AppProvider>
 		</QueryClientProvider>

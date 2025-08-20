@@ -2,6 +2,7 @@ import { NotificationDropdown } from '@/components/commons/header/NotificationDr
 import { useCurrentApp } from '@/components/context/AppContext';
 import { Button } from '@/components/ui';
 import { useClickOutside, useNotificationListener } from '@/hooks';
+import { useMessageListener } from '@/components/context/MessageListenerContext';
 import { useInfiniteCategoriesQuery } from '@/services/query/category';
 import { useGetNotifications } from '@/services/query/notification';
 import {
@@ -43,6 +44,7 @@ export function HeaderBottom() {
 
 	useNotificationListener();
 	const { data } = useGetNotifications(isAuthenticated);
+	const { hasUnreadMessages } = useMessageListener();
 
 	const notifications = data?.success ? data.data : [];
 	const countNotificationsUnread = notifications.filter(
@@ -70,6 +72,10 @@ export function HeaderBottom() {
 	const handleToggleNotification = (e: React.MouseEvent) => {
 		e.stopPropagation();
 		setIsNotificationOpen((prev) => !prev);
+	};
+
+	const handleChatClick = () => {
+		navigate('/chats');
 	};
 
 	const navigate = useNavigate();
@@ -179,7 +185,12 @@ export function HeaderBottom() {
 						/>
 					)}
 				</div>
-				<MessageSquareText className="order-1 sm:order-none w-4 h-4 sm:w-5 sm:h-5 hover:opacity-70 cursor-pointer" />
+				<div className="relative order-1 sm:order-none" onClick={handleChatClick}>
+					<MessageSquareText className="w-4 h-4 sm:w-5 sm:h-5 hover:opacity-70 cursor-pointer" />
+					{isAuthenticated && hasUnreadMessages && (
+						<span className="absolute rounded-full size-2 bg-red-500 -top-1 -right-1"></span>
+					)}
+				</div>
 				<ShoppingBag className="order-2 sm:order-none w-4 h-4 sm:w-5 sm:h-5 hover:opacity-70 cursor-pointer" />
 				<div className="order-3 sm:order-none inline-flex items-center gap-1 sm:gap-2 cursor-pointer group">
 					<Newspaper className="w-4 h-4 sm:w-5 sm:h-5 group-hover:opacity-70" />

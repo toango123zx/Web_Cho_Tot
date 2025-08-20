@@ -4,6 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { uploadFileToCloudinary } from '@/services/api/cloudinary';
 import { useSocket } from '@/components/context/SocketContext';
 import { toast } from 'sonner';
+import { useChatRoomRead } from '@/hooks';
 
 interface UploadedImage {
 	id: string;
@@ -18,12 +19,19 @@ interface UploadedImage {
 interface Props {
 	chatRoom: IChatRoom;
 	currentUserId: string;
+	onMessageSent?: (chatRoomId: string, message: IMessage) => void;
+	onMessageReceived?: (chatRoomId: string) => void;
 }
 
 import { useInfiniteMessages } from '@/services/query/chatRoom';
 
-export function Chat({ chatRoom, currentUserId }: Props) {
-	const [localMessages, setLocalMessages] = useState<IMessage[]>(chatRoom.messages || []);
+export function Chat({
+	chatRoom,
+	currentUserId,
+	onMessageSent,
+	onMessageReceived,
+}: Props) {
+	const [localMessages, setLocalMessages] = useState<IMessage[]>([]);
 	const [input, setInput] = useState('');
 	const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
 	const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -32,6 +40,20 @@ export function Chat({ chatRoom, currentUserId }: Props) {
 	const { socket, isConnected } = useSocket();
 	const otherUser = chatRoom.secondUser;
 	const currentUser = chatRoom.firstUser;
+	const { markCurrentChatRoomAsRead } = useChatRoomRead();
+
+	useEffect(() => {
+		setLocalMessages([]);
+		setInput('');
+		setUploadedImages((prev) => {
+			prev.forEach((img) => URL.revokeObjectURL(img.preview));
+			return [];
+		});
+
+		if (chatRoom.id) {
+			markCurrentChatRoomAsRead(chatRoom.id);
+		}
+	}, [chatRoom.id, markCurrentChatRoomAsRead]);
 
 	const scrollToBottom = () => {
 		if (scrollAreaRef.current) {
@@ -116,13 +138,11 @@ export function Chat({ chatRoom, currentUserId }: Props) {
 		}
 	};
 
-	// Infinite loading messages
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteMessages({
 		chatRoomId: chatRoom.id,
 		limit: 20,
 	});
 
-	// Merge pages and sort by createdAt ascending
 	useEffect(() => {
 		const pages = data?.pages
 			?.filter((p) => p.success)
@@ -132,17 +152,17 @@ export function Chat({ chatRoom, currentUserId }: Props) {
 			merged.sort(
 				(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
 			);
-			setLocalMessages((prev) => {
-				// If lengths differ significantly (new page loaded), replace; otherwise keep realtime additions
-				if (merged.length >= prev.length) return merged;
-				return prev;
-			});
+			setLocalMessages(merged);
 		}
-	}, [data]);
+	}, [data, chatRoom.id]);
 
 	useEffect(scrollToBottom, [localMessages]);
 
-	// Handle loading older messages when scroll reaches top
+	useEffect(() => {
+		const timer = setTimeout(scrollToBottom, 100);
+		return () => clearTimeout(timer);
+	}, [chatRoom.id]);
+
 	const handleScroll = useCallback(() => {
 		if (!scrollAreaRef.current) return;
 		const viewport = scrollAreaRef.current.querySelector(
@@ -152,7 +172,6 @@ export function Chat({ chatRoom, currentUserId }: Props) {
 		if (viewport.scrollTop <= 0 && hasNextPage && !isFetchingNextPage) {
 			const prevHeight = viewport.scrollHeight;
 			fetchNextPage().then(() => {
-				// Maintain scroll position after prepending
 				requestAnimationFrame(() => {
 					const newHeight = viewport.scrollHeight;
 					viewport.scrollTop = newHeight - prevHeight;
@@ -188,10 +207,18 @@ export function Chat({ chatRoom, currentUserId }: Props) {
 					const exists = prev.some((msg) => msg.id === newMessage.id);
 					return exists ? prev : [...prev, newMessage];
 				});
+
+				if (onMessageReceived) {
+					onMessageReceived(chatRoom.id);
+				}
 			}
 		};
 
 		socket.on('newMessage', handleNewMessage);
+
+		return () => {
+			socket.off('newMessage', handleNewMessage);
+		};
 	}, [socket, isConnected, chatRoom.id, currentUserId]);
 
 	useEffect(() => {
@@ -206,6 +233,11 @@ export function Chat({ chatRoom, currentUserId }: Props) {
 		const newMessage = createMessage(input.trim(), 'TEXT');
 		sendToSocket(input.trim(), 'TEXT');
 		setLocalMessages((prev) => [...prev, newMessage]);
+
+		if (onMessageSent) {
+			onMessageSent(chatRoom.id, newMessage);
+		}
+
 		setInput('');
 	};
 
@@ -265,6 +297,10 @@ export function Chat({ chatRoom, currentUserId }: Props) {
 			const textMessage = createMessage(input.trim(), 'TEXT');
 			sendToSocket(input.trim(), 'TEXT');
 			setLocalMessages((prev) => [...prev, textMessage]);
+
+			if (onMessageSent) {
+				onMessageSent(chatRoom.id, textMessage);
+			}
 		}
 
 		const previouslyUploadedImages = uploadedImages.filter(
@@ -284,6 +320,10 @@ export function Chat({ chatRoom, currentUserId }: Props) {
 
 			sendToSocket(image.cloudinaryUrl!, 'IMAGE');
 			setLocalMessages((prev) => [...prev, imageMessage]);
+
+			if (onMessageSent) {
+				onMessageSent(chatRoom.id, imageMessage);
+			}
 
 			if (index < allUploadedImages.length - 1) {
 				await new Promise((resolve) => setTimeout(resolve, 200));
@@ -355,6 +395,7 @@ export function Chat({ chatRoom, currentUserId }: Props) {
 
 	const getButtonTitle = () => {
 		if (!isConnected) return 'Mất kết nối';
+		return 'Gửi tin nhắn';
 	};
 
 	const isButtonDisabled = () => {

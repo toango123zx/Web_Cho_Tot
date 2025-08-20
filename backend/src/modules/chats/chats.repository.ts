@@ -52,6 +52,16 @@ export class ChatsRepository {
 				},
 				data: {
 					updatedAt: new Date(),
+					messages: {
+						updateMany: {
+							where: {
+								isRead: false,
+							},
+							data: {
+								isRead: true,
+							},
+						},
+					},
 				},
 			});
 
@@ -73,6 +83,27 @@ export class ChatsRepository {
 					},
 				},
 			});
+		});
+	}
+
+	async updateMessageIsRead({
+		messageId,
+		isRead = true,
+	}: {
+		messageId: string;
+		isRead: boolean;
+	}): Promise<MessagesEntity> {
+		return this.prismaService.messages.update({
+			include: {
+				user: true,
+			},
+			where: {
+				id: messageId,
+				isRead: false,
+			},
+			data: {
+				isRead: isRead,
+			},
 		});
 	}
 }

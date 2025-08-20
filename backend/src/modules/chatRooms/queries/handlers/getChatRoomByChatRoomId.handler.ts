@@ -38,6 +38,18 @@ export class GetChatRoomByChatRoomIdHandler
 			throw new NotFoundException('chatRoomId');
 		}
 
+		if (
+			chatRoom.messages &&
+			chatRoom.messages.length > 0 &&
+			chatRoom.messages[0].isRead === false &&
+			chatRoom.messages[0].userId !== myInformation.id
+		) {
+			await this.chatsRepository.updateMessageIsRead({
+				messageId: chatRoom.messages[0].id,
+				isRead: true,
+			});
+		}
+
 		const messages = (
 			await this.chatsRepository.findMessages({
 				chatRoomId: chatRoom.id,

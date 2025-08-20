@@ -3,9 +3,16 @@ import { Chat } from './Chat';
 interface Props {
 	chatRoom: IChatRoom;
 	currentUserId: string;
+	onMessageSent?: (chatRoomId: string, message: IMessage) => void;
+	onMessageReceived?: (chatRoomId: string) => void;
 }
 
-export function ChatRoom({ chatRoom, currentUserId }: Props) {
+export function ChatRoom({
+	chatRoom,
+	currentUserId,
+	onMessageSent,
+	onMessageReceived,
+}: Props) {
 	if (!chatRoom) {
 		return (
 			<div className="flex items-center justify-center h-full bg-gray-50">
@@ -34,5 +41,12 @@ export function ChatRoom({ chatRoom, currentUserId }: Props) {
 		);
 	}
 
-	return <Chat chatRoom={chatRoom} currentUserId={currentUserId} />;
+	return (
+		<Chat
+			chatRoom={chatRoom}
+			currentUserId={currentUserId}
+			onMessageSent={onMessageSent}
+			onMessageReceived={onMessageReceived}
+		/>
+	);
 }
