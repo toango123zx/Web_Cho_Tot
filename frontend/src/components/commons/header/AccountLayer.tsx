@@ -1,6 +1,7 @@
 import { GoodCoinIcon } from '@/assets/icons';
 import { ChevronRight, Pencil, Star } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useUserTotalBalance } from '@/services/query/transaction';
 
 interface AccountLayerProps {
 	accountLayerRef: React.RefObject<HTMLDivElement | null>;
@@ -25,11 +26,12 @@ export function AccountLayer({
 
 	const handleRegisterClick = () =>
 		window.open(
-			'/register',
+			'/register?popup=1',
 			'_blank',
 			'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
 		);
 	const navigate = useNavigate();
+	const { data: totalBalance, isLoading: isLoadingBalance } = useUserTotalBalance();
 
 	return (
 		<div
@@ -146,11 +148,14 @@ export function AccountLayer({
 								<span>0</span>
 							</span>
 						</div>
-						<div className="shadow-lg px-3 py-2 rounded-lg flex flex-col flex-1">
+						<div
+							className="shadow-lg px-3 py-2 rounded-lg flex flex-col flex-1 cursor-pointer"
+							onClick={() => navigate('/transactions')}
+						>
 							<span>Đồng Tốt</span>
 							<span className="inline-flex gap-2 mt-1">
 								<img src={GoodCoinIcon} alt="Coin" width={16} height={16} />
-								<span>0</span>
+								<span>{isLoadingBalance ? '...' : (totalBalance?.balance ?? 0)}</span>
 							</span>
 						</div>
 					</div>
@@ -214,7 +219,10 @@ export function AccountLayer({
 					<div className="px-3 py-2 font-semibold text-gray-500 bg-gray-200">
 						Dịch vụ trả phí
 					</div>
-					<div className="hover:bg-gray-100 px-3 py-2 flex items-center gap-2">
+					<div
+						className="hover:bg-gray-100 px-3 py-2 flex items-center gap-2 cursor-pointer"
+						onClick={() => navigate('/transactions')}
+					>
 						<img src={GoodCoinIcon} className="size-5" alt="Good coin Icon" />
 						<span>Đồng Tốt</span>
 					</div>
@@ -225,7 +233,9 @@ export function AccountLayer({
 							className="size-5"
 							alt="Good coin Icon"
 						/>
-						<span>Lịch sử giao dịch</span>
+						<span onClick={() => navigate('/transactions-history')}>
+							Lịch sử giao dịch
+						</span>
 					</div>
 
 					<div className="px-3 py-2 font-semibold text-gray-500 bg-gray-200">Khác</div>

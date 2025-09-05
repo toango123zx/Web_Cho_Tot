@@ -191,7 +191,10 @@ export default function LoginForm() {
 						<Button
 							variant="link"
 							className="text-blue-600 font-medium p-0 h-auto"
-							onClick={() => navigate('/register')}
+							onClick={() => {
+								if (isPopup) navigate('/register?popup=1');
+								else navigate('/register');
+							}}
 						>
 							Đăng ký tài khoản mới
 						</Button>

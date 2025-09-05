@@ -20,6 +20,12 @@ export const QUERY_KEY = {
 	getPostsByUserId: (userId: string) => ['posts', 'user', userId],
 	getArchivedPosts: (params?: Record<string, any>) => ['archived-posts', params],
 	getNotifications: () => ['notifications'],
+	getUserTotalBalance: () => ['user', 'total-balance'],
+	getTransactionHistory: (page: number, limit: number) => [
+		'transaction-history',
+		page,
+		limit,
+	],
 	getChatRooms: (page: number, limit: number, search: string) => {
 		return ['fetchRoomChats', page, limit, search] as const;
 	},

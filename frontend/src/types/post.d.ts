@@ -22,6 +22,7 @@ interface IPost {
 	updatedAt: string;
 	status: IPostStatus;
 	postImages: IPostImage[];
+	isArchived?: boolean;
 }
 
 interface IPostWithCategoryAndUser extends IPost {

@@ -1,4 +1,5 @@
 import { AuthModule } from './auth/auth.module';
+import { TransactionsModule } from './transactions/transactions.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ChatRoomsModule } from './chatRooms/chatRooms.module';
 import { ChatsModule } from './chats/chats.module';

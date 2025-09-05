@@ -27,6 +27,9 @@ import UpdatePost from './pages/UpdatePost.tsx';
 import SavedPostsPage from './pages/SavedPostsPage.tsx';
 import SearchResults from './pages/SearchResults.tsx';
 import { SocketProvider } from '@/components/context/SocketContext.tsx';
+import TransactionsPage from './pages/TransactionPage.tsx';
+import { SolanaWalletContext } from './components/context/SolanaWalletProvider.tsx';
+import TransactionHistory from './pages/TransactionHistory.tsx';
 import { MessageListenerProvider } from '@/components/context/MessageListenerContext.tsx';
 import Chat from './pages/Chat.tsx';
 
@@ -101,6 +104,22 @@ const router = createBrowserRouter([
 				),
 			},
 			{
+				path: '/transactions',
+				element: (
+					<ProtectedRoute>
+						<TransactionsPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/transactions-history',
+				element: (
+					<ProtectedRoute>
+						<TransactionHistory />
+					</ProtectedRoute>
+				),
+			},
+			{
 				path: '/chats',
 				element: <Chat />,
 			},
@@ -148,16 +167,18 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<AppProvider>
-				<SocketProvider>
-					<MessageListenerProvider>
-						<RouterProvider router={router} />
-						<Toaster />
-						<ReactQueryDevtools initialIsOpen={false} />
-					</MessageListenerProvider>
-				</SocketProvider>
-			</AppProvider>
-		</QueryClientProvider>
+		<SolanaWalletContext>
+			<QueryClientProvider client={queryClient}>
+				<AppProvider>
+					<SocketProvider>
+						<MessageListenerProvider>
+							<RouterProvider router={router} />
+							<Toaster />
+							<ReactQueryDevtools initialIsOpen={false} />
+						</MessageListenerProvider>
+					</SocketProvider>
+				</AppProvider>
+			</QueryClientProvider>
+		</SolanaWalletContext>
 	</StrictMode>,
 );
