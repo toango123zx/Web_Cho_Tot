@@ -18,6 +18,7 @@ import { MyInformation } from 'src/modules/users/decorators';
 import { UserInformationDto } from 'src/modules/users/dtos';
 
 import {
+	ForgotPasswordCommand,
 	LoginCommand,
 	RefreshTokenCommand,
 	RegisterCommand,
@@ -25,6 +26,8 @@ import {
 } from './commands/implements';
 import { AuthRefreshToken, RefreshToken } from './decorators';
 import {
+	ForgotPasswordRequestDto,
+	ForgotPasswordResponseDto,
 	LoginRequestDto,
 	LoginResponseDto,
 	RegisterRequestDto,
@@ -89,5 +92,12 @@ export class AuthController {
 		@Body() sendOtp: SendOtpRequestDto,
 	): Promise<HttpResponseBodyDto<string | HttpException>> {
 		return this.commandBus.execute(new SendOtpToEmailCommand(sendOtp.email));
+	}
+
+	@Post('forgot-password')
+	async forgotPassword(
+		@Body() forgotPassword: ForgotPasswordRequestDto,
+	): Promise<HttpResponseBodyDto<ForgotPasswordResponseDto | HttpException>> {
+		return this.commandBus.execute(new ForgotPasswordCommand(forgotPassword));
 	}
 }
