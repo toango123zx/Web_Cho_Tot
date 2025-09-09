@@ -28,9 +28,9 @@ model chatRooms {
 model messages {
     id        String          @id @default(uuid())
     /// @DtoUpdateHidden
-    roomId    String          @map("room_id")
+    chatRoomId    String          @map("room_id")
     /// @DtoRelationCanConnectOnCreate
-    room      chatRooms       @relation(fields: [roomId], references: [id])
+    chatRoom      chatRooms       @relation(fields: [chatRoomId], references: [id])
     /// @DtoUpdateHidden
     userId    String          @map("user_id")
     /// @DtoRelationCanConnectOnCreate

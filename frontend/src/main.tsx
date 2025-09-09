@@ -30,6 +30,8 @@ import { SocketProvider } from '@/components/context/SocketContext.tsx';
 import TransactionsPage from './pages/TransactionPage.tsx';
 import { SolanaWalletContext } from './components/context/SolanaWalletProvider.tsx';
 import TransactionHistory from './pages/TransactionHistory.tsx';
+import { MessageListenerProvider } from '@/components/context/MessageListenerContext.tsx';
+import Chat from './pages/Chat.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -117,6 +119,10 @@ const router = createBrowserRouter([
 					</ProtectedRoute>
 				),
 			},
+			{
+				path: '/chats',
+				element: <Chat />,
+			},
 		],
 	},
 
@@ -165,9 +171,11 @@ createRoot(document.getElementById('root')!).render(
 			<QueryClientProvider client={queryClient}>
 				<AppProvider>
 					<SocketProvider>
-						<RouterProvider router={router} />
-						<Toaster />
-						<ReactQueryDevtools initialIsOpen={false} />
+						<MessageListenerProvider>
+							<RouterProvider router={router} />
+							<Toaster />
+							<ReactQueryDevtools initialIsOpen={false} />
+						</MessageListenerProvider>
 					</SocketProvider>
 				</AppProvider>
 			</QueryClientProvider>

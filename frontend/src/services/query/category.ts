@@ -18,6 +18,9 @@ export const useGetCategories = ({ page, limit, search }: CategoryQueryProps) =>
 		queryKey: QUERY_KEY.getCategoryPaginate(page, search),
 		queryFn: () => getCategoriesAPI({ page, limit, search }),
 		staleTime: 1000 * 60 * 5, // 5 minutes
+		gcTime: 1000 * 60 * 5,
+		refetchOnWindowFocus: true,
+		refetchOnMount: true,
 	});
 
 	return query;
@@ -49,7 +52,10 @@ export const useGetAllCategories = () => {
 	const query = useQuery({
 		queryKey: QUERY_KEY.getAllCategories(),
 		queryFn: () => getCategoriesAPI({ page: 1, limit: 1000 }),
-		staleTime: 1000 * 60 * 10, // 10 minutes
+		staleTime: 0, // Always fetch fresh data
+		gcTime: 1000 * 60 * 10, // Keep in cache for 10 minutes
+		refetchOnWindowFocus: true, // Refetch when window gains focus
+		refetchOnMount: true, // Always refetch on mount
 	});
 
 	return query;

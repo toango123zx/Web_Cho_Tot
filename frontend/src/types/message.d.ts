@@ -1,10 +1,15 @@
+type MessageType = 'TEXT' | 'IMAGE';
+
 interface IMessage {
-	_id: string;
-	senderId: string;
-	receiverId: string;
-	message: string;
-	createdAt: string;
-	updatedAt: string;
+	id?: string;
+	userId: string;
+	name: string;
+	avatar: string;
+	chatRoomId: string;
+	content: string;
+	type: MessageType;
+	createdAt: Date;
+	isRead: boolean;
 }
 
 interface IOnlineUser {

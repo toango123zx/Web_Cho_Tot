@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { AppGateway } from 'src/gateway/app.gateway';
 import { AuthModule } from 'src/modules/auth/auth.module';
+import { AppGateway } from 'src/modules/gateway/app.gateway';
 
 import { UserRepository } from 'src/modules/users/users.repository';
 

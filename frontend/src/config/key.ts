@@ -26,4 +26,11 @@ export const QUERY_KEY = {
 		page,
 		limit,
 	],
+	getChatRooms: (page: number, limit: number, search: string) => {
+		return ['fetchRoomChats', page, limit, search] as const;
+	},
+	getChatRoomByChatRoomId: (
+		chatRoomId: string,
+		params: { page: number; limit: number },
+	) => ['fetchRoomChatByChatRoomId', chatRoomId, params],
 };

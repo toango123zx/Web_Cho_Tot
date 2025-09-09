@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useCurrentApp } from '@/components/context/AppContext';
 import { Button, Avatar, AvatarFallback, AvatarImage } from '@/components/ui';
 import {
@@ -21,6 +21,8 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { QUERY_KEY } from '@/config/key';
+import { useCreateChatRoom } from '@/services/query/chatRoom';
+import { getChatRoomsAPI } from '@/services/api/chatRoom';
 
 const ageMap: Record<string, string> = {
 	PUPPY: 'Chó con',
@@ -30,8 +32,9 @@ const ageMap: Record<string, string> = {
 };
 
 export default function ProductDetailPage() {
-	const { isAuthenticated } = useCurrentApp();
+	const { isAuthenticated, user: currentUser } = useCurrentApp();
 	const { id } = useParams<{ id: string }>();
+	const navigate = useNavigate();
 	const { data, isLoading, isError, refetch } = usePostById(id || '');
 	const [currentImageIdx, setCurrentImageIdx] = useState(0);
 	const [showPhone, setShowPhone] = useState(false);
@@ -39,6 +42,7 @@ export default function ProductDetailPage() {
 	const queryClient = useQueryClient();
 	const toggleArchiveMutation = useToggleArchivePost();
 	const { data: archivedData } = useArchivedPosts({ page: 1, limit: 100 });
+	const createChatRoomMutation = useCreateChatRoom();
 	const archivedIds =
 		archivedData && archivedData.success && Array.isArray(archivedData.data)
 			? (archivedData.data as { id: string }[]).map((p) => p.id)
@@ -125,6 +129,60 @@ export default function ProductDetailPage() {
 	};
 	const handleNext = () => {
 		setCurrentImageIdx((prev) => (prev === thumbnails.length - 1 ? 0 : prev + 1));
+	};
+
+	const handleChatClick = async () => {
+		const openLoginPopup = () => {
+			window.open(
+				'/login?popup=1',
+				'_blank',
+				'noopener,noreferrer,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=420,height=680',
+			);
+		};
+
+		if (!isAuthenticated) {
+			openLoginPopup();
+			return;
+		}
+		if (!user?.id || createChatRoomMutation.isPending) return;
+
+		const sellerId = user.id;
+		if (currentUser?.id && currentUser.id === sellerId) {
+			toast.error('Không thể chat với chính mình');
+			return;
+		}
+		try {
+			const existing = await getChatRoomsAPI(1, 1, sellerId);
+			if (existing?.success && Array.isArray(existing.data) && existing.data.length > 0) {
+				const roomId = existing.data[0].id;
+				navigate(`/chats?room=${roomId}`);
+				return;
+			}
+
+			createChatRoomMutation.mutate(
+				{ userId: sellerId },
+				{
+					onSuccess: (res: any) => {
+						if (res?.success) {
+							queryClient.invalidateQueries({
+								queryKey: QUERY_KEY.getChatRooms(1, 10, ''),
+							});
+							const newRoomId = res.data?.id;
+							if (newRoomId) navigate(`/chats?room=${newRoomId}`);
+						} else {
+							toast.error(res?.message || 'Tạo cuộc trò chuyện thất bại');
+						}
+					},
+					onError: (err: any) => {
+						toast.error(err?.response?.data?.message || 'Không thể tạo cuộc trò chuyện');
+					},
+				},
+			);
+		} catch (error: any) {
+			toast.error(
+				error?.response?.data?.message || 'Có lỗi xảy ra khi kiểm tra cuộc trò chuyện',
+			);
+		}
 	};
 
 	return (
@@ -264,7 +322,10 @@ export default function ProductDetailPage() {
 									{showPhone ? userPhone : `Hiện số ${phoneMasked}`}
 								</Button>
 							)}
-							<Button className="bg-yellow-400 text-black hover:bg-yellow-500 text-sm">
+							<Button
+								className="bg-yellow-400 text-black hover:bg-yellow-500 text-sm"
+								onClick={handleChatClick}
+							>
 								<MessageSquare className="w-4 h-4 mr-2" /> Chat
 							</Button>
 						</div>

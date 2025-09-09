@@ -5,7 +5,7 @@ export class ConflictException extends HttpException {
 		super(
 			{
 				success: false,
-				message: `Resources already exist ${location}`,
+				message: `Đã tồn tại ${location}`,
 			},
 			HttpStatus.CONFLICT,
 		);
