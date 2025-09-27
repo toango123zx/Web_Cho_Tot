@@ -277,10 +277,6 @@ The application uses PostgreSQL with Prisma ORM. Key models include:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
-
-For support, email support@example.com or join our Discord community.
-
 ---
 
 **Note**: This is a development version. For production deployment, ensure proper security configurations and environment setup.
